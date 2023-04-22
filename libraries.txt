@@ -1,0 +1,37 @@
+npm i @react-navigation/native-stack
+npm i @react-navigation/native
+npm i react-native-safe-area-context
+npm i react-native-screens
+
+npm i firebase
+npm i @react-native-async-storage/async-storage
+
+npm install @react-navigation/drawer
+npm i react-native-gesture-handler
+npm i react-native-vector-icons
+npm i react-native-reanimated
+
+npm i @react-native-community/datetimepicker
+npm i react-native-animatable
+npm i react-native-linear-gradient
+
+npm i @react-navigation/bottom-tabs
+npm i react-native-circular-progress-indicator
+npm i react-native-svg 
+npm install react-native-month-year-picker
+
+npm install react-native-dialog-input
+npm install react-native-modal
+npm install react-native-image-picker 
+npm install react-native-root-toast
+npm install @react-navigation/material-top-tabs
+npm install react-native-tab-view   
+npm install react-native-pager-view
+
+npm install react-native-chart-kit
+npm install react-native-svg@13.4.0
+npm i trny
+
+cd android     
+./gradlew clean
+cd ..
