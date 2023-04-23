@@ -13,6 +13,7 @@ import AddIncome from "./Components/Income/AddIncome";
 import Visualisation from "./Components/Visualisation/Visualisation";
 import Header from "./Components/Header";
 import ConfirmUntrackedIncTrans from "./Components/Income/ConfirmUntrackedIncTrans";
+import AddExpense from "./Components/Expense/AddExpense";
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -63,7 +64,7 @@ const App = () => {
         <Stack.Screen name="Sign Up" component={SignUp} options={{ headerTitle: () => <Header></Header> }} />
         <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}/>
         <Stack.Screen name="AddIncome" component={AddIncome} options={{headerTitle: () => <Header></Header>}}/>
-        {/* <Stack.Screen name="AddExpense" component={AddExpense} options={{headerTitle: () => <Header></Header>}}/> */}
+        <Stack.Screen name="AddExpense" component={AddExpense} options={{headerTitle: () => <Header></Header>}}/>
         <Stack.Screen name="Visualisation" component={Visualisation} options={{headerTitle: () => <Header></Header>}}/>
         <Stack.Screen name="AddFixedExp" component={AddFixedExp} />
         <Stack.Screen name="ConfirmUntrackedIncTrans" component={ConfirmUntrackedIncTrans} />

@@ -32,6 +32,9 @@ npm install react-native-chart-kit
 npm install react-native-svg@13.4.0
 npm i trny
 
+npm install react-native-vision-camera
+npm i vision-camera-code-scanner
+
 cd android     
 ./gradlew clean
 cd ..
