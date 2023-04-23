@@ -1,8 +1,9 @@
-import { View, TouchableOpacity, Image, StatusBar} from "react-native";
+import { View, TouchableOpacity, Image, StatusBar, Pressable, StyleSheet} from "react-native";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { DrawerContent } from './Components/DrawerContent';
 import HomePage from "./Components/HomePage";
 import ProfileScreen from "./Components/ProfileScreen";
+import EditProfile from "./Components/EditProfile";
 import FixedExp from "./Components/FixedExpenses/FixedExp";
 import AddFixedExp from "./Components/FixedExpenses/AddFixedExp";
 import Budget from "./Components/Budget/Budget";
@@ -14,6 +15,7 @@ import Visualisation from "./Components/Visualisation/Visualisation";
 import Header from "./Components/Header";
 import ConfirmUntrackedIncTrans from "./Components/Income/ConfirmUntrackedIncTrans";
 import AddExpense from "./Components/Expense/AddExpense";
+import AddGrpExpMembers from "./Components/Expense/AddGrpExpMembers";
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -21,7 +23,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
-function Root() {
+function Root({navigation}) {
   return (
     <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />} >
       <Drawer.Screen name="HomePage"
@@ -47,7 +49,27 @@ function Root() {
               },
             }}
           />
-      <Drawer.Screen name="Profile" component={ProfileScreen} />
+      <Drawer.Screen name="Profile" component={ProfileScreen}
+        options={{
+          drawerIcon: ({ focused, size }) => (
+            <Image
+              source={require("./Assets/profile.png")}
+              style={[focused ? styles.drawerActive : styles.drawerInActive, { height: 20, width: 20}]}
+            />
+          ),
+          drawerActiveTintColor:"#006A42",
+          headerRight: () => (
+            <View style={{marginRight: 10}}>
+              <Pressable onPress={() => navigation.navigate('EditProfile')}>
+              <Image
+              source={require("./Assets/Profile_edit.png")}
+              style={ { height: 25, width: 25}} 
+            />
+            </Pressable>
+            </View>
+          ),
+        }}
+      />
       <Drawer.Screen name="FixedExp" component={FixedExp} />
       <Drawer.Screen name="Budget" component={Budget} />
     </Drawer.Navigator>
@@ -68,9 +90,20 @@ const App = () => {
         <Stack.Screen name="Visualisation" component={Visualisation} options={{headerTitle: () => <Header></Header>}}/>
         <Stack.Screen name="AddFixedExp" component={AddFixedExp} />
         <Stack.Screen name="ConfirmUntrackedIncTrans" component={ConfirmUntrackedIncTrans} />
+        <Stack.Screen name="AddGrpExpMembers" component={AddGrpExpMembers} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   )
 }
 
 export default App;
+
+const styles = StyleSheet.create({
+  drawerActive: {
+    // color:'#006A42',
+  },
+  drawerInActive: {
+
+  }
+});

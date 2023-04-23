@@ -113,20 +113,28 @@ export default function RedirectToPaymentApps(props) {
 	}
 
 	// This function is triggered when the "Select an image" button pressed
-	const showImagePicker = async () => {
-
-		const result = await ImagePicker.launchImageLibrary();
-		console.log(result.assets[0].uri, "file");
-		setPickedImagePath(result.assets[0].uri);
-
-	};
+	const showImagePicker = () => {
+		ImagePicker.launchImageLibrary()
+			.then((result) => {
+				if (result) {
+					setPickedImagePath(result.assets[0].uri);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}
 
 	// This function is triggered when the "Open camera" button pressed
-	const openCamera = async () => {
-		const result = await ImagePicker.launchCamera();
-		console.log(result.assets[0].uri, "file");
-		setPickedImagePath(result.assets[0].uri);
-
+	const openCamera = () => {
+		ImagePicker.launchCamera()
+			.then((result) => {
+				console.log(result.assets[0].uri, "file");
+				setPickedImagePath(result.assets[0].uri);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 	};
 
 	const saveExpense = async () => {

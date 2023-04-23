@@ -91,23 +91,29 @@ export default function ScanBills() {
 
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const showImagePicker = async () => {
+  const showImagePicker = () => {
+		ImagePicker.launchImageLibrary()
+			.then((result) => {
+				if (result) {
+					setPickedImagePath(result.assets[0].uri);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}
 
-
-    const result = await ImagePicker.launchImageLibrary();
-    console.log(result.assets[0].uri, "file");
-    setPickedImagePath(result.assets[0].uri);
-    
-  };
-
-  const openCamera = async () => {
-    // Ask the user for the permission to access the camera
-    
-    const result = await ImagePicker.launchCamera();
-    console.log(result.assets[0].uri, "file");
-    setPickedImagePath(result.assets[0].uri);
-  
-  };
+	// This function is triggered when the "Open camera" button pressed
+	const openCamera = () => {
+		ImagePicker.launchCamera()
+			.then((result) => {
+				console.log(result.assets[0].uri, "file");
+				setPickedImagePath(result.assets[0].uri);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
 
   const handleFilePick = async () => {
     try {
@@ -512,6 +518,8 @@ export default function ScanBills() {
         </Background>
       );
 }
+
+
 const styles = StyleSheet.create({
 
   mainContainer : {

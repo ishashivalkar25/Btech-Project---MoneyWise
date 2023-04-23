@@ -70,7 +70,7 @@ export default function MyPieChart(props) {
                     borderRadius: 16,
                 }}
                 accessor="amount"
-                backgroundColork="transparent"
+                backgroundColor="transparent"
                 paddingLeft="2"
                 absolute //for the absolute number remove if you want percentage
             />

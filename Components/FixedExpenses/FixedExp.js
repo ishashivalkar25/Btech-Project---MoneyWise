@@ -25,7 +25,7 @@ import {
 	deleteDoc 
 } from '../../Firebase/config';
 // import DateTimePicker from '@react-native-community/datetimepicker';
-import { darkGreen } from '../../Assets/Constants';
+import { darkGreen } from '../Constants';
 import { NavigationScreenProp } from '@react-navigation/native';
 // import {useNavigation} from '@react-navigation/core';
 import {
@@ -39,6 +39,8 @@ import {
 	TouchableRipple,
 	Switch
 } from 'react-native-paper';
+//notifications import
+import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -47,6 +49,8 @@ const FixedExp = ({ navigation, route }) => {
 	const [fixedExpenses, setFixedExpenses] = useState([]);
 	const [extraData, setExtraData] = useState(false);
 	const [isEnabled, setIsEnabled] = React.useState(false);
+	const [ExpName,setExpName] = React.useState();
+	const [date,setDate] = React.useState();
 
 
 	React.useEffect(() => {
@@ -113,18 +117,63 @@ const FixedExp = ({ navigation, route }) => {
 		return tempDate.getDate() + '/' + (tempDate.getMonth() + 1) + '/' + tempDate.getFullYear();
 	}
 
+	async function onCreateTriggerNotification() {
+
+		// Create a channel (required for Android)
+		const channelId = await notifee.createChannel({
+		  id: 'default',
+		  name: 'Default Channel',
+		});
+		
+		
+		// Create a time-based trigger
+		const trigger = {
+		  id:ExpName,
+		  type: TriggerType.TIMESTAMP,
+		  timestamp: notifyTime  , 
+		};
+		
+		// Create a trigger notification
+		await notifee.createTriggerNotification({
+		  title: 'Time to pay fixed expense',
+		  body: ExpName,
+		  android: {
+			channelId,
+		  },
+		}, trigger);
+		
+		}
+
+	async function cancelNotifee(notificationId) {
+		console.log('canceling notification', notificationId)
+
+		await notifee.cancelTriggerNotification(notificationId);
+	  }
+
+
 	const toggleSwitch = (item, val) => {
 		setIsEnabled(previousState => !previousState);
 		console.log(val, "Val")
+
 		if (val) {
 			// navigation.navigate("AddGrpExpMembers", {
 			// 	splitAmount: 1000,
 			// })
+			item.status='Paid'
+			// setExtraData(true)
+			// setExtraData(false)
 			updateFixedExpStatus(item,"Paid");
+			notifee.getTriggerNotifications();
+			console.log(notifee.getTriggerNotifications());
+			cancelNotifee(item.ExpName);
 		}
 		else
 		{
+			item.status='Unpaid'
 			updateFixedExpStatus(item,"Unpaid");
+			setExpName(item.ExpName);
+			setDate(item.dueDate);
+			onCreateTriggerNotification()
 		}
 	}
 
@@ -175,9 +224,9 @@ const FixedExp = ({ navigation, route }) => {
 											<Text style={styles.fixedExpContainerText}>Paid </Text>
 											<Switch
 												trackColor={{ false: '#767577', true: 'lightgreen' }}
-												thumbColor={isEnabled ? 'green' : 'white'}
+												thumbColor={(item.status==='Unpaid') ? 'green' : 'white'}
 												onValueChange={(val) => toggleSwitch(item, val)}
-												value={isEnabled}
+												value={(item.status==='Unpaid') ?false:true}
 											/>
 										</View>
 									</View>
@@ -242,7 +291,6 @@ const FixedExp = ({ navigation, route }) => {
 							/>
 						</View>
 					</View>
-				
 				</View>
 			</View>
 		</ImageBackground>

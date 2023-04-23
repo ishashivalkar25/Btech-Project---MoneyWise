@@ -38,7 +38,7 @@ const { width, height } = Dimensions.get("window");
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-export default function ManualAdditionOfExpense(props) {
+export default function ManualAdditionOfExpense({navigation}) {
 
 	const [category, setCategory] = useState([]);
 	const [userExpCategories, setUserExpCategories] = useState([]);
@@ -53,8 +53,15 @@ export default function ManualAdditionOfExpense(props) {
 
 
 	const [isEnabled, setIsEnabled] = useState(false);
-	const toggleSwitch = () => {
+
+	const toggleSwitch = (val) => {
 		setIsEnabled(previousState => !previousState);
+		console.log(isEnabled)
+		if(val){
+			navigation.navigate("AddGrpExpMembers", {
+			splitAmount : 1000,
+			})
+		}
 	}
 
 	useEffect(() => {
@@ -102,24 +109,28 @@ export default function ManualAdditionOfExpense(props) {
 		Image.resolveAssetSource(uploadImg).uri
 	);
 
-	// This function is triggered when the "Select an image" button pressed
-	const showImagePicker = async () => {
+	const showImagePicker = () => {
+		ImagePicker.launchImageLibrary()
+			.then((result) => {
+				if (result) {
+					setPickedImagePath(result.assets[0].uri);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}
 
-
-		const result = await ImagePicker.launchImageLibrary();
-		console.log(result.assets[0].uri, "file");
-		setPickedImagePath(result.assets[0].uri);
-
-	};
-
-	// // This function is triggered when the "Open camera" button pressed
-	const openCamera = async () => {
-		// Ask the user for the permission to access the camera
-
-		const result = await ImagePicker.launchCamera();
-		console.log(result.assets[0].uri, "file");
-		setPickedImagePath(result.assets[0].uri);
-
+	// This function is triggered when the "Open camera" button pressed
+	const openCamera = () => {
+		ImagePicker.launchCamera()
+			.then((result) => {
+				console.log(result.assets[0].uri, "file");
+				setPickedImagePath(result.assets[0].uri);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 	};
 
 	const saveExpense = async () => {
@@ -251,7 +262,6 @@ export default function ManualAdditionOfExpense(props) {
 					});
 				}
 
-
 				//Update budget
 				const recordId = months[date.getMonth()] + "" + date.getFullYear();
 				console.log(recordId);
@@ -292,7 +302,7 @@ export default function ManualAdditionOfExpense(props) {
 			}
 
 			alert("Record Added Successfully");
-			props.navigation.replace("HomePage");
+			navigation.replace("HomePage");
 
 
 		} catch (e) {
@@ -416,14 +426,14 @@ export default function ManualAdditionOfExpense(props) {
 							</View>
 						</Modal>
 
-						<View style={styles.container2}>
-							<Text>Group Expense : </Text>
-							<Switch
-								trackColor={{ false: '#767577', true: 'lightgreen' }}
-								thumbColor={isEnabled ? 'green' : 'white'}
-								onValueChange={toggleSwitch}
-								value={isEnabled}
-							/>
+						<View style = {[styles.grpExpcontainer, styles.container1]}>
+						<Text style={styles.grpExpText}>Group Expense : </Text>
+						<Switch
+							trackColor={{ false: '#767577', true: 'lightgreen' }}
+							thumbColor={isEnabled ? 'green' : 'white'}
+							onValueChange={(val) => toggleSwitch(val)}
+							value={isEnabled}
+						/>
 						</View>
 						<View style={styles.container2}>
 							<Text style={styles.head}>Add note</Text>
@@ -535,7 +545,7 @@ const styles = StyleSheet.create({
 		},
 		elevation: 5,
 		backgroundColor: "white",
-		marginTop: 20,
+		marginVertical: 5,
 	},
 
 	container2: {
@@ -545,13 +555,12 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.5,
 		shadowColor: "black",
 		shadowOffset: {
-			// height:5,
-			//width:5
+			height:5,
+			width:5
 		},
-
 		elevation: 5,
 		backgroundColor: "white",
-		marginTop: 30,
+		marginVertical: 5,
 		paddingTop: 5,
 		paddingLeft: 20,
 		paddingRight: 20,
@@ -763,4 +772,18 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 5,
 	},
+	grpExpcontainer: {
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        borderRadius: 10,
+        flexDirection: "row",
+        justifyContent: 'space-between',
+        alignItems: "center",
+        marginVertical: 5,
+        height: 50,
+        paddingHorizontal: 20,
+    },
+	grpExpText : {
+		color : darkGreen,
+		fontWeight : 'bold'
+	}
 });
