@@ -1,6 +1,6 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Modal, TextInput, Alert } from 'react-native'
 import React from 'react'
-import { auth, db, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc} from "../../Firebase/config";
+import { auth, db, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc } from "../../Firebase/config";
 
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -11,7 +11,7 @@ const FiftyThirtyTwenty = (props) => {
 
     const [categoryWiseFiftyPerBudget, setCategoryWiseFiftyPerBudget] = React.useState([]);
     const [categoryWiseThirtyPerBudget, setCategoryWiseThirtyPerBudget] = React.useState([]);
-    const [categoryWiseTwentyPerBudget, setCategoryWiseTwentyPerBudget] = React.useState([]);    
+    const [categoryWiseTwentyPerBudget, setCategoryWiseTwentyPerBudget] = React.useState([]);
 
     const [fiftyPerAmt, setFiftyPerAmt] = React.useState([]);
     const [thirtyPerAmt, setThirtyPerAmt] = React.useState([]);
@@ -38,9 +38,9 @@ const FiftyThirtyTwenty = (props) => {
     const [isCategoryWiseTwentyPerBudgetChanged, updateIsCategoryWiseTwentyPerBudgetChanged] = React.useState(false);
 
     const [whichPercentage, setWhichPercentage] = React.useState()
-    const fiftyarr=[]
-    const thirtyarr=[]
-    const twentyarr=[]
+    const fiftyarr = []
+    const thirtyarr = []
+    const twentyarr = []
 
     React.useEffect(() => {
         fetchCategories();
@@ -51,25 +51,22 @@ const FiftyThirtyTwenty = (props) => {
         try {
             const fiftyDocRef = doc(db, "FiftyThirtyTwenty", "Fifty");
             const fiftyCat = await getDoc(fiftyDocRef);
-            for (index = 0; index < fiftyCat.data().categories.length; index++)
-            {
-                fiftyarr.push({label: fiftyCat.data().categories[index], value: fiftyCat.data().categories[index]})
+            for (index = 0; index < fiftyCat.data().categories.length; index++) {
+                fiftyarr.push({ label: fiftyCat.data().categories[index], value: fiftyCat.data().categories[index] })
             }
             setFiftyPerCategories(fiftyarr)
 
             const thirtyDocRef = doc(db, "FiftyThirtyTwenty", "Thirty");
             const thirtyCat = await getDoc(thirtyDocRef);
-            for (index = 0; index < thirtyCat.data().categories.length; index++)
-            {
-                thirtyarr.push({label: thirtyCat.data().categories[index], value: thirtyCat.data().categories[index]})
+            for (index = 0; index < thirtyCat.data().categories.length; index++) {
+                thirtyarr.push({ label: thirtyCat.data().categories[index], value: thirtyCat.data().categories[index] })
             }
             setThirtyPerCategories(thirtyarr)
 
             const twentyDocRef = doc(db, "FiftyThirtyTwenty", "Twenty");
             const twentyCat = await getDoc(twentyDocRef);
-            for (index = 0; index < twentyCat.data().categories.length; index++)
-            {
-                twentyarr.push({label: twentyCat.data().categories[index], value: twentyCat.data().categories[index]})
+            for (index = 0; index < twentyCat.data().categories.length; index++) {
+                twentyarr.push({ label: twentyCat.data().categories[index], value: twentyCat.data().categories[index] })
             }
             setTwentyPerCategories(twentyarr)
         } catch (e) {
@@ -79,11 +76,10 @@ const FiftyThirtyTwenty = (props) => {
     }
 
     React.useEffect(() => {
-           if(props.monthlyInc)
-        {
-            setFiftyPerAmt(props.monthlyInc*50/100);
-            setThirtyPerAmt(props.monthlyInc*30/100);
-            setTwentyPerAmt(props.monthlyInc*20/100);
+        if (props.monthlyInc) {
+            setFiftyPerAmt(props.monthlyInc * 50 / 100);
+            setThirtyPerAmt(props.monthlyInc * 30 / 100);
+            setTwentyPerAmt(props.monthlyInc * 20 / 100);
         }
     }, [props.monthlyInc]);
 
@@ -105,25 +101,22 @@ const FiftyThirtyTwenty = (props) => {
         }
     }
 
-    const deleteCategory = (index,percentage) => {
-        if(percentage==="Fifty")
-        {
+    const deleteCategory = (index, percentage) => {
+        if (percentage === "Fifty") {
             const rm = categoryWiseFiftyPerBudget.splice(index, 1);
             const rms = selectedFiftyPerCategories.splice(index, 1);
             console.log(rm, "rm");
             console.log(rms, "rms");
             updateIsCategoryWiseFiftyPerBudgetChanged(true);
         }
-        else if(percentage==="Thirty")
-        {
+        else if (percentage === "Thirty") {
             const rm = categoryWiseThirtyPerBudget.splice(index, 1);
             const rms = selectedThirtyPerCategories.splice(index, 1);
             console.log(rm, "rm");
             console.log(rms, "rms");
             updateIsCategoryWiseThirtyPerBudgetChanged(true);
         }
-        else if(percentage==="Twenty")
-        {
+        else if (percentage === "Twenty") {
             const rm = categoryWiseTwentyPerBudget.splice(index, 1);
             const rms = selectedTwentyPerCategories.splice(index, 1);
             console.log(rm, "rm");
@@ -132,10 +125,10 @@ const FiftyThirtyTwenty = (props) => {
         }
     }
 
-    const editCategoryWiseBudget = (index,percentage) => {
+    const editCategoryWiseBudget = (index, percentage) => {
         setWhichPercentage(percentage)
         setEditCatBudgetModalVisible(!editCatBudgetModalVisible)
-        console.log (index);
+        console.log(index);
         setEditIdx(index);
     }
 
@@ -143,17 +136,14 @@ const FiftyThirtyTwenty = (props) => {
 
         setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
         console.log(editIdx, " ", categoryBudgetEdit);
-        
-        if(categoryBudgetEdit == null)
-        {
+
+        if (categoryBudgetEdit == null) {
             alert("Please enter budget amount!")
         }
-        else if(categoryBudgetEdit<=0)
-        {
+        else if (categoryBudgetEdit <= 0) {
             alert("Please enter valid budget amount!")
         }
-        else if(percentage ==="Fifty" && editIdx>-1 && categoryWiseFiftyPerBudget.length>editIdx && categoryWiseFiftyPerBudget[editIdx]!=null)
-        {
+        else if (percentage === "Fifty" && editIdx > -1 && categoryWiseFiftyPerBudget.length > editIdx && categoryWiseFiftyPerBudget[editIdx] != null) {
             console.log(categoryWiseFiftyPerBudget[editIdx], "****");
             console.log(categoryWiseFiftyPerBudget[editIdx].budgetPlanned, "**");
             categoryWiseFiftyPerBudget[editIdx].budgetPlanned = parseFloat(categoryBudgetEdit);
@@ -161,8 +151,7 @@ const FiftyThirtyTwenty = (props) => {
             setCategoryBudgetEdit(null);
             setEditIdx(-1);
         }
-        else if(percentage ==="Thirty" && editIdx>-1 && categoryWiseThirtyPerBudget.length>editIdx && categoryWiseThirtyPerBudget[editIdx]!=null)
-        {
+        else if (percentage === "Thirty" && editIdx > -1 && categoryWiseThirtyPerBudget.length > editIdx && categoryWiseThirtyPerBudget[editIdx] != null) {
             console.log(categoryWiseThirtyPerBudget[editIdx], "****");
             console.log(categoryWiseThirtyPerBudget[editIdx].budgetPlanned, "**");
             categoryWiseThirtyPerBudget[editIdx].budgetPlanned = parseFloat(categoryBudgetEdit);
@@ -170,8 +159,7 @@ const FiftyThirtyTwenty = (props) => {
             setCategoryBudgetEdit(null);
             setEditIdx(-1);
         }
-        else if(percentage ==="Twenty" && editIdx>-1 && categoryWiseTwentyPerBudget.length>editIdx && categoryWiseTwentyPerBudget[editIdx]!=null)
-        {
+        else if (percentage === "Twenty" && editIdx > -1 && categoryWiseTwentyPerBudget.length > editIdx && categoryWiseTwentyPerBudget[editIdx] != null) {
             console.log(categoryWiseTwentyPerBudget[editIdx], "****");
             console.log(categoryWiseTwentyPerBudget[editIdx].budgetPlanned, "**");
             categoryWiseTwentyPerBudget[editIdx].budgetPlanned = parseFloat(categoryBudgetEdit);
@@ -179,7 +167,7 @@ const FiftyThirtyTwenty = (props) => {
             setCategoryBudgetEdit(null);
             setEditIdx(-1);
         }
-    
+
 
     }
 
@@ -189,37 +177,34 @@ const FiftyThirtyTwenty = (props) => {
         if (selectedCategory == null) {
             alert("Please select category!");
         }
-        else if ((percentage==="Fifty" && selectedFiftyPerCategories.includes(selectedCategory)) || (percentage==="Thirty" && selectedThirtyPerCategories.includes(selectedCategory)) || (percentage==="Twenty" && selectedTwentyPerCategories.includes(selectedCategory))) {
+        else if ((percentage === "Fifty" && selectedFiftyPerCategories.includes(selectedCategory)) || (percentage === "Thirty" && selectedThirtyPerCategories.includes(selectedCategory)) || (percentage === "Twenty" && selectedTwentyPerCategories.includes(selectedCategory))) {
             alert(`You have already added ${selectedCategory} category in Budget!`);
         }
-        else if (categoryBudget <= 0 || (percentage==="Fifty" && categoryBudget>fiftyPerAmt) || (percentage==="Thirty" && categoryBudget>thirtyPerAmt) || (percentage==="Twenty" && categoryBudget>twentyPerAmt)) {
+        else if (categoryBudget <= 0 || (percentage === "Fifty" && categoryBudget > fiftyPerAmt) || (percentage === "Thirty" && categoryBudget > thirtyPerAmt) || (percentage === "Twenty" && categoryBudget > twentyPerAmt)) {
             alert("Please enter valid budget amount!");
         }
         else {
-            if(percentage==="Fifty")
-            {
+            if (percentage === "Fifty") {
                 selectedFiftyPerCategories.push(selectedCategory);
-                categoryWiseFiftyPerBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent : 0});
+                categoryWiseFiftyPerBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent: 0 });
                 console.log("categoryWiseBudget", categoryWiseFiftyPerBudget);
                 updateIsCategoryWiseFiftyPerBudgetChanged(true);
                 console.log(isCategoryWiseFiftyPerBudgetChanged);
                 setSelectedCategory(null);
                 setCategoryBudget(null);
             }
-            else if(percentage==="Thirty")
-            {
+            else if (percentage === "Thirty") {
                 selectedThirtyPerCategories.push(selectedCategory);
-                categoryWiseThirtyPerBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent : 0});
+                categoryWiseThirtyPerBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent: 0 });
                 console.log("categoryWiseThirtyBudget", categoryWiseThirtyPerBudget);
                 updateIsCategoryWiseThirtyPerBudgetChanged(true);
                 console.log(isCategoryWiseThirtyPerBudgetChanged);
                 setSelectedCategory(null);
                 setCategoryBudget(null);
             }
-            else if(percentage==="Twenty")
-            {
+            else if (percentage === "Twenty") {
                 selectedTwentyPerCategories.push(selectedCategory);
-                categoryWiseTwentyPerBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent : 0});
+                categoryWiseTwentyPerBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent: 0 });
                 console.log("categoryWiseBudget", categoryWiseTwentyPerBudget);
                 updateIsCategoryWiseTwentyPerBudgetChanged(true);
                 console.log(isCategoryWiseTwentyPerBudgetChanged);
@@ -235,7 +220,7 @@ const FiftyThirtyTwenty = (props) => {
 
     const calculateTotalIncome = () => {
 
-        const totalAmount=[]
+        const totalAmount = []
 
         var fiftyPerTotalAmt = 0;
         var thirtyPerTotalAmt = 0;
@@ -250,7 +235,7 @@ const FiftyThirtyTwenty = (props) => {
         })
 
         categoryWiseTwentyPerBudget.forEach((item) => {
-            twentyPerTotalAmt = twentyPerTotalAmt  + item.budgetPlanned;
+            twentyPerTotalAmt = twentyPerTotalAmt + item.budgetPlanned;
         })
 
         totalAmount.push(fiftyPerTotalAmt);
@@ -266,31 +251,27 @@ const FiftyThirtyTwenty = (props) => {
         const totalAmount = calculateTotalIncome();
         var fiftyPerTotalAmt = totalAmount[0];
         var thirtyPerTotalAmt = totalAmount[1];
-        var twentyPerTotalAmt = totalAmount[2]; 
+        var twentyPerTotalAmt = totalAmount[2];
 
-        if(fiftyPerTotalAmt>fiftyPerAmt)
-        {
+        if (fiftyPerTotalAmt > fiftyPerAmt) {
             alert("Your set budget amount total is exceeding 50%.")
             return false;
         }
-        else if(thirtyPerTotalAmt>thirtyPerAmt)
-        {
+        else if (thirtyPerTotalAmt > thirtyPerAmt) {
             alert("Your set budget amount total is exceeding 30%.")
             return false;
         }
-        else if(twentyPerTotalAmt>twentyPerAmt)
-        {
+        else if (twentyPerTotalAmt > twentyPerAmt) {
             alert("Your set budget amount total is exceeding 20%.")
             return false;
         }
-        else
-        {
+        else {
             return true;
         }
-        
+
     }
 
-   
+
 
     // const clearFields = () => {
     //     setDate(new Date());
@@ -304,12 +285,12 @@ const FiftyThirtyTwenty = (props) => {
     // }
 
 
-    const saveBudget = async() => {
+    const saveBudget = async () => {
 
         const totalAmount = calculateTotalIncome();
         var fiftyPerTotalAmt = totalAmount[0];
         var thirtyPerTotalAmt = totalAmount[1];
-        var twentyPerTotalAmt = totalAmount[2]; 
+        var twentyPerTotalAmt = totalAmount[2];
 
 
         // if(!selectedCategories.includes("Other Expenses"))
@@ -317,241 +298,241 @@ const FiftyThirtyTwenty = (props) => {
         //     categoryWiseBudget.push({ category: "Other Expenses", budgetPlanned: 0, budgetSpent : 0});
         // }
 
-        try{
-            
-            const recordId = months[props.date.getMonth()] + ""+ props.date.getFullYear();
+        try {
+
+            const recordId = months[props.date.getMonth()] + "" + props.date.getFullYear();
             const docRef = await setDoc(doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1", "Budget", recordId), {
-                method : props.selectedBudgetingMethod,
-                budget: {needs: categoryWiseFiftyPerBudget,
+                method: props.selectedBudgetingMethod,
+                budget: {
+                    needs: categoryWiseFiftyPerBudget,
                     wants: categoryWiseThirtyPerBudget,
-                    savings: categoryWiseTwentyPerBudget,},
-                monthlyInc : props.monthlyInc,
-                totalBudget : fiftyPerTotalAmt+thirtyPerTotalAmt+twentyPerTotalAmt
-              });
-              console.log("Saved");
-              props.navigation.navigate("Your Budget", {
-                  budgetChanged : true,
-              });
-              alert(`Budget for ${months[props.date.getMonth()] + " " + props.date.getFullYear()} is saved Successfully!`);
+                    savings: categoryWiseTwentyPerBudget,
+                },
+                monthlyInc: props.monthlyInc,
+                totalBudget: fiftyPerTotalAmt + thirtyPerTotalAmt + twentyPerTotalAmt
+            });
+            console.log("Saved");
+            props.navigation.navigate("Your Budget", {
+                budgetChanged: true,
+            });
+            alert(`Budget for ${months[props.date.getMonth()] + " " + props.date.getFullYear()} is saved Successfully!`);
             //   clearFields();
         }
-        catch(e)
-        {
+        catch (e) {
             console.log(e)
         }
     }
     const confirmBudget = () => {
 
-        if(validateBudget())
-        {
+        if (validateBudget()) {
             Alert.alert('Alert Title', 'Do you want to confirm a Budget?', [
                 {
                     text: 'Cancel',
                     onPress: () => console.log('Cancel Pressed'),
                     style: 'cancel',
                 },
-                { 
-                    text: 'Yes', 
+                {
+                    text: 'Yes',
                     onPress: () => saveBudget()
                 },
             ]);
         }
-        
-    }
-    
 
-   
-  return (
-    <ScrollView>
-      <FlatList
-                    data={categoryWiseFiftyPerBudget}
-                    ListHeaderComponent={
-                        <View style={styles.categoryWiseBudgetTitle}>
-                            <Text style={styles.categoryWiseBudgetTitleText}>Needs (50%) </Text>
-                            <Text style={styles.categoryWiseBudgetTitleText}>Amount- {fiftyPerAmt} </Text>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => addCategory("Fifty")} >
-                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    renderItem={({ item, index }) =>
-                        <View style={styles.budgetCategory}>
-                            <TouchableOpacity style={styles.budgetCategoryEdit} onPress={() => editCategoryWiseBudget(index,"Fifty")}>
-                                <View style={styles.budgetCategoryCenter}>
-                                    <Text style={styles.budgetCategoryText}>Category Name</Text>
-                                    <Text>{item.category}</Text>
-                                </View>
-                                <View style={styles.budgetCategoryCenter}>
-                                    <Text style={styles.budgetCategoryText}>Budget Planned</Text>
-                                    <Text>{item.budgetPlanned}</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index,"Fifty")}>
-                                <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    ListEmptyComponent={
-                        <View style={styles.noBudget}>
-                            <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                            <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
-                        </View>
-                    }
-                // extraData={isBudgetChanged}
-                />
+    }
+
+
+
+    return (
+        <ScrollView >
+            <FlatList
+                data={categoryWiseFiftyPerBudget}
+                ListHeaderComponent={
+                    <View style={styles.categoryWiseBudgetTitle}>
+                        <Text style={styles.categoryWiseBudgetTitleText}>Needs (50%) </Text>
+                        <Text style={styles.categoryWiseBudgetTitleText}>Amount- {fiftyPerAmt} </Text>
+                        <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => addCategory("Fifty")} >
+                            <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                        </TouchableOpacity>
+                    </View>
+                }
+                renderItem={({ item, index }) =>
+                    <View style={styles.budgetCategory}>
+                        <TouchableOpacity style={styles.budgetCategoryEdit} onPress={() => editCategoryWiseBudget(index, "Fifty")}>
+                            <View style={styles.budgetCategoryCenter}>
+                                <Text style={styles.budgetCategoryText}>Category Name</Text>
+                                <Text>{item.category}</Text>
+                            </View>
+                            <View style={styles.budgetCategoryCenter}>
+                                <Text style={styles.budgetCategoryText}>Budget Planned</Text>
+                                <Text>{item.budgetPlanned}</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index, "Fifty")}>
+                            <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                        </TouchableOpacity>
+                    </View>
+                }
+                ListEmptyComponent={
+                    <View style={styles.noBudget}>
+                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
+                        <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
+                    </View>
+                }
+            // extraData={isBudgetChanged}
+            />
 
             <FlatList
-                    data={categoryWiseThirtyPerBudget}
-                    ListHeaderComponent={
-                        <View style={styles.categoryWiseBudgetTitle}>
-                             <Text style={styles.categoryWiseBudgetTitleText}>Wants (30%) </Text>
-                            <Text style={styles.categoryWiseBudgetTitleText}>Amount- {thirtyPerAmt} </Text>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => addCategory("Thirty")} >
-                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    renderItem={({ item, index }) =>
-                        <View style={styles.budgetCategory}>
-                            <TouchableOpacity style={styles.budgetCategoryEdit} onPress={() => editCategoryWiseBudget(index,"Thirty")}>
-                                <View style={styles.budgetCategoryCenter}>
-                                    <Text style={styles.budgetCategoryText}>Category Name</Text>
-                                    <Text>{item.category}</Text>
-                                </View>
-                                <View style={styles.budgetCategoryCenter}>
-                                    <Text style={styles.budgetCategoryText}>Budget Planned</Text>
-                                    <Text>{item.budgetPlanned}</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index,"Thirty")}>
-                                <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    ListEmptyComponent={
-                        <View style={styles.noBudget}>
-                            <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                            <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
-                        </View>
-                    }
-                // extraData={isBudgetChanged}
-                />
-
-                <FlatList
-                    data={categoryWiseTwentyPerBudget}
-                    ListHeaderComponent={
-                        <View style={styles.categoryWiseBudgetTitle}>
-                            <Text style={styles.categoryWiseBudgetTitleText}>Savings (20%) </Text>
-                            <Text style={styles.categoryWiseBudgetTitleText}>Amount- {twentyPerAmt} </Text>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => addCategory("Twenty")} >
-                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    renderItem={({ item, index }) =>
-                        <View style={styles.budgetCategory}>
-                            <TouchableOpacity style={styles.budgetCategoryEdit} onPress={() => editCategoryWiseBudget(index,"Twenty")}>
-                                <View style={styles.budgetCategoryCenter}>
-                                    <Text style={styles.budgetCategoryText}>Category Name</Text>
-                                    <Text>{item.category}</Text>
-                                </View>
-                                <View style={styles.budgetCategoryCenter}>
-                                    <Text style={styles.budgetCategoryText}>Budget Planned</Text>
-                                    <Text>{item.budgetPlanned}</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index,"Twenty")}>
-                                <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    ListEmptyComponent={
-                        <View style={styles.noBudget}>
-                            <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                            <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
-                        </View>
-                    }
-                // extraData={isBudgetChanged}
-                />
-
-
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={editCatBudgetModalVisible}
-                    onRequestClose={() => {
-                        setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
-                    }}>
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>Enter Budget</Text>
-                            <TextInput
-                                style={styles.budgetAmountInput}
-                                onChangeText={text => setCategoryBudgetEdit(text)}
-                                value={categoryBudgetEdit}
-                                placeholder='Enter Budget for this category...'
-                                keyboardType="numeric"
-                            />
-                            <TouchableOpacity
-                                style={[styles.buttonModal, styles.buttonClose]}
-                                onPress={() => setEditedCategoryWiseBudget(whichPercentage)}>
-                                <Text style={styles.textStyle}>Set</Text>
-                            </TouchableOpacity>
-                        </View>
+                data={categoryWiseThirtyPerBudget}
+                ListHeaderComponent={
+                    <View style={styles.categoryWiseBudgetTitle}>
+                        <Text style={styles.categoryWiseBudgetTitleText}>Wants (30%) </Text>
+                        <Text style={styles.categoryWiseBudgetTitleText}>Amount- {thirtyPerAmt} </Text>
+                        <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => addCategory("Thirty")} >
+                            <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                        </TouchableOpacity>
                     </View>
-                </Modal>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => {
-                        setModalVisible(!modalVisible);
-                    }}>
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>Add Categorywise Budget</Text>
-                            <Dropdown
-                                style={styles.dropdown}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                data={(whichPercentage==="Fifty")?fiftyPerCategories:((whichPercentage==="Thirty")?thirtyPerCategories:twentyPerCategories)}
-                                search
-                                maxHeight={300}
-                                labelField="label"
-                                valueField="value"
-                                placeholder="Select Category"
-                                searchPlaceholder="Search..."
-                                value="category"
-                                onChange={(item) => {
-                                    setSelectedCategory(item.value);
-                                }}
-                            />
-                            
-                            
-                            <TextInput
-                                style={styles.budgetAmountInput}
-                                onChangeText={text => setCategoryBudget(text)}
-                                value={categoryBudget}
-                                placeholder='Enter Budget for selected category...'
-                                keyboardType="numeric"
-                            />
-                            <TouchableOpacity
-                                style={[styles.buttonModal, styles.buttonClose]}
-                                onPress={() =>addCategoryWiseBudget(whichPercentage)}>
-                                <Text style={styles.textStyle}>Add</Text>
-                            </TouchableOpacity>
-                        </View>
+                }
+                renderItem={({ item, index }) =>
+                    <View style={styles.budgetCategory}>
+                        <TouchableOpacity style={styles.budgetCategoryEdit} onPress={() => editCategoryWiseBudget(index, "Thirty")}>
+                            <View style={styles.budgetCategoryCenter}>
+                                <Text style={styles.budgetCategoryText}>Category Name</Text>
+                                <Text>{item.category}</Text>
+                            </View>
+                            <View style={styles.budgetCategoryCenter}>
+                                <Text style={styles.budgetCategoryText}>Budget Planned</Text>
+                                <Text>{item.budgetPlanned}</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index, "Thirty")}>
+                            <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                        </TouchableOpacity>
                     </View>
-                </Modal>
+                }
+                ListEmptyComponent={
+                    <View style={styles.noBudget}>
+                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
+                        <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
+                    </View>
+                }
+            // extraData={isBudgetChanged}
+            />
 
-                <View style={styles.buttonContainer} >
-                <TouchableOpacity style={[styles.button, ((categoryWiseFiftyPerBudget!=null && categoryWiseFiftyPerBudget.length > 0) || (categoryWiseThirtyPerBudget!=null && categoryWiseThirtyPerBudget.length > 0) || (categoryWiseTwentyPerBudget!=null && categoryWiseTwentyPerBudget.length > 0)) ? styles.enabled : styles.disabled]} disabled={((categoryWiseFiftyPerBudget!=null && categoryWiseFiftyPerBudget.length > 0) || (categoryWiseThirtyPerBudget!=null && categoryWiseThirtyPerBudget.length > 0) || (categoryWiseTwentyPerBudget!=null && categoryWiseTwentyPerBudget.length > 0)) ? false : true} onPress={confirmBudget}>
+            <FlatList
+                data={categoryWiseTwentyPerBudget}
+                ListHeaderComponent={
+                    <View style={styles.categoryWiseBudgetTitle}>
+                        <Text style={styles.categoryWiseBudgetTitleText}>Savings (20%) </Text>
+                        <Text style={styles.categoryWiseBudgetTitleText}>Amount- {twentyPerAmt} </Text>
+                        <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => addCategory("Twenty")} >
+                            <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                        </TouchableOpacity>
+                    </View>
+                }
+                renderItem={({ item, index }) =>
+                    <View style={styles.budgetCategory}>
+                        <TouchableOpacity style={styles.budgetCategoryEdit} onPress={() => editCategoryWiseBudget(index, "Twenty")}>
+                            <View style={styles.budgetCategoryCenter}>
+                                <Text style={styles.budgetCategoryText}>Category Name</Text>
+                                <Text>{item.category}</Text>
+                            </View>
+                            <View style={styles.budgetCategoryCenter}>
+                                <Text style={styles.budgetCategoryText}>Budget Planned</Text>
+                                <Text>{item.budgetPlanned}</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index, "Twenty")}>
+                            <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                        </TouchableOpacity>
+                    </View>
+                }
+                ListEmptyComponent={
+                    <View style={styles.noBudget}>
+                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
+                        <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
+                    </View>
+                }
+            // extraData={isBudgetChanged}
+            />
+
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={editCatBudgetModalVisible}
+                onRequestClose={() => {
+                    setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
+                }}>
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Enter Budget</Text>
+                        <TextInput
+                            style={styles.budgetAmountInput}
+                            onChangeText={text => setCategoryBudgetEdit(text)}
+                            value={categoryBudgetEdit}
+                            placeholder='Enter Budget for this category...'
+                            keyboardType="numeric"
+                        />
+                        <TouchableOpacity
+                            style={[styles.buttonModal, styles.buttonClose]}
+                            onPress={() => setEditedCategoryWiseBudget(whichPercentage)}>
+                            <Text style={styles.textStyle}>Set</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}>
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Add Categorywise Budget</Text>
+                        <Dropdown
+                            style={styles.dropdown}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            data={(whichPercentage === "Fifty") ? fiftyPerCategories : ((whichPercentage === "Thirty") ? thirtyPerCategories : twentyPerCategories)}
+                            search
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder="Select Category"
+                            searchPlaceholder="Search..."
+                            value="category"
+                            onChange={(item) => {
+                                setSelectedCategory(item.value);
+                            }}
+                        />
+
+
+                        <TextInput
+                            style={styles.budgetAmountInput}
+                            onChangeText={text => setCategoryBudget(text)}
+                            value={categoryBudget}
+                            placeholder='Enter Budget for selected category...'
+                            keyboardType="numeric"
+                        />
+                        <TouchableOpacity
+                            style={[styles.buttonModal, styles.buttonClose]}
+                            onPress={() => addCategoryWiseBudget(whichPercentage)}>
+                            <Text style={styles.textStyle}>Add</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            <View style={styles.buttonContainer} >
+                <TouchableOpacity style={[styles.button, ((categoryWiseFiftyPerBudget != null && categoryWiseFiftyPerBudget.length > 0) || (categoryWiseThirtyPerBudget != null && categoryWiseThirtyPerBudget.length > 0) || (categoryWiseTwentyPerBudget != null && categoryWiseTwentyPerBudget.length > 0)) ? styles.enabled : styles.disabled]} disabled={((categoryWiseFiftyPerBudget != null && categoryWiseFiftyPerBudget.length > 0) || (categoryWiseThirtyPerBudget != null && categoryWiseThirtyPerBudget.length > 0) || (categoryWiseTwentyPerBudget != null && categoryWiseTwentyPerBudget.length > 0)) ? false : true} onPress={confirmBudget}>
                     <Text style={styles.buttonText}>Set Budget</Text>
                 </TouchableOpacity>
             </View>
-    </ScrollView>
-  )
+        </ScrollView>
+    )
 }
 
 export default FiftyThirtyTwenty
@@ -661,9 +642,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
     },
-    budgetCategoryEdit : {
+    budgetCategoryEdit: {
         flexDirection: "row",
-        width : "90%",
+        width: "90%",
         justifyContent: "space-around",
     },
     budgetCategoryText: {

@@ -27,7 +27,7 @@ import {
 // import DateTimePicker from '@react-native-community/datetimepicker';
 import { darkGreen } from '../Constants';
 import { NavigationScreenProp } from '@react-navigation/native';
-// import {useNavigation} from '@react-navigation/core';
+
 import {
 	useTheme,
 	Avatar,

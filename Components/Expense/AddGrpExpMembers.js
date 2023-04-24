@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image } from 'react-native'
-
+import { auth, db, collection, getDocs, doc,updateDoc,  getDoc, deleteDoc} from "../../Firebase/config";
 import { selectContactPhone } from 'react-native-select-contact';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { NavigationRouteContext } from '@react-navigation/native';
@@ -107,6 +107,7 @@ const AddGrpExpMembers = ({ route, navigation}) => {
 
 
     React.useEffect(() => {
+        console.log("In Use Effect")
         addUser();
     }, [])
 
@@ -115,6 +116,7 @@ const AddGrpExpMembers = ({ route, navigation}) => {
         try{
             const document = await getDoc(doc(db, "User", auth.currentUser.uid));
             const userName = document.data().name;
+            const phoneNo = document.data().phoneNo;
             setMembersList([{ contactName: userName, contactNo: phoneNo, amount: 0 }]);
         }catch(e)
         {
@@ -159,6 +161,8 @@ const AddGrpExpMembers = ({ route, navigation}) => {
         membersList.forEach((item) => {
             totalAmount = totalAmount + item.amount;
         });
+
+        totalAmount = parseFloat((totalAmount).toFixed(2))
         console.log(totalAmount);
         const splitAmount = route.params.splitAmount;
         if (totalAmount < splitAmount) {
@@ -169,8 +173,16 @@ const AddGrpExpMembers = ({ route, navigation}) => {
         }
         else {
 
-            navigation.navigate('Manual', {grpMembersList : membersList});
-            alert('Saved');
+            if(route.params && route.params.previous_screen=='Manual')
+            {
+                navigation.navigate('Manual', {grpMembersList : membersList});
+                alert('Saved');
+            }
+            else{
+                navigation.navigate('Scan Bills', {grpMembersList : membersList});
+                alert('Saved');
+            }
+            
         }
     }
     return (

@@ -12,11 +12,14 @@ import Index from "./Components/Index";
 import Login from "./Components/Login";
 import SignUp from "./Components/SignUp";
 import AddIncome from "./Components/Income/AddIncome";
+import ShowIncomeDetails from "./Components/Income/ShowIncomeDetails";
 import Visualisation from "./Components/Visualisation/Visualisation";
 import Header from "./Components/Header";
 import ConfirmUntrackedIncTrans from "./Components/Income/ConfirmUntrackedIncTrans";
 import AddExpense from "./Components/Expense/AddExpense";
 import AddGrpExpMembers from "./Components/Expense/AddGrpExpMembers";
+import ShowExpenseDetails from "./Components/Expense/ShowExpenseDetails";
+
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -111,6 +114,8 @@ const App = () => {
         <Stack.Screen name="ConfirmUntrackedIncTrans" component={ConfirmUntrackedIncTrans} />
         <Stack.Screen name="AddGrpExpMembers" component={AddGrpExpMembers} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen name="ShowIncomeDetails" component={ShowIncomeDetails} />
+        <Stack.Screen name="ShowExpenseDetails" component={ShowExpenseDetails} />
       </Stack.Navigator>
     </NavigationContainer>
   )

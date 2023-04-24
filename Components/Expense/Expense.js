@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getTransactionInfo } from "trny";
-import { auth, db, collection, getDocs, doc,updateDoc,  getDoc} from "../../Firebase/config";
+import { auth, db, collection, getDocs, doc,updateDoc,  getDoc, deleteDoc} from "../../Firebase/config";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import SmsAndroid from 'react-native-get-sms-android';
 import Background from '../Background';
@@ -27,7 +27,7 @@ const { height, width } = Dimensions.get('window');
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 
-function Expense(props) {
+function Expense({navigation}) {
     const [recordsFilter, setRecordsFilter] = React.useState("Day");
     const [datePicker, setDatePicker] = React.useState(false);
     const [date, setDate] = React.useState(new Date());
@@ -71,8 +71,16 @@ function Expense(props) {
     }, [recordsFilter,date, month, year, expenseRecords]); 
 
     React.useEffect(() => {
-        fetchRecords();
-    }, []);
+		const unsubscribe = navigation.addListener('focus', () => {
+			fetchRecords();
+            // if (checkPermisson()) {
+            //     fetchLastFetchedMsgTS();
+            // }
+		});
+
+		// Return the function to unsubscribe from the event so it gets removed on unmount
+		return unsubscribe;
+	}, [navigation]);
 
     React.useEffect(() => {
         filterRecordsCategotyWise();
@@ -94,7 +102,8 @@ function Expense(props) {
                     "expAmount": data.expAmount, 
                     "expDescription": data.expDescription, 
                     "expCategory": data.expCategory, 
-                    "expDate": data.expDate 
+                    "expDate": data.expDate ,
+                    "expImage":data.expImage
                 };
                 tempRecords.push(record); 
             });
@@ -122,6 +131,7 @@ function Expense(props) {
         setExpenseRecordsDateWise(tempRecords);
         console.log(expenseRecordsDateWise, "Filtered Records")
     }
+
     const filterRecordsMonthWise = () => {
         const tempRecords = [];
         expenseRecords.forEach((expenseRecord) => {
@@ -135,6 +145,7 @@ function Expense(props) {
         setExpenseRecordsMonthWise(tempRecords);
         console.log(expenseRecordsMonthWise, "Filtered Records")
     }
+
     const filterRecordsYearWise = () => {
         const tempRecords = [];
         
@@ -230,6 +241,15 @@ function Expense(props) {
         setCategoryWiseExp(categoryWiseAmt);
         console.log(category);
         console.log(categoryWiseAmt, "Category------------------------------**********************************");
+    }
+
+    const deleteRecord = async(item) => {
+        const docRef = await deleteDoc(doc(db, 'User', auth.currentUser.uid, 'Expense', item.key));
+        console.log("document deleted")
+        const filterData = expenseRecords.filter(curr => curr !== item);
+        console.log(filterData);
+        console.log(filterData.length);
+        setExpenseRecords(filterData);
     }
     return (
         <>
@@ -331,19 +351,30 @@ function Expense(props) {
                         {expenseRecordsDateWise.length > 0 && (<FlatList
                             data={expenseRecordsDateWise}
                             renderItem={({ item }) =>
-                                <View style={styles.record}>
-                                    <View >
+                                <View style={styles.alignRecord}>
+                                <TouchableOpacity style={styles.record} onPress={()=>{
+                                    console.log("show income details",item.incPath,item);
+                                    navigation.navigate("ShowExpenseDetails",{expenseRecId:item.key,expenseRec:item});
+                                }}>
+                                     <View >
                                     <Text style = {styles.cat}>{item.expCategory}</Text>
                                     <Text style = {styles.amt}>-{item.expAmount}</Text>
                                 </View>
                                 <View>
                                     <Text style = {styles.dt}>{getDateFormat(item.expDate.seconds)}</Text>
                                 </View>
+                                
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                 <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                               </TouchableOpacity>
+                               
                                 {/* <View>
                                     <TouchableOpacity  style={styles.details}>                               
                                      <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Details </Text>
                                     </TouchableOpacity>
                                 </View> */}
+                                
                                 </View>
                             }
                             enableEmptySections={true}
@@ -354,7 +385,11 @@ function Expense(props) {
                         {expenseRecordsMonthWise.length > 0 && (<FlatList
                             data={expenseRecordsMonthWise}
                             renderItem={({ item }) =>
-                                <View style={styles.record}>
+                                <View style={styles.alignRecord}>
+                                    <TouchableOpacity style={styles.record} onPress={()=>{
+                                    console.log("show income details",item.incPath,item);
+                                    navigation.navigate("ShowExpenseDetails",{expenseRecId:item.key,expenseRec:item});
+                                }}>
                                     <View >
                                     <Text style = {styles.cat}>{item.expCategory}</Text>
                                     <Text style = {styles.amt}>+{item.expAmount}</Text>
@@ -362,6 +397,12 @@ function Expense(props) {
                                 <View>
                                     <Text style = {styles.dt}>{getDateFormat(item.expDate.seconds)}</Text>
                                 </View>
+                                
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                 <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                               </TouchableOpacity>
+                                    
                                 {/* <View>
                                     <TouchableOpacity  style={styles.details}>                               
                                      <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Details </Text>
@@ -377,7 +418,11 @@ function Expense(props) {
                         {expenseRecordsYearWise.length > 0 && (<FlatList
                             data={expenseRecordsYearWise}
                             renderItem={({ item }) =>
-                                <View style={styles.record}>
+                                <View style={styles.alignRecord}>
+                                    <TouchableOpacity style={styles.record} onPress={()=>{
+                                    console.log("show income details",item.incPath,item);
+                                    navigation.navigate("ShowExpenseDetails",{expenseRecId:item.key,expenseRec:item});
+                                }}>
                                     <View >
                                     <Text style = {styles.cat}>{item.expCategory}</Text>
                                     <Text style = {styles.amt}>+{item.expAmount}</Text>
@@ -385,6 +430,12 @@ function Expense(props) {
                                 <View>
                                     <Text style = {styles.dt}>{getDateFormat(item.expDate.seconds)}</Text>
                                 </View>
+                                
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                 <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                               </TouchableOpacity>
+                                    
                                 {/* <View>
                                     <TouchableOpacity  style={styles.details}>                               
                                      <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Details </Text>
@@ -417,7 +468,7 @@ function Expense(props) {
                                 marginBottom: 5,
                             }}
                             onStartShouldSetResponder={() => {
-                                props.navigation.navigate("AddExpense");
+                                navigation.navigate("AddExpense");
                             }}
                         >
                             <Image
@@ -506,15 +557,31 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
-    record: {
-        flexDirection: 'row',
-        justifyContent: "space-around",
-        alignItems : "center",
+    budgetCategoryCenter: {
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    alignRecord:{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         backgroundColor: 'white',
         height: 70,
         borderRadius: 15,
         marginBottom: 10,
-        padding: 15
+        padding: 15,
+    },
+    buttonImg: {
+        width: 25,
+        height: 25,
+        tintColor: "#cc1d10"
+    },
+    record: {
+        flexDirection: 'row',
+        justifyContent: "space-around",
+        alignItems : "center",
+        width: "85%",
     },
     cat: {
         color: 'grey',

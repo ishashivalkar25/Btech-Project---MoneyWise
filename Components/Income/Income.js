@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getTransactionInfo } from "trny";
-import { auth, db, collection, getDocs, doc,updateDoc,  getDoc} from "../../Firebase/config";
+import { auth, db, collection, getDocs, doc,updateDoc,  getDoc, deleteDoc} from "../../Firebase/config";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import SmsAndroid from 'react-native-get-sms-android';
 import Background from '../Background';
@@ -96,7 +96,7 @@ function Income({navigation, route}) {
     }, [recordsFilter, date, month, year, incomeRecords]);
 
     React.useEffect(() => {
-        fetchRecords();
+        // fetchRecords();
         console.log("In usestate");
 		console.log("MS : ", new Date().getTime())
 
@@ -113,7 +113,7 @@ function Income({navigation, route}) {
 
     React.useEffect(() => {
 		const unsubscribe = navigation.addListener('focus', () => {
-			// fetchRecords();
+			fetchRecords();
             // if (checkPermisson()) {
             //     fetchLastFetchedMsgTS();
             // }
@@ -135,7 +135,7 @@ function Income({navigation, route}) {
     const fetchRecords = async () => {
         try {
             const tempRecords = [];
-            console.log(auth.currentUser.uid, "auth.currentUser.uid***********************")
+            // console.log(auth.currentUser.uid, "auth.currentUser.uid***********************")
             const querySnapshot = await getDocs(collection(doc(db, "User", auth.currentUser.uid), "Income"));
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
@@ -146,11 +146,14 @@ function Income({navigation, route}) {
                     "incCategory": data.incCategory,
                     "incDate": data.incDate
                 };
+                if(data.incImage) {
+                    record.incImage=data.incImage;
+                }
                 tempRecords.push(record);
             });
             setIncomeRecords(tempRecords);
             filterRecordsDateWise();
-            console.log(incomeRecords, "data");
+            // console.log(incomeRecords, "data");
         }
         catch (e) {
             console.error("Error adding document: ", e);
@@ -159,17 +162,17 @@ function Income({navigation, route}) {
 
     const filterRecordsDateWise = () => {
         const tempRecords = [];
-        console.log(incomeRecords, "Datewise *-----------");
+        // console.log(incomeRecords, "Datewise *-----------");
         incomeRecords.forEach((incomeRecord) => {
             const recordDate = getDateFormat(incomeRecord.incDate.seconds);
             const desiredDate = date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear();
             if (recordDate == desiredDate) {
                 tempRecords.push(incomeRecord);
-                console.log(incomeRecord, "Datewise");
+                // console.log(incomeRecord, "Datewise");
             }
         })
         setIncomeRecordsDateWise(tempRecords);
-        console.log(incomeRecordsDateWise, "Filtered Records")
+        // console.log(incomeRecordsDateWise, "Filtered Records")
     }
     const filterRecordsMonthWise = () => {
         const tempRecords = [];
@@ -177,11 +180,11 @@ function Income({navigation, route}) {
             const recordMonth = new Date(incomeRecord.incDate.seconds * 1000).getMonth();
             if (recordMonth == month) {
                 tempRecords.push(incomeRecord);
-                console.log(incomeRecord, "MonthWise");
+                // console.log(incomeRecord, "MonthWise");
             }
         })
         setIncomeRecordsMonthWise(tempRecords);
-        console.log(incomeRecordsMonthWise, "Filtered Records")
+        // console.log(incomeRecordsMonthWise, "Filtered Records")
     }
     const filterRecordsYearWise = () => {
         const tempRecords = [];
@@ -190,11 +193,11 @@ function Income({navigation, route}) {
             const recordYear = new Date(incomeRecord.incDate.seconds * 1000).getFullYear();
             if (recordYear == year) {
                 tempRecords.push(incomeRecord);
-                console.log(incomeRecord, "YearWise");
+                // console.log(incomeRecord, "YearWise");
             }
         })
         setIncomeRecordsYearWise(tempRecords);
-        console.log(incomeRecordsYearWise, "Filtered Records")
+        // console.log(incomeRecordsYearWise, "Filtered Records")
     }
 
     const filterRecordsCategotyWise = () => {
@@ -202,7 +205,7 @@ function Income({navigation, route}) {
         const category = [];
         if (recordsFilter == "Day") {
             incomeRecordsDateWise.forEach((incomeRecord) => {
-                console.log(incomeRecord.incCategory, "Category Income");
+                // console.log(incomeRecord.incCategory, "Category Income");
                 // const recordYear = new Date(incomeRecord.incDate.seconds*1000).getMonth();
                 if (!category.includes(incomeRecord.incCategory)) {
                     category.push(incomeRecord.incCategory);
@@ -211,19 +214,19 @@ function Income({navigation, route}) {
                     // console.log(incomeRecord, "YearWise");
                 }
                 else {
-                    console.log("Amount***");
+                    // console.log("Amount***");
                     categoryWiseAmt.forEach((item) => {
                         if (item.name == incomeRecord.incCategory) {
                             item.amount += Number(incomeRecord.incAmount);
                         }
-                        console.log((item.name == incomeRecord.incCategory), "Amount***");
+                        // console.log((item.name == incomeRecord.incCategory), "Amount***");
                     })
                 }
             })
         }
         else if (recordsFilter == "Month") {
             incomeRecordsMonthWise.forEach((incomeRecord) => {
-                console.log(incomeRecord.incCategory, "Category Income");
+                // console.log(incomeRecord.incCategory, "Category Income");
                 // const recordYear = new Date(incomeRecord.incDate.seconds*1000).getMonth();
 
                 if (!category.includes(incomeRecord.incCategory)) {
@@ -237,14 +240,14 @@ function Income({navigation, route}) {
                         if (item.name == incomeRecord.incCategory) {
                             item.amount += Number(incomeRecord.incAmount);
                         }
-                        console.log((item.name == incomeRecord.incCategory), "Amount***");
+                        // console.log((item.name == incomeRecord.incCategory), "Amount***");
                     })
                 }
             })
         }
         else {
             incomeRecordsYearWise.forEach((incomeRecord) => {
-                console.log(incomeRecord.incCategory, "Category Income");
+                // console.log(incomeRecord.incCategory, "Category Income");
 
                 if (!category.includes(incomeRecord.incCategory)) {
                     category.push(incomeRecord.incCategory);
@@ -256,7 +259,7 @@ function Income({navigation, route}) {
                         if (item.name == incomeRecord.incCategory) {
                             item.amount += Number(incomeRecord.incAmount);
                         }
-                        console.log(item.name, incomeRecord.incCategory, "Amount***")
+                        // console.log(item.name, incomeRecord.incCategory, "Amount***")
                     })
                 }
 
@@ -264,21 +267,21 @@ function Income({navigation, route}) {
         }
 
         setCategoryWiseInc(categoryWiseAmt);
-        console.log(category);
-        console.log(categoryWiseAmt, "Category------------------------------**********************************");
+        // console.log(category);
+        // console.log(categoryWiseAmt, "Category------------------------------**********************************");
     }
 
     const fetchLastFetchedMsgTS = async () => {
 		try {
 			const user = await getDoc(doc(db, "User", "LCssg7nKyeWotOlCXOov5iVlQwO2"));
-			console.log(user.data());
+			// console.log(user.data());
 
 			filter.minDate = user.data().lastViewTS;
 			filter.maxDate = new Date().getTime();
-			console.log("Mindb : ", user.data().lastViewTS);
-			console.log("Maxdb : ", new Date().getTime());
-			console.log("min : ", filter.minDate);
-			console.log("Max : ", filter.maxDate);
+			// console.log("Mindb : ", user.data().lastViewTS);
+			// console.log("Maxdb : ", new Date().getTime());
+			// console.log("min : ", filter.minDate);
+			// console.log("Max : ", filter.maxDate);
 
 			SmsAndroid.list(
 				JSON.stringify(filter),
@@ -286,15 +289,15 @@ function Income({navigation, route}) {
 					console.log('Failed with this error: ' + fail);
 				},
 				(count, smsList) => {
-					console.log('Count: ', count);
+					// console.log('Count: ', count);
 					// console.log('List: ', smsList);
 					var arr = JSON.parse(smsList);
                     const tempList = [];
 					arr.forEach(function (object) {
 						// console.log('-->' + object.date);
-						console.log('-->' + object.address);
+						// console.log('-->' + object.address);
 						const transactionDetails = getTransactionInfo(object.body);
-						console.log("Message :" + JSON.stringify(transactionDetails));
+						// console.log("Message :" + JSON.stringify(transactionDetails));
 
 						if (!(transactionDetails.account.no == "" || transactionDetails.money == "" || transactionDetails.typeOfTransaction == "")) {
 							const tempTransaction = {
@@ -309,9 +312,9 @@ function Income({navigation, route}) {
 						}
 
 					});
-                    console.log(messageList, "messageList2");
+                    // console.log(messageList, "messageList2");
                     setMessageList([...messageList, ...tempList]);
-					console.log(messageList, "messageList1");
+					// console.log(messageList, "messageList1");
 				},
 			);
 
@@ -320,7 +323,7 @@ function Income({navigation, route}) {
 
 			// filter.minDate = user.data().lastViewTS;
 			// setLastFetchedMsgTS(user.data().lastViewTS);
-			console.log(filter.maxDate, "lastFetchedMsgTS");
+		// /	console.log(filter.maxDate, "lastFetchedMsgTS");
 		}
 		catch (e) {
 			console.error("Error adding document: ", e);
@@ -353,7 +356,6 @@ function Income({navigation, route}) {
         } catch (err) {
             console.warn(err);
         }
-       
 	}
     const updateLastViewTS = async (lastViewTS) => {
         console.log("updateLastViewTS")
@@ -367,17 +369,26 @@ function Income({navigation, route}) {
         });
 	}
 
+    const deleteRecord = async(item) => {
+        const docRef = await deleteDoc(doc(db, 'User', auth.currentUser.uid, 'Income', item.key));
+        console.log("document deleted")
+        const filterData = incomeRecords.filter(curr => curr !== item);
+        console.log(filterData);
+        console.log(filterData.length);
+        setIncomeRecords(filterData);
+    }
+
     React.useEffect(() => {
 
         if(route.params!=null && route.params.transactionList!=null){
             const filterData = messageList.filter(curr => !route.params.transactionList.includes(curr));
-            console.log(filterData);
-            console.log(filterData.length);
+            // console.log(filterData);
+            // console.log(filterData.length);
             setMessageList(filterData);
-            console.log("Route Params : ", route.params.transactionList);
+            // console.log("Route Params : ", route.params.transactionList);
         }
         else{
-            console.log("Route Params Empty ");
+            // console.log("Route Params Empty ");
         }
         
     }, [route.params]);
@@ -489,7 +500,11 @@ function Income({navigation, route}) {
                         {incomeRecordsDateWise.length > 0 && (<FlatList
                             data={incomeRecordsDateWise}
                             renderItem={({ item }) =>
-                                <View style={styles.record}>
+                               <View style={styles.alignRecord}>
+                                 <TouchableOpacity style={styles.record} onPress={()=>{
+                                    console.log("show income details",item.incPath,item);
+                                    navigation.navigate("ShowIncomeDetails",{incomeRecId:item.key,incomeRec:item});
+                                }}>
                                     <View >
                                         <Text style={styles.cat}>{item.incCategory}</Text>
                                         <Text style={styles.amt}>+{item.incAmount}</Text>
@@ -497,16 +512,25 @@ function Income({navigation, route}) {
                                     <View>
                                         <Text style={styles.dt}>{getDateFormat(item.incDate.seconds)}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                 <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                               </TouchableOpacity>
+                               </View>
                             }
                             enableEmptySections={true}
+                            
                         />)}
                     </View>)}
                     {recordsFilter == "Month" && (<View style={styles.record_container}>
                         {incomeRecordsMonthWise.length > 0 && (<FlatList
                             data={incomeRecordsMonthWise}
                             renderItem={({ item }) =>
-                                <View style={styles.record}>
+                           <View style={styles.alignRecord}>
+                             <TouchableOpacity style={styles.record} onPress={()=>{
+                                console.log("show income details",item.incPath,item);
+                                navigation.navigate("ShowIncomeDetails",{incomeRecId:item.key,incomeRec:item});
+                            }}>
                                     <View >
                                         <Text style={styles.cat}>{item.incCategory}</Text>
                                         <Text style={styles.amt}>+{item.incAmount}</Text>
@@ -519,7 +543,11 @@ function Income({navigation, route}) {
                                      <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Details </Text>
                                     </TouchableOpacity>
                                 </View> */}
-                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                 <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                               </TouchableOpacity>
+                           </View>
                             }
                             enableEmptySections={true}
                         />)}
@@ -529,7 +557,11 @@ function Income({navigation, route}) {
                         {incomeRecordsYearWise.length > 0 && (<FlatList
                             data={incomeRecordsYearWise}
                             renderItem={({ item }) =>
-                                <View style={styles.record}>
+                            <View style={styles.alignRecord}>
+                                <TouchableOpacity style={styles.record} onPress={()=>{
+                                    console.log("show income details",item.incPath,item);
+                                    navigation.navigate("ShowIncomeDetails",{incomeRecId:item.key,incomeRec:item});
+                            }}>
                                     <View >
                                         <Text style={styles.cat}>{item.incCategory}</Text>
                                         <Text style={styles.amt}>+{item.incAmount}</Text>
@@ -537,7 +569,11 @@ function Income({navigation, route}) {
                                     <View>
                                         <Text style={styles.dt}>{getDateFormat(item.incDate.seconds)}</Text>
                                     </View>
-                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                 <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                               </TouchableOpacity>
+                            </View>
                             }
                             enableEmptySections={true}
                         />)}
@@ -662,6 +698,32 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         marginBottom: 10,
         padding: 15
+    },
+    budgetCategoryCenter: {
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    alignRecord:{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: 'white',
+        height: 70,
+        borderRadius: 15,
+        marginBottom: 10,
+        padding: 15,
+    },
+    buttonImg: {
+        width: 25,
+        height: 25,
+        tintColor: "#cc1d10"
+    },
+    record: {
+        flexDirection: 'row',
+        justifyContent: "space-around",
+        alignItems : "center",
+        width: "85%",
     },
     cat: {
         color: 'grey',

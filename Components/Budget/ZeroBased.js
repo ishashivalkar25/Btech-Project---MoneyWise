@@ -26,7 +26,7 @@ const ZeroBased = (props) => {
     React.useEffect(() => {
       setTotalSavings(props.monthlyInc);
       // setCategoryWiseBudget({ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent : 0})
-      categoryWiseBudget.push({ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent : 0})
+      setCategoryWiseBudget([{ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent : 0}]);
   },[]);
 
     React.useEffect(() => {
@@ -125,7 +125,7 @@ const ZeroBased = (props) => {
             alert("Please enter valid budget amount!");
         }
         else {
-            categoryWiseBudget[0]["budgetPlanned"]=totalSavings-parseFloat(categoryBudget)
+            categoryWiseBudget[0].budgetPlanned=totalSavings-parseFloat(categoryBudget)
             setTotalSavings(totalSavings-parseFloat(categoryBudget))
             selectedCategories.push(selectedCategory);
             categoryWiseBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent : 0});
@@ -151,6 +151,15 @@ const ZeroBased = (props) => {
     }
 
     const validateBudget = () => {
+
+        // categoryWiseBudget.forEach((item) => {
+        //     console.log(item.category)
+        //     if(item.budgetPlanned<=0)
+        //     {
+        //         alert(`Please enter valid budget amount for category ${item.category}!`);
+        //         return false;
+        //     }
+        // })
 
         const totalAmount = calculateTotalIncome();
 

@@ -51,7 +51,7 @@ export default function AddIncome(props) {
   const [pickedImagePath, setPickedImagePath] = useState(
     Image.resolveAssetSource(uploadImg).uri
   );
-
+  let downloadURL=""
   useEffect(() => {
     const loadData = async () => {
       const catList = [];
@@ -60,7 +60,7 @@ export default function AddIncome(props) {
 				user.data().incCategories.forEach((item) => {
 					//   console.log(doc.id, JSON.stringify(doc.data()));
 					getcat = { label: item, value: item };
-					console.log(getcat);
+					// console.log(getcat);
 					catList.push(getcat);
 				});
 				// console.log(user.data() , "user");
@@ -68,7 +68,7 @@ export default function AddIncome(props) {
 				catList.push({ label: "other", value: "other" });
 				setCategory(catList);
 				setUserIncCategories(user.data().incCategories);
-				console.log(user.data().incCategories, "incCategories");
+				// /console.log(user.data().incCategories, "incCategories");
 				// console.log(category);
 			} catch (e) {
 				console.error("Error adding document: ", e);
@@ -94,7 +94,7 @@ export default function AddIncome(props) {
   const showImagePicker = async () => {
 
     const result = await ImagePicker.launchImageLibrary();
-    console.log(result.assets[0].uri, "file");
+    // console.log(result.assets[0].uri, "file");
     setPickedImagePath(result.assets[0].uri);
 
   };
@@ -102,73 +102,49 @@ export default function AddIncome(props) {
   // This function is triggered when the "Open camera" button pressed
   const openCamera = async () => {
     const result = await ImagePicker.launchCamera();
-    console.log(result.assets[0].uri, "file");
+    // console.log(result.assets[0].uri, "file");
     setPickedImagePath(result.assets[0].uri);
 
   };
 
   const saveIncome = async () => {
-    try {
-      if (amount == 0) {
-        // Add a Toast on screen.
-        let toast = Toast.show("Please enter amount.", {
-          duration: Toast.durations.LONG,
-        });
-
-        // You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
-        setTimeout(function hideToast() {
-          Toast.hide(toast);
-        }, 800);
-      }
-      else if (selectedCategory == "") {
-        // Add a Toast on screen.
-        let toast = Toast.show("Please select category.", {
-          duration: Toast.durations.LONG,
-        });
-
-        // You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
-        setTimeout(function hideToast() {
-          Toast.hide(toast);
-        }, 800);
-      }
-      else {
-        if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
-          //concerting image to blob image
-          const blobImage = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-              resolve(xhr.response);
-            };
-            xhr.onerror = function () {
-              reject(new TypeError("Network request failed"));
-            };
-            xhr.responseType = "blob";
-            xhr.open("GET", pickedImagePath, true);
-            xhr.send(null);
-          });
-
-          //set metadata of image
-          /**@type */
+    if (amount == 0) {
+      let toast = Toast.show("Please enter amount.", {
+        duration: Toast.durations.LONG,
+      });
+      setTimeout(function hideToast() {
+        Toast.hide(toast);
+      }, 8000);
+      return ;
+    }
+  
+    if (selectedCategory == "") {
+      let toast = Toast.show("Please select category.", {
+        duration: Toast.durations.LONG,
+      });
+      setTimeout(function hideToast() {
+        Toast.hide(toast);
+      }, 8000);
+      return ;
+    }
+  
+    let promise = Promise.resolve();
+    if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
+      promise = new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          const blobImage = xhr.response;
           const metadata = {
             contentType: "image/jpeg",
           };
-
-          // Upload file and metadata to the object 'images/mountains.jpg'
           const storageRef = ref(storage, "IncImages/" + Date.now());
-          const uploadTask = uploadBytesResumable(
-            storageRef,
-            blobImage,
-            metadata
-          );
-
-          // Listen for state changes, errors, and completion of the upload.
+          const uploadTask = uploadBytesResumable(storageRef, blobImage, metadata);
           uploadTask.on(
             "state_changed",
             (snapshot) => {
-              // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-              const progress =
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log("Upload is " + progress + "% done");
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+             
+              // console.log("Upload is " + progress + "% done");
               switch (snapshot.state) {
                 case "paused":
                   console.log("Upload is paused");
@@ -179,64 +155,79 @@ export default function AddIncome(props) {
               }
             },
             (error) => {
-              // A full list of error codes is available at
-              // https://firebase.google.com/docs/storage/web/handle-errors
               switch (error.code) {
                 case "storage/unauthorized":
-                  // User doesn't have permission to access the object
+                  reject(new Error("User doesn't have permission to access the object"));
                   break;
                 case "storage/canceled":
-                  // User canceled the upload
+                  reject(new Error("User canceled the upload"));
                   break;
-
-                // ...
-
                 case "storage/unknown":
-                  // Unknown error occurred, inspect error.serverResponse
+                  reject(new Error("Unknown error occurred, inspect error.serverResponse"));
+                  break;
+                default:
+                  reject(error);
                   break;
               }
             },
-            () => {
-              // Upload completed successfully, now we can get the download URL
-              getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                console.log("File available at", downloadURL);
-              });
+            async () => {
+              downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              console.log("File available at", downloadURL);
+              setPickedImagePath(downloadURL);
+              resolve();
             }
           );
-        }
-
-        console.log(selectedCategory);
-        if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
-          const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Income"), {
-            incAmount: amount,
-            incDate: date,
-            incCategory: selectedCategory,
-            incDescription: description,
-            incImage: imagepath,
-          });
-        }
-        else {
-          const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Income"), {
-            incAmount: amount,
-            incDate: date,
-            incCategory: selectedCategory,
-            incDescription: description
-          });
-        }
-
-        const querySnapshot = await getDocs(collection(db, "income"));
-        querySnapshot.forEach((doc) => {
-          console.log(doc.id, JSON.stringify(doc.data()));
-        });
-
-        alert("Record Added Successfully");
-        props.navigation.replace("HomePage");
+        };
+        xhr.onerror = function () {
+          reject(new Error("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", pickedImagePath, true);
+        xhr.send(null);
+      });
+    }
+  
+    try {
+      await promise;
+      setPickedImagePath(downloadURL);
+      let data_1 = {
+        incAmount: amount,
+        incDate: date,
+        incCategory: selectedCategory,
+        incDescription: description,
+      };
+      if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
+        data_1.incImage = pickedImagePath;
       }
 
-    } catch (e) {
-      console.error("Error adding document: ", e);
+      const docRef = await addDoc(
+        collection(doc(db, "User", auth.currentUser.uid), "Income"), data_1);
+
+      const querySnapshot = await getDocs(collection(db, "income"));
+      querySnapshot.forEach((doc) => {
+        // console.log(doc.id, JSON.stringify(doc.data()));
+      });
+
+      alert("Record Added Successfully");
+      props.navigation.navigate("HomePage");
+    } catch (error_1) {
+      console.error("Error adding document: ", error_1);
+      throw error_1;
     }
-  }
+  };
+  
+
+  const updateRecord=async()=>{
+
+    const docRef = await updateDoc(collection(doc(db,"User",auth.currentUser.uid), "Income",props.incomeRecId), {
+        incAmount: amount,
+        incDate: date,
+        incCategory: selectedCategory,
+        incDescription: description,
+        incImage: pickedImagePath,
+      });
+
+}
 
 
   return (
@@ -390,7 +381,7 @@ export default function AddIncome(props) {
               </Modal>
               <TouchableOpacity
                 onPress={() => {
-                  console.log("image clicked");
+                  // console.log("image clicked");
                   setVisibilityOfImgModal(true);
                 }}
               >
@@ -520,6 +511,7 @@ const styles = StyleSheet.create({
   },
 
   inputText: {
+    padding : 0,
     borderRadius: 5,
     color: darkGreen,
     paddingHorizontal: 5,

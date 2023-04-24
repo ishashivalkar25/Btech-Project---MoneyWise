@@ -774,6 +774,7 @@ const styles = StyleSheet.create({
 	},
 
 	inputText: {
+		padding : 0,
 		borderRadius: 5,
 		color: darkGreen,
 		paddingHorizontal: 5,

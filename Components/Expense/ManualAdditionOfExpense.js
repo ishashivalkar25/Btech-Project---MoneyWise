@@ -12,9 +12,9 @@ import {
 	ImageBackground,
 	ScrollView,
 	Switch
-  } from "react-native";
-  import React, { useState, useEffect } from "react";
-  import {
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import {
 	db,
 	collection,
 	addDoc,
@@ -22,23 +22,24 @@ import {
 	getDoc,
 	storage,
 	auth,
-	doc,setDoc
-  } from '../../Firebase/config';
-  import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-  import DateTimePicker from "@react-native-community/datetimepicker";
-  import { Dropdown } from "react-native-element-dropdown";
-  import uploadImg from "../../Assets/uploadReceiptIcon.png";
-  import Toast from "react-native-root-toast";
-  import { darkGreen } from "../Constants";
-  import * as ImagePicker from 'react-native-image-picker';
-  import { useSafeAreaInsets } from 'react-native-safe-area-context';
-  import SmsAndroid from 'react-native-get-sms-android';
+	doc, setDoc
+} from '../../Firebase/config';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Dropdown } from "react-native-element-dropdown";
+import uploadImg from "../../Assets/uploadReceiptIcon.png";
+import Toast from "react-native-root-toast";
+import { darkGreen } from "../Constants";
+import * as ImagePicker from 'react-native-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import SmsAndroid from 'react-native-get-sms-android';
 
 const { width, height } = Dimensions.get("window");
+let downloadURL = ""
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-export default function ManualAdditionOfExpense({navigation, route}) {
+export default function ManualAdditionOfExpense({ navigation, route }) {
 
 	const [category, setCategory] = useState([]);
 	const [userExpCategories, setUserExpCategories] = useState([]);
@@ -57,27 +58,25 @@ export default function ManualAdditionOfExpense({navigation, route}) {
 
 	const toggleSwitch = (val) => {
 
-		if(amount>0)
-		{
+		if (amount > 0) {
 			setIsEnabled(previousState => !previousState);
 			console.log(isEnabled)
-			if(val){
+			if (val) {
 				navigation.navigate("AddGrpExpMembers", {
-				splitAmount : amount,
+					splitAmount: amount,
+					previous_screen: 'Manual'
 				})
 			}
 		}
-		else
-		{
+		else {
 			alert("Please Enter Expense Amount!")
 		}
 	}
 
 	useEffect(() => {
 
-		if(route.params && route.params.grpMembersList)
-		{
-			console.log(route.params.grpMembersList,'route.params.grpMembersList');
+		if (route.params && route.params.grpMembersList) {
+			console.log(route.params.grpMembersList, 'route.params.grpMembersList');
 			setGrpMembersList(grpMembersList);
 		}
 	}, [route.params])
@@ -152,32 +151,30 @@ export default function ManualAdditionOfExpense({navigation, route}) {
 	};
 
 	const saveExpense = async () => {
-		console.log(grpMembersList , 'grpMembersListIn')
+
+		console.log(grpMembersList, 'grpMembersListIn')
 		try {
 			if (amount == 0) {
-				// Add a Toast on screen.
 				let toast = Toast.show("Please enter amount.", {
 					duration: Toast.durations.LONG,
 				});
-
-				// You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
 				setTimeout(function hideToast() {
 					Toast.hide(toast);
 				}, 800);
+				return ;
 			}
-			else if (selectedCategory == "") {
-				// Add a Toast on screen.
+
+			if (selectedCategory == "") {
 				let toast = Toast.show("Please select category.", {
 					duration: Toast.durations.LONG,
 				});
-
-				// You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
 				setTimeout(function hideToast() {
 					Toast.hide(toast);
 				}, 800);
+				return ;
 			}
-			else if(isEnabled && !route.params && route.params.grpMembersList)
-			{ 
+
+			if (isEnabled && !route.params && route.params.grpMembersList) {
 				alert('Please add group members to split an expense.')
 				// Add a Toast on screen.
 				let toast = Toast.show("Please add group members to split an expense.", {
@@ -188,205 +185,249 @@ export default function ManualAdditionOfExpense({navigation, route}) {
 				setTimeout(function hideToast() {
 					Toast.hide(toast);
 				}, 800);
+
+				return ;
 			}
-			else {
-				if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
-					//concerting image to blob image
-					const blobImage = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.onload = function () {
-							resolve(xhr.response);
+			
+			let promise = Promise.resolve();
+			if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
+				promise = new Promise((resolve, reject) => {
+					const xhr = new XMLHttpRequest();
+					xhr.onload = function () {
+						const blobImage = xhr.response;
+						const metadata = {
+							contentType: "image/jpeg",
 						};
-						xhr.onerror = function () {
-							reject(new TypeError("Network request failed"));
-						};
-						xhr.responseType = "blob";
-						xhr.open("GET", pickedImagePath, true);
-						xhr.send(null);
-					});
-
-					//set metadata of image
-					/**@type */
-					const metadata = {
-						contentType: "image/jpeg",
-					};
-
-					// Upload file and metadata to the object 'images/mountains.jpg'
-					const storageRef = ref(storage, "ExpImages/" + Date.now());
-					const uploadTask = uploadBytesResumable(
-						storageRef,
-						blobImage,
-						metadata
-					);
-
-					// Listen for state changes, errors, and completion of the upload.
-					uploadTask.on(
-						"state_changed",
-						(snapshot) => {
-							// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-							const progress =
-								(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-							console.log("Upload is " + progress + "% done");
-							switch (snapshot.state) {
-								case "paused":
-									console.log("Upload is paused");
-									break;
-								case "running":
-									console.log("Upload is running");
-									break;
-							}
-						},
-						(error) => {
-							// A full list of error codes is available at
-							// https://firebase.google.com/docs/storage/web/handle-errors
-							switch (error.code) {
-								case "storage/unauthorized":
-									// User doesn't have permission to access the object
-									break;
-								case "storage/canceled":
-									// User canceled the upload
-									break;
-
-								// ...
-
-								case "storage/unknown":
-									// Unknown error occurred, inspect error.serverResponse
-									break;
-							}
-						},
-						() => {
-							// Upload completed successfully, now we can get the download URL
-							getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+						const storageRef = ref(storage, "ExpImages/" + Date.now());
+						const uploadTask = uploadBytesResumable(storageRef, blobImage, metadata);
+						uploadTask.on(
+							"state_changed",
+							(snapshot) => {
+								const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+	
+								// console.log("Upload is " + progress + "% done");
+								switch (snapshot.state) {
+									case "paused":
+										console.log("Upload is paused");
+										break;
+									case "running":
+										console.log("Upload is running");
+										break;
+								}
+							},
+							(error) => {
+								switch (error.code) {
+									case "storage/unauthorized":
+										reject(new Error("User doesn't have permission to access the object"));
+										break;
+									case "storage/canceled":
+										reject(new Error("User canceled the upload"));
+										break;
+									case "storage/unknown":
+										reject(new Error("Unknown error occurred, inspect error.serverResponse"));
+										break;
+									default:
+										reject(error);
+										break;
+								}
+							},
+							async () => {
+								downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 								console.log("File available at", downloadURL);
-							});
-						}
-					);
-				}
+								setPickedImagePath(downloadURL);
+								resolve();
+							}
+						);
+					};
+					xhr.onerror = function () {
+						reject(new Error("Network request failed"));
+					};
+					xhr.responseType = "blob";
+					xhr.open("GET", pickedImagePath, true);
+					xhr.send(null);
+				});
+			}
 
-				console.log(selectedCategory);
-				if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
 
-					if(isEnabled)
-					{
-						const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
-							expAmount: amount,
-							expDate: date,
-							expCategory: selectedCategory,
-							expDescription: description,
-							expImage: pickedImagePath,
-							groupExp: isEnabled,
-							grpMembersList : grpMembersList
-						});
-					}
-					else
-					{
-						const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
-							expAmount: amount,
-							expDate: date,
-							expCategory: selectedCategory,
-							expDescription: description,
-							expImage: pickedImagePath,
-							groupExp: isEnabled,
-						});
-					}
-					
+			try {
+				await promise;
+				setPickedImagePath(downloadURL);
+				let data_1 = {
+					expAmount: amount,
+					expDate: date,
+					expCategory: selectedCategory,
+					expDescription: description,
+					groupExp: isEnabled,
+				};
+				if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri && downloadURL != "") {
+					data_1.expImage = downloadURL;
 				}
-				else {
-					if(isEnabled){
-						const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
-							expAmount: amount,
-							expDate: date,
-							expCategory: selectedCategory,
-							expDescription: description,
-							groupExp : isEnabled, 
-							grpMembersList : grpMembersList
-						});
-					}
-					else{
-						const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
-							expAmount: amount,
-							expDate: date,
-							expCategory: selectedCategory,
-							expDescription: description,
-							groupExp : isEnabled, 
-						});
-					}
-					
+	
+				if (isEnabled) {
+					data_1.grpMembersList = route.params.grpMembersList;
 				}
-
-				//add category to user expense categories if not present
 				
-				if(!userExpCategories.includes(selectedCategory))
-				{
-					userExpCategories.push(selectedCategory);
-					await updateDoc(doc(db, "User", auth.currentUser.uid), {
-						expCategories : userExpCategories,
-					});
-				}
 
+				// const docRef = await addDoc(
+				// 	collection(doc(db, "User", auth.currentUser.uid), "Expense"), data_1);
+	
+				const docRef = await addDoc(
+					collection(doc(db, "User", auth.currentUser.uid), "Expense"), data_1);
+	
+				const querySnapshotExp = await getDocs(collection(db, "Expense"));
+				querySnapshotExp.forEach((doc) => {
+					// console.log(doc.id, JSON.stringify(doc.data()));
+				});
+	
 				//Update budget
 				const recordId = months[date.getMonth()] + "" + date.getFullYear();
 				console.log(recordId);
-				const document = await getDoc(doc(db, "User", auth.currentUser.uid , "Budget", recordId));
-
+				const document = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
+	
 				const categoryWiseBudget = document.data()
 				var isCategoryBudgetSet = false;
 				var otherExpIdx = -1;
-
+				var savingsIdx = -1;
+				var done = false;
+	
 				console.log(categoryWiseBudget);
-				categoryWiseBudget.budget.forEach((item, idx) => {
-					if(item.category==selectedCategory)
-					{
-						item.budgetSpent = item.budgetSpent + parseFloat(amount);
-						isCategoryBudgetSet = true;
+				if (categoryWiseBudget.method === 'Envelop Method') {
+					categoryWiseBudget.budget.forEach((item, idx) => {
+						if (item.category == selectedCategory) {
+							item.budgetSpent = item.budgetSpent + parseFloat(amount);
+							isCategoryBudgetSet = true;
+						}
+	
+						if (item.category == "Other Expenses") {
+							otherExpIdx = idx;
+						}
+					});
+	
+					if (!isCategoryBudgetSet && otherExpIdx > -1) {
+						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
 					}
-
-					if(item.category=="Other Expenses")
-					{
-						otherExpIdx = idx;
-					}
-				});
-
-				if(!isCategoryBudgetSet && otherExpIdx>-1)
-				{
-					categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
 				}
-				
+				else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
+					categoryWiseBudget.budget.forEach((item, idx) => {
+						if (item.category == selectedCategory) {
+							item.budgetSpent = item.budgetSpent + parseFloat(amount);
+							isCategoryBudgetSet = true;
+						}
+	
+						if (item.category == "Other Expenses") {
+							otherExpIdx = idx;
+						}
+	
+						if (item.category == "Savings") {
+							savingsIdx = idx;
+						}
+					});
+	
+					if (!isCategoryBudgetSet && otherExpIdx > -1) {
+						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
+						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+					}
+					else {
+						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+					}
+				}
+				else {
+					categoryWiseBudget.needs.forEach((item, idx) => {
+						if (item.category == selectedCategory) {
+							item.budgetSpent = item.budgetSpent + parseFloat(amount);
+							isCategoryBudgetSet = true;
+							done = true;
+						}
+	
+						if (item.category == "Other Needs") {
+							otherExpIdx = idx;
+						}
+					});
+	
+					if (!isCategoryBudgetSet && otherExpIdx > -1) {
+						categoryWiseBudget.needs[otherExpIdx].budgetSpent = categoryWiseBudget.needs[otherExpIdx].budgetSpent + parseFloat(amount);
+						done = true;
+					}
+	
+					if (!done) {
+						categoryWiseBudget.wants.forEach((item, idx) => {
+							if (item.category == selectedCategory) {
+								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								isCategoryBudgetSet = true;
+								done = true;
+							}
+	
+							if (item.category == "Other Wants") {
+								otherExpIdx = idx;
+							}
+						});
+	
+						if (!isCategoryBudgetSet && otherExpIdx > -1) {
+							categoryWiseBudget.wants[otherExpIdx].budgetSpent = categoryWiseBudget.wants[otherExpIdx].budgetSpent + parseFloat(amount);
+							done = true;
+						}
+	
+					}
+	
+					if (!done) {
+						categoryWiseBudget.needs.forEach((item, idx) => {
+							if (item.category == selectedCategory) {
+								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								isCategoryBudgetSet = true;
+								done = true;
+							}
+	
+							if (item.category == "Other Savings") {
+								otherExpIdx = idx;
+							}
+						});
+	
+						if (!isCategoryBudgetSet && otherExpIdx > -1) {
+							categoryWiseBudget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.savings[otherExpIdx].budgetSpent + parseFloat(amount);
+							done = true;
+						}
+					}
+				}
+	
 				await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
-
+	
 				const querySnapshot = await getDocs(collection(db, "expense"));
 				querySnapshot.forEach((doc) => {
 					console.log(doc.id, JSON.stringify(doc.data()));
 				});
-
-
-				if(isEnabled)
-				{
+	
+				if (isEnabled) {
 					const document = await getDoc(doc(db, "User", auth.currentUser.uid));
 					const userName = document.data().name;
 					route.params.grpMembersList.forEach((item) => {
 
-						const message = `${userName} has split a bill with you. Kindly pay amount of Rs.${item.amount}.`
-						SmsAndroid.autoSend(
-							item.contactNo,
-							message,
-							(fail) => {
-							  console.log('Failed with this error: ' + fail);
-							},
-							(success) => {
-							  console.log('SMS sent successfully');
-							},
-						  );
+						if(userName != item.name)
+						{
+							const message = `${userName} has split a bill with you. Kindly pay amount of Rs.${item.amount}.`
+							SmsAndroid.autoSend(
+								item.contactNo,
+								message,
+								(fail) => {
+									console.log('Failed with this error: ' + fail);
+								},
+								(success) => {
+									console.log('SMS sent successfully');
+								},
+							);
+						}
+						
 					})
-					
+
 				}
 
 				alert("Record Added Successfully");
-				navigation.replace("Root");
-				
-
+				navigation.navigate("Root");
+			} catch (error_1) {
+				console.error("Error adding document: ", error_1);
+				throw error_1;
 			}
 
+			
 
 		} catch (e) {
 			console.error("Error adding document: ", e);
@@ -501,14 +542,14 @@ export default function ManualAdditionOfExpense({navigation, route}) {
 							</View>
 						</Modal>
 
-						<View style = {[styles.grpExpcontainer, styles.container1]}>
-						<Text style={styles.grpExpText}>Group Expense : </Text>
-						<Switch
-							trackColor={{ false: '#767577', true: 'lightgreen' }}
-							thumbColor={isEnabled ? 'green' : 'white'}
-							onValueChange={(val) => toggleSwitch(val)}
-							value={isEnabled}
-						/>
+						<View style={[styles.grpExpcontainer, styles.container1]}>
+							<Text style={styles.grpExpText}>Group Expense : </Text>
+							<Switch
+								trackColor={{ false: '#767577', true: 'lightgreen' }}
+								thumbColor={isEnabled ? 'green' : 'white'}
+								onValueChange={(val) => toggleSwitch(val)}
+								value={isEnabled}
+							/>
 						</View>
 						<View style={styles.container2}>
 							<Text style={styles.head}>Add note</Text>
@@ -630,8 +671,8 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.5,
 		shadowColor: "black",
 		shadowOffset: {
-			height:5,
-			width:5
+			height: 5,
+			width: 5
 		},
 		elevation: 5,
 		backgroundColor: "white",
@@ -680,6 +721,7 @@ const styles = StyleSheet.create({
 	},
 
 	inputText: {
+		padding : 0,
 		borderRadius: 5,
 		color: darkGreen,
 		paddingHorizontal: 5,
@@ -848,17 +890,17 @@ const styles = StyleSheet.create({
 		marginTop: 5,
 	},
 	grpExpcontainer: {
-        backgroundColor: 'rgba(0,0,0,0.2)',
-        borderRadius: 10,
-        flexDirection: "row",
-        justifyContent: 'space-between',
-        alignItems: "center",
-        marginVertical: 5,
-        height: 50,
-        paddingHorizontal: 20,
-    },
-	grpExpText : {
-		color : darkGreen,
-		fontWeight : 'bold'
+		backgroundColor: 'rgba(0,0,0,0.2)',
+		borderRadius: 10,
+		flexDirection: "row",
+		justifyContent: 'space-between',
+		alignItems: "center",
+		marginVertical: 5,
+		height: 50,
+		paddingHorizontal: 20,
+	},
+	grpExpText: {
+		color: darkGreen,
+		fontWeight: 'bold'
 	}
 });
