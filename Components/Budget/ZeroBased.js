@@ -251,13 +251,13 @@ const ZeroBased = (props) => {
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index)}>
-                        <Image source={require('../Images/remove.png')} style={styles.buttonImg} />
+                        <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
                     </TouchableOpacity>
                 </View>
                     }
                     ListEmptyComponent={
                         <View style={styles.noBudget}>
-                            <Image source={require('../Images/no-data.png')} style={{ width: 100, height: 100 }} />
+                            <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
                             <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
                         </View>
                     }

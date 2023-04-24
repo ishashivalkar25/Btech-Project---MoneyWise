@@ -25,8 +25,8 @@ import {
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const {width, height} = Dimensions.get('window');
-const EditProfile = ({navigation}) => {
+const { width, height } = Dimensions.get('window');
+const EditProfile = ({ navigation, route}) => {
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [phoneNo, setPhoneNo] = React.useState('');
@@ -39,43 +39,18 @@ const EditProfile = ({navigation}) => {
   const [formattedDate, setFormattedDate] = React.useState('');
   const [isChanged, setChanged] = React.useState(false);
 
-  const fetchUserDetails = async () => {
-    try {
-      const docRef = doc(db, 'User', 'o4qWuRGsfDRbSyuA1OO2yljfjDr1');
-      const data = await getDoc(docRef);
-      const userData = data.data();
-      setName(userData.name);
-      const tempDate = new Date(
-        userData.DOB.seconds * 1000 + userData.DOB.nanoseconds / 1000000,
-      );
-
-      console.log(tempDate, 'userData.DOB');
-      setDOB(tempDate);
-      setEmail(userData.email);
-      setBankName(userData.bankName);
-      setAccBalance(userData.accBalance);
-      setPhoneNo(userData.phoneNo);
-      setFormattedDate(
-        tempDate.getDate() +
-          ' / ' +
-          (tempDate.getMonth() + 1) +
-          ' / ' +
-          tempDate.getFullYear(),
-      );
-      console.log(userData);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchUserDetails();
-    });
-
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
+  React.useEffect(()=> {
+   
+    const tempDate = new Date(route.params.DOB);
+    console.log(tempDate, '****************************************************************');
+    setName(route.params.name);
+    setPhoneNo(route.params.phoneNo);
+    setDOB(tempDate);
+    setBankName(route.params.bankName);
+    setAccBalance(route.params.accBalance);
+    setFormattedDate(tempDate.getDate() + ' / ' + (tempDate.getMonth() + 1) + ' / ' + tempDate.getFullYear());
+    
+  }, [route.params])
 
   const handlePhoneNumberChange = phoneNumberInput => {
     const reg = /^[0]?[789]\d{9}$/;
@@ -154,7 +129,7 @@ const EditProfile = ({navigation}) => {
         });
 
         console.log('User Details Updated Successfully!');
-        navigation.navigate('Home');
+        navigation.navigate('Profile');
       } catch (e) {
         console.log(e);
       }
@@ -165,139 +140,123 @@ const EditProfile = ({navigation}) => {
 
   return (
     <View>
-        <ImageBackground
-			source={require('../Assets/Gradient_Back.jpeg')}
-			style={{ width: width, height: '100%'}}>
-    <View style={styles.container}>
-        <ScrollView>
-      <View style={styles.action} >
-        <Image
-          source={require('../Assets/profile1.png')}
-          style={{height: 17, width: 19, marginRight: 0.20}}
-        />
-        <TextInput
-          placeholder="Name"
-          placeholderTextColor="#666666"
-          autoCorrect={false}
-          style={[
-            styles.textInput,
-            {
-              color: '#006A42',
-            },
-          ]}
-          onChangeText={text => {
-            setName(text);
-            setChanged(true);
-          }}
-        />
-      </View>
+      <ImageBackground
+        source={require('../Assets/Background.jpeg')}
+        style={{ width: width, height: '100%' }}>
+        <View style={styles.container}>
+          <ScrollView>
+            <View style={styles.action} >
+              <Image
+                source={require('../Assets/profile1.png')}
+                style={styles.img}
+              />
+              <TextInput
+                placeholder="Name"
+                placeholderTextColor="#666666"
+                autoCorrect={false}
+                style={[
+                  styles.textInput
+                ]}
+                onChangeText={text => {
+                  setName(text);
+                  setChanged(true);
+                }}
+              >{name}</TextInput>
+            </View>
 
-      <View style={styles.action}>
-        <Image
-          source={require('../Assets/email.png')}
-          style={{height: 22, width: 22, marginRight: 0.20}}
-        />
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#666666"
-          keyboardType="email-address"
-          autoCorrect={false}
-          style={[
-            styles.textInput,
-            {
-              color: '#006A42',
-            },
-          ]}
-        />
-      </View>
+            {/* <View style={styles.action}>
+              <Image
+                source={require('../Assets/email.png')}
+                style={styles.img}
+              />
+              <TextInput
+                placeholder="Email"
+                placeholderTextColor="#666666"
+                keyboardType="email-address"
+                autoCorrect={false}
+                style={[
+                  styles.textInput,
+                ]}
+                >{email}</TextInput>
+            </View> */}
 
-      <View style={styles.action}>
-        <Image
-          source={require('../Assets/telephone.png')}
-          style={{height: 17, width: 17, marginRight: 0.20}}
-        />
-        <TextInput
-          placeholder="Phone"
-          placeholderTextColor="#666666"
-          keyboardType="number-pad"
-          autoCorrect={false}
-          style={[
-            styles.textInput,
-            {
-              color: '#006A42',
-            },
-          ]}
-          onChangeText={text => handlePhoneNumberChange(text)}
-        />
-      </View>
+            <View style={styles.action}>
+              <Image
+                source={require('../Assets/telephone.png')}
+                style={styles.img}
+              />
+              <TextInput
+                placeholder="Phone"
+                placeholderTextColor="#666666"
+                keyboardType="number-pad"
+                autoCorrect={false}
+                style={[
+                  styles.textInput,
+                ]}
+                onChangeText={text => handlePhoneNumberChange(text)}
+                >{phoneNo}</TextInput>
+            </View>
 
-      <View style={styles.action}>
-        <Image
-          source={require('../Assets/calendar.png')}
-          style={{height: 18, width: 18, marginRight: 0.20}}
-        />
+            <View style={styles.action}>
+              <Image
+                source={require('../Assets/calendar.png')}
+                style={styles.img}
+              />
 
-        <Pressable
-            onPress={() => setShow(true)}>
-            <Text style={{color :'#666666', fontSize:15, paddingLeft:20, marginBottom:9}} >Date Of Birth</Text>
-          </Pressable>
-      </View>
+              <Pressable
+                onPress={() => setShow(true)}>
+                <Text style={styles.textInput} >{formattedDate}</Text>
+              </Pressable>
+            </View>
 
-      <View style={styles.action}>
-        <Image
-          source={require('../Assets/bank.png')}
-          style={{height: 17, width: 17, marginRight: 0.20}}
-        />
-        <TextInput
-          placeholder="Bank Name"
-          placeholderTextColor="#666666"
-          autoCorrect={false}
-          style={[
-            styles.textInput,
-            {
-              color: '#006A42',
-            },
-          ]}
-          onChangeText={text => {
-            setBankName(text);
-            setChanged(true);
-          }}></TextInput>
-      </View>
+            <View style={styles.action}>
+              <Image
+                source={require('../Assets/bank.png')}
+                style={styles.img}
+              />
+              <TextInput
+                placeholder="Bank Name"
+                placeholderTextColor="#666666"
+                autoCorrect={false}
+                style={[
+                  styles.textInput,
+                ]}
+                onChangeText={text => {
+                  setBankName(text);
+                  setChanged(true);
+                }}>{bankName}</TextInput>
+            </View>
 
-      <View style={styles.action}>
-        <Image
-          source={require('../Assets/balance.png')}
-          style={{height: 25, width: 25, marginRight: 0.20}}
-        />
-        <TextInput
-          placeholder="Account Balance"
-          placeholderTextColor="#666666"
-          keyboardType="number-pad"
-          autoCorrect={false}
-          style={[
-            styles.textInput,
-            {
-              color: '#006A42',
-            },
-          ]}
-          onChangeText={text => handleAccBalanceChange(text)}
-        />
-      </View>
+            <View style={styles.action}>
+              <Image
+                source={require('../Assets/balance.png')}
+                style={styles.img}
+              />
+              <TextInput
+                placeholder="Account Balance"
+                placeholderTextColor="#666666"
+                keyboardType="number-pad"
+                autoCorrect={false}
+                style={[
+                  styles.textInput,
+                ]}
+                onChangeText={text => handleAccBalanceChange(text)}
+                >{accBalance}</TextInput>
+            </View>
 
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={DOB}
-          display="default"
-          is24Hour={true}
-          onChange={onChange}
-          style={styles.datePicker}
-        />
-      )}
+            {show && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={DOB}
+                display="default"
+                is24Hour={true}
+                onChange={onChange}
+                style={styles.datePicker}
+              />
+            )}
 
             <TouchableOpacity
-              onPress={() => {}}
-              style={{
+              style={[{
                 backgroundColor: '#006A42',
                 borderRadius: 200,
                 alignItems: 'center',
@@ -305,13 +264,16 @@ const EditProfile = ({navigation}) => {
                 paddingVertical: 5,
                 marginVertical: 100,
                 alignSelf: 'center',
-              }}>
+              }, isChanged ? styles.enabled : styles.disabled ]}
+              onPress={() => updateUserDetails()}
+              disabled={!isChanged}
+              >
               <Text style={{ color: "white", fontSize: 20, fontWeight: 'bold', margin: 0 }}> Submit </Text>
             </TouchableOpacity>
-     </ScrollView>
+          </ScrollView>
+        </View>
+      </ImageBackground>
     </View>
-    </ImageBackground>
-    </View> 
   );
 };
 
@@ -319,13 +281,13 @@ export default EditProfile;
 
 const styles = StyleSheet.create({
   container: {
-    flex: Platform.OS === 'ios' ? 3 : 5,
-    //flex:1,
+    // flex: Platform.OS === 'ios' ? 3 : 5,
+    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 25,
     paddingVertical: 30,
     width: '95%',
-    height:300,
+    height: 300,
     alignSelf: 'center',
     marginVertical: 35,
     shadowOpacity: 0.5,
@@ -336,12 +298,6 @@ const styles = StyleSheet.create({
     },
     elevation: 6,
   },
-  disabled: {
-    opacity: 0.7,
-  },
-  enabled: {
-    opacity: 1,
-  },
   commandButton: {
     padding: 15,
     borderRadius: 10,
@@ -349,27 +305,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  
-  header: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#333333',
-    shadowOffset: {width: -1, height: -3},
-    shadowRadius: 2,
-    shadowOpacity: 0.4,
-    // elevation: 5,
-    paddingTop: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
 
   action: {
     flexDirection: 'row',
-    marginTop: 15,
-    marginBottom: 10,
-    paddingLeft: 35,
-	borderBottomColor: 'rgba(0,0,0,0.5)',
-	borderBottomWidth: StyleSheet.hairlineWidth,
+    alignItems: 'flex-end',
+    height: 50,
+    paddingHorizontal: 35,
+    paddingBottom : 5,
+    marginHorizontal: 20,
+    borderBottomColor: 'rgba(0,0,0,0.5)',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
+
   actionError: {
     flexDirection: 'row',
     marginTop: 10,
@@ -377,11 +324,26 @@ const styles = StyleSheet.create({
     borderBottomColor: '#FF0000',
     paddingBottom: 5,
   },
+  img: {
+    height: 19,
+    width: 19,
+    marginRight : 20,
+  },
+
   textInput: {
-    //flex: 1,
-    marginTop: Platform.OS === 'ios' ? 0 : -12,
-    paddingLeft: 10,
-    color: '#05375a',
-    fontSize:15,
-  },  
+    color: '#006A42',
+    fontSize: 15,
+    padding: 0,
+    margin: 0,
+    height: 40,
+    textAlignVertical: 'bottom',
+  },
+
+  disabled: {
+    opacity: 0.7
+  },
+  enabled: {
+      opacity: 1
+  }
+
 });

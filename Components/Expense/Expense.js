@@ -235,7 +235,7 @@ function Expense(props) {
         <>
             <View  style={{ width: "100%" }}>
                 <ImageBackground
-                    source={require("../../Assets/background.jpg")}
+                    source={require("../../Assets/Background.jpeg")}
                     style={{
                         height: "100%",
                     }}
@@ -255,7 +255,7 @@ function Expense(props) {
                                 <Text>Period</Text>
                             </TouchableOpacity> */}
                         </View>
-                        <View style={{ backgroundColor: "lightgreen", borderRadius:5}}>
+                        <View style={{ backgroundColor: "rgb(211, 211, 211)", borderRadius:5}}>
                             {(recordsFilter == "Day") && (<View style={styles.choose_filter_date}>
                                 <TouchableOpacity onPress={() => setDatePicker(true)}>
                                     <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>

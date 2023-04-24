@@ -330,29 +330,30 @@ function Income({navigation, route}) {
     
 	const checkPermisson = async () => {
 
-		var granted = await PermissionsAndroid.request(
-			PermissionsAndroid.PERMISSIONS.READ_SMS
-		);
-		console.log(granted, "***");
-		if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-			console.log("in")
-			granted = await PermissionsAndroid.request(
-				PermissionsAndroid.PERMISSIONS.RECEIVE_SMS
-			);
-
-			if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-				console.log("RECEIVE_SMS permissions granted", granted);
-				return true;
-			}
-			else {
-				console.log("RECEIVE_SMS permissions denied");
-				return false;
-			}
-		}
-		else {
-			return false;
-		}
-
+        try{
+            const permissions = [
+                PermissionsAndroid.PERMISSIONS.READ_SMS, 
+                PermissionsAndroid.PERMISSIONS.SEND_SMS,
+                PermissionsAndroid.PERMISSIONS.RECEIVE_SMS
+              ];
+    
+            var granted = await PermissionsAndroid.requestMultiple(permissions);
+            if (
+                granted[PermissionsAndroid.PERMISSIONS.READ_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
+                granted[PermissionsAndroid.PERMISSIONS.SEND_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
+                granted[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] === PermissionsAndroid.RESULTS.GRANTED
+              ) 
+              {
+                console.log('All permissions granted');
+                return true;
+              } else {
+                console.log('Some permissions not granted');
+                return false;
+              }
+        } catch (err) {
+            console.warn(err);
+        }
+       
 	}
     const updateLastViewTS = async (lastViewTS) => {
         console.log("updateLastViewTS")
@@ -389,7 +390,7 @@ function Income({navigation, route}) {
     return (
             <KeyboardAvoidingView style={{ width: "100%"}}>
                 <ImageBackground
-                    source={require("../../Assets/background.jpg")}
+                    source={require("../../Assets/Background.jpeg")}
                     style={{
                         height: "100%",
                     }}
@@ -406,7 +407,7 @@ function Income({navigation, route}) {
                                 <Text style={styles.choose_filter_text}>Year</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={{ backgroundColor: "lightgreen", borderRadius: 5 }}>
+                        <View style={{ backgroundColor: "rgb(211, 211, 211)", borderRadius: 5 }}>
                             {(recordsFilter == "Day") && (<View style={styles.choose_filter_date}>
                                 <TouchableOpacity onPress={() => setDatePicker(true)}>
                                     <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>

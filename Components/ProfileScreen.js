@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, SafeAreaView, StyleSheet, TouchableOpacity, Dimensions, Image, Text, ImageBackground } from 'react-native';
+import { View, SafeAreaView, StyleSheet, TouchableOpacity, Dimensions, Image, Text, ImageBackground, Pressable} from 'react-native';
 import {
 	Title,
 	Caption,
 	TouchableRipple,
 } from 'react-native-paper';
+import {
+	auth,
+	db,
+	collection,
+	getDocs,
+	getDoc,
+	doc,
+	updateDoc,
+  } from '../Firebase/config';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Animatable from 'react-native-animatable';
 import { NavigationContainer } from '@react-navigation/native';
@@ -23,6 +32,29 @@ const ProfileScreen = ({ navigation }) => {
 	const [show, setShow] = React.useState(false);
 	const [formattedDate, setFormattedDate] = React.useState("");
 	const [isChanged, setChanged] = React.useState(false);
+
+	React.useEffect(() => {
+	
+		navigation.setOptions({
+			headerRight: () => (
+				<View style={{marginRight: 10}}>
+				  <Pressable onPress={() => {navigation.navigate('EditProfile', { 
+					name : name,
+					phoneNo : phoneNo,
+					DOB : DOB.getTime(),
+					bankName : bankName,
+					accBalance : accBalance
+				}) ;console.log(name, phoneNo, '///////////////////////////////')}}>
+				  <Image
+				  source={require("../Assets/Profile_edit.png")}
+				  style={ { height: 25, width: 25}} 
+				/>
+				</Pressable>
+				</View>
+			  ),
+		});
+		
+	}, [name, phoneNo, bankName, accBalance, DOB]);
 
 	const fetchUserDetails = async () => {
 		try {
@@ -47,8 +79,10 @@ const ProfileScreen = ({ navigation }) => {
 	}
 
 	React.useEffect(() => {
+		
 		const unsubscribe = navigation.addListener('focus', () => {
 			fetchUserDetails();
+			
 		});
 
 		// Return the function to unsubscribe from the event so it gets removed on unmount
@@ -66,7 +100,7 @@ const ProfileScreen = ({ navigation }) => {
 					<Title style={[styles.title, {
 						marginTop: 15,
 						marginBottom: 85,
-					}]}>John Doe</Title>
+					}]}>{name}</Title>
 				</View>
 			</ImageBackground>
 
@@ -76,36 +110,36 @@ const ProfileScreen = ({ navigation }) => {
 					<View style={styles.menuItem}>
 						<Image source={require("../Assets/profile1.png")} style={styles.menuItemImg} />
 						<Text style={styles.menuItemText}>
-							Isha Shivalkar
+							{name}
 						</Text>
 					</View>
 
 					<View style={styles.menuItem}>
 						<Image source={require("../Assets/email.png")} style={styles.menuItemImg} />
-						<Text style={styles.menuItemText}>rutujap201@gmail.com
+						<Text style={styles.menuItemText}>{email}
 						</Text>
 					</View>
 
 					<View style={styles.menuItem}>
 						<Image source={require("../Assets/telephone.png")} style={styles.menuItemImg} />
-						<Text style={styles.menuItemText}>9767907903</Text>
+						<Text style={styles.menuItemText}>{phoneNo}</Text>
 					</View>
 
 					<View style={styles.menuItem}>
 						<Image source={require("../Assets/calendar.png")} style={styles.menuItemImg} />
-						<Text style={styles.menuItemText}>05/02/2001</Text>
+						<Text style={styles.menuItemText}>{formattedDate}</Text>
 					</View>
 				</View>
 
 				<Text style={{ color: "#006A42", marginLeft: 20, fontWeight: 'bold', fontSize: 17, marginTop: 20 }}>Bank Details</Text>
 				<View style={styles.bankDetailsContainer}>
 					<Text style={styles.bankText} >Bank Name :</Text>
-					<Text style={styles.bankData}>State Bank Of India</Text>
+					<Text style={styles.bankData}>{bankName}</Text>
 				</View>
 
 				<View  style={styles.bankDetailsContainer}>
 					<Text style={styles.bankText} >Balance :</Text>
-					<Text style={styles.bankData}>5000</Text>
+					<Text style={styles.bankData}>{accBalance}</Text>
 				</View>
 			</Animatable.View>
 

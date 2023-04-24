@@ -23,7 +23,7 @@ const Index = (props) => {
     return (
         <View style={{marginTop:insets.top}}>
         <ImageBackground
-          source={require('../Assets/background.jpg')}
+          source={require('../Assets/Background.jpeg')}
           style={{width: '100%', height: '100%'}}
         >
            <View style={{marginTop:40}}></View>

@@ -11,6 +11,7 @@ import {
     TouchableRipple,
     Switch
 } from 'react-native-paper';
+import { getDoc, auth , doc, db} from '../Firebase/config'
 import {
     DrawerContentScrollView,
     DrawerItem,
@@ -23,9 +24,26 @@ import Icon from 'react-native-vector-icons';
 
 export function DrawerContent(props) {
 
-    // const paperTheme = useTheme();
+    const [name, setName] = React.useState('');
+    const [email, setEmail] = React.useState('');
 
-    // const { signOut, toggleTheme } = React.useContext(AuthContext);
+    React.useEffect(() => {
+        getUser();
+    }, [])
+    
+    const getUser = async() =>
+    {
+        try{
+            const document = await getDoc(doc(db, "User", auth.currentUser.uid));
+    
+            setName(document.data().name);
+            setEmail(document.data().email);
+        }catch(e)
+        {
+            console.log(e);
+        }
+        
+    }
 
     return(
         <View style={{flex:1}}>
@@ -41,8 +59,8 @@ export function DrawerContent(props) {
                             /> */}
                             <View style={{marginLeft:15, flexDirection:'column'}}>
                             <Text style={styles.welcome}>Welcome !</Text>
-                            <Title style={styles.title}>Rutuja Patil</Title>
-                            <Caption style={styles.caption}>@ruts</Caption>
+                            <Title style={styles.title}>{name}</Title>
+                            <Caption style={styles.caption}>{email}</Caption>
                             </View>
                         {/* </View> */}
 
@@ -99,9 +117,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userInfoSection: {
-    paddingLeft: 20,
+    paddingLeft: 5,
     backgroundColor: '#006A42',
-    height:130,
+    height:150,
   },
   welcome: {
     fontSize: 30,
@@ -120,6 +138,7 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     marginTop:4,
     color: 'white',
+    flexWrap: 'wrap'
   },
   row: {
     marginTop: 20,

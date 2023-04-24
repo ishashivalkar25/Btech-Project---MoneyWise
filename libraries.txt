@@ -35,6 +35,8 @@ npm i trny
 npm install react-native-vision-camera
 npm i vision-camera-code-scanner
 
+npm i lottie-react-native
+
 cd android     
 ./gradlew clean
 cd ..

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   View,
@@ -30,11 +29,16 @@ import LinearGradient from 'react-native-linear-gradient';
 // import Field from './Field';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useState, useEffect } from 'react';
-import { darkGreen } from '../../Assets/Constants';
+import { darkGreen } from '../Constants';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDoc } from 'firebase/firestore';
 
+//notifications import
+import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
+
+
 const { width, height } = Dimensions.get('window');
+let notifyTime=0
 
 const AddFixedExp = ({ navigation }) => {
   const [amount, setAmount] = useState(0);
@@ -42,7 +46,9 @@ const AddFixedExp = ({ navigation }) => {
   const [ExpName, setExpName] = useState('');
   const [datePicker, setDatePicker] = useState(false);
   const [date, setDate] = useState(new Date());
+  const [notificationTime, setNotificationTime] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [triggerNotifeeId, setTriggerNotifeeId] = useState();
 
   function showDatePicker() {
     setDatePicker(true);
@@ -53,13 +59,99 @@ const AddFixedExp = ({ navigation }) => {
     setDatePicker(false);
   }
 
-  const saveFixedExpense = () => {
+  async function cancelNotifee(notificationId) {
+		console.log('canceling notification', notificationId)
+
+		await notifee.cancelTriggerNotification(notificationId);
+	}
+
+  //notification
+  async function onDisplayNotification() {
+    
+    // Create a channel (required for Android)
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+    });
+
+    // Display a notification
+    await notifee.displayNotification({
+      title: 'Time to pay',
+      body: 'Main body content of the notification',
+      android: {
+        channelId,
+         pressAction: {
+          id: 'default',
+        },
+      },
+    });
+  }
+  
+  async function onCreateTriggerNotification() {
+
+// Create a channel (required for Android)
+const channelId = await notifee.createChannel({
+  id: 'default',
+  name: 'Default Channel',
+});
+
+
+// Create a time-based trigger
+const trigger = {
+  id:ExpName,
+  type: TriggerType.TIMESTAMP,
+  timestamp: notifyTime  , 
+};
+
+// Create a trigger notification
+const notId = await notifee.createTriggerNotification({
+  id: ExpName,
+  title: 'Time to pay fixed expense',
+  body: ExpName,
+  android: {
+    channelId,
+    pressAction: {
+      id: ExpName,
+    },
+  },
+}, trigger);
+
+setTriggerNotifeeId(notId);
+
+}
+
+  const saveFixedExpense = async () => {
 
     if (ExpName == "" && category == "" && amount <= 0) {
       alert("Please, enter valid details!");
       return;
     }
+
+    
+    if(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),16-5,52-30) < Date.now())
+    {
+      const t=Date.now()+1000*60*3;
+      // setNotificationTime(1202);
+      notifyTime=Date.now()+1000*60*1;
+    }
+    else
+    {
+      notifyTime=Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),16-5,52-30)
+    }
+
+    // setNotifyTime(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),16-5,52-30))
+    onCreateTriggerNotification();
+
     addFixedExpToDB();
+
+    // console.log('Notification ids are:',JSON.stringify(notifee.getTriggerNotificationIds()));
+    // const notificationIds = await notifee.getTriggerNotificationIds();
+
+
+// console.log('Notification ids are:',notificationIds);
+notifee.getTriggerNotificationIds().then(ids => console.log('All trigger notifications: ', ids));
+
+    // cancelNotifee(ExpName);
   }
 
   const addFixedExpToDB = async() => {
@@ -70,14 +162,15 @@ const AddFixedExp = ({ navigation }) => {
         category: category,
         amount: amount,
         dueDate: date,
-        status : "Unpaid"
+        status : "Unpaid",
+        triggerNotificationId:triggerNotifeeId
       });
       console.log("Saved");
       navigation.navigate("FixedExp");
       alert(`Fixed Expense is saved Successfully!`);
     }
     catch (e) {
-      console.log(e)
+      // console.log(e)
     }
 }
 
@@ -86,7 +179,7 @@ return (
     <View style={styles.header}>
       <View style={styles.curve}>
         <ImageBackground
-          source={require('../../Assets/background.jpg')}
+          source={require('../../Assets/Background.jpeg')}
           style={styles.curvedImg}>
           <Text style={styles.text_header}>Add Fixed Payment</Text>
         </ImageBackground>
@@ -127,7 +220,7 @@ return (
             />
           )}
 
-          <Text style={styles.text_footer}>Deu Date</Text>
+          <Text style={styles.text_footer}>Due Date</Text>
 
 
           {!datePicker && (
@@ -141,7 +234,7 @@ return (
                   date.getFullYear()}
               </Text>
               <Image
-                source={require("../../Assets/Calender.jpg")}
+                source={require("../../Assets/calendar.png")}
                 style={{ width: 30, height: 30 }}
                 onPress={() => console.log("image pressed")}
               />

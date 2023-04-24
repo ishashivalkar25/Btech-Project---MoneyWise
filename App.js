@@ -2,6 +2,7 @@ import { View, TouchableOpacity, Image, StatusBar, Pressable, StyleSheet} from "
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { DrawerContent } from './Components/DrawerContent';
 import HomePage from "./Components/HomePage";
+import SplashScreen from "./Components/SplashScreen/SplashScreen";
 import ProfileScreen from "./Components/ProfileScreen";
 import EditProfile from "./Components/EditProfile";
 import FixedExp from "./Components/FixedExpenses/FixedExp";
@@ -29,6 +30,13 @@ function Root({navigation}) {
       <Drawer.Screen name="HomePage"
             component={HomePage}
             options={{
+              drawerIcon: ({ focused, size }) => (
+                <Image
+                  source={require("./Assets/home.png")}
+                  style={[focused ? styles.drawerActive : styles.drawerInActive, { height: 20, width: 20}]}
+                />
+              ),
+              drawerActiveTintColor:"#006A42",
               headerTitle: () => <Header></Header>,
               headerRight: () => (
                 <View>
@@ -58,20 +66,30 @@ function Root({navigation}) {
             />
           ),
           drawerActiveTintColor:"#006A42",
-          headerRight: () => (
-            <View style={{marginRight: 10}}>
-              <Pressable onPress={() => navigation.navigate('EditProfile')}>
-              <Image
-              source={require("./Assets/Profile_edit.png")}
-              style={ { height: 25, width: 25}} 
-            />
-            </Pressable>
-            </View>
-          ),
         }}
       />
-      <Drawer.Screen name="FixedExp" component={FixedExp} />
-      <Drawer.Screen name="Budget" component={Budget} />
+      <Drawer.Screen name="Fixed Expense" component={FixedExp} 
+        options={{
+          drawerIcon: ({ focused, size }) => (
+            <Image
+              source={require("./Assets/Fixed_Payment.png")}
+              style={[focused ? styles.drawerActive : styles.drawerInActive, { height: 20, width: 20}]}
+            />
+          ),
+          drawerActiveTintColor:"#006A42",
+        }}
+      />
+      <Drawer.Screen name="Manage Budget" component={Budget} 
+        options={{
+          drawerIcon: ({ focused, size }) => (
+            <Image
+              source={require("./Assets/Budget.png")}
+              style={[focused ? styles.drawerActive : styles.drawerInActive, { height: 20, width: 20}]}
+            />
+          ),
+          drawerActiveTintColor:"#006A42",
+        }}
+      />
     </Drawer.Navigator>
   );
 }
@@ -81,7 +99,8 @@ const App = () => {
     <NavigationContainer>
       <StatusBar></StatusBar>
       <Stack.Navigator>
-        <Stack.Screen name="Index" component={Index} options={{ headerShown: false }} />
+        <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
+        {/* <Stack.Screen name="Index" component={Index} options={{ headerShown: false }} /> */}
         <Stack.Screen name="Login" component={Login} options={{ headerTitle: () => <Header></Header> }} />
         <Stack.Screen name="Sign Up" component={SignUp} options={{ headerTitle: () => <Header></Header> }} />
         <Stack.Screen name="Root" component={Root} options={{ headerShown: false }}/>

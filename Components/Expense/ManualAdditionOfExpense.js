@@ -22,7 +22,7 @@ import {
 	getDoc,
 	storage,
 	auth,
-	doc
+	doc,setDoc
   } from '../../Firebase/config';
   import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
   import DateTimePicker from "@react-native-community/datetimepicker";
@@ -32,13 +32,13 @@ import {
   import { darkGreen } from "../Constants";
   import * as ImagePicker from 'react-native-image-picker';
   import { useSafeAreaInsets } from 'react-native-safe-area-context';
-  import { Alert } from "react-native";
+  import SmsAndroid from 'react-native-get-sms-android';
 
 const { width, height } = Dimensions.get("window");
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-export default function ManualAdditionOfExpense({navigation}) {
+export default function ManualAdditionOfExpense({navigation, route}) {
 
 	const [category, setCategory] = useState([]);
 	const [userExpCategories, setUserExpCategories] = useState([]);
@@ -50,19 +50,37 @@ export default function ManualAdditionOfExpense({navigation}) {
 	const [amount, setAmount] = useState(0);
 	const [description, setDescription] = useState("");
 	const [mounted, setMounted] = useState(false);
+	const [grpMembersList, setGrpMembersList] = useState([]);
 
 
 	const [isEnabled, setIsEnabled] = useState(false);
 
 	const toggleSwitch = (val) => {
-		setIsEnabled(previousState => !previousState);
-		console.log(isEnabled)
-		if(val){
-			navigation.navigate("AddGrpExpMembers", {
-			splitAmount : 1000,
-			})
+
+		if(amount>0)
+		{
+			setIsEnabled(previousState => !previousState);
+			console.log(isEnabled)
+			if(val){
+				navigation.navigate("AddGrpExpMembers", {
+				splitAmount : amount,
+				})
+			}
+		}
+		else
+		{
+			alert("Please Enter Expense Amount!")
 		}
 	}
+
+	useEffect(() => {
+
+		if(route.params && route.params.grpMembersList)
+		{
+			console.log(route.params.grpMembersList,'route.params.grpMembersList');
+			setGrpMembersList(grpMembersList);
+		}
+	}, [route.params])
 
 	useEffect(() => {
 		const loadData = async () => {
@@ -134,6 +152,7 @@ export default function ManualAdditionOfExpense({navigation}) {
 	};
 
 	const saveExpense = async () => {
+		console.log(grpMembersList , 'grpMembersListIn')
 		try {
 			if (amount == 0) {
 				// Add a Toast on screen.
@@ -149,6 +168,19 @@ export default function ManualAdditionOfExpense({navigation}) {
 			else if (selectedCategory == "") {
 				// Add a Toast on screen.
 				let toast = Toast.show("Please select category.", {
+					duration: Toast.durations.LONG,
+				});
+
+				// You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
+				setTimeout(function hideToast() {
+					Toast.hide(toast);
+				}, 800);
+			}
+			else if(isEnabled && !route.params && route.params.grpMembersList)
+			{ 
+				alert('Please add group members to split an expense.')
+				// Add a Toast on screen.
+				let toast = Toast.show("Please add group members to split an expense.", {
 					duration: Toast.durations.LONG,
 				});
 
@@ -233,23 +265,53 @@ export default function ManualAdditionOfExpense({navigation}) {
 
 				console.log(selectedCategory);
 				if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
-					const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
-						expAmount: amount,
-						expDate: date,
-						expCategory: selectedCategory,
-						expDescription: description,
-						expImage: pickedImagePath,
-						groupExp : isEnabled, 
-					});
+
+					if(isEnabled)
+					{
+						const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
+							expAmount: amount,
+							expDate: date,
+							expCategory: selectedCategory,
+							expDescription: description,
+							expImage: pickedImagePath,
+							groupExp: isEnabled,
+							grpMembersList : grpMembersList
+						});
+					}
+					else
+					{
+						const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
+							expAmount: amount,
+							expDate: date,
+							expCategory: selectedCategory,
+							expDescription: description,
+							expImage: pickedImagePath,
+							groupExp: isEnabled,
+						});
+					}
+					
 				}
 				else {
-					const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
-						expAmount: amount,
-						expDate: date,
-						expCategory: selectedCategory,
-						expDescription: description,
-						groupExp : isEnabled, 
-					});
+					if(isEnabled){
+						const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
+							expAmount: amount,
+							expDate: date,
+							expCategory: selectedCategory,
+							expDescription: description,
+							groupExp : isEnabled, 
+							grpMembersList : grpMembersList
+						});
+					}
+					else{
+						const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
+							expAmount: amount,
+							expDate: date,
+							expCategory: selectedCategory,
+							expDescription: description,
+							groupExp : isEnabled, 
+						});
+					}
+					
 				}
 
 				//add category to user expense categories if not present
@@ -298,11 +360,32 @@ export default function ManualAdditionOfExpense({navigation}) {
 				});
 
 
-				
-			}
+				if(isEnabled)
+				{
+					const document = await getDoc(doc(db, "User", auth.currentUser.uid));
+					const userName = document.data().name;
+					route.params.grpMembersList.forEach((item) => {
 
-			alert("Record Added Successfully");
-			navigation.replace("HomePage");
+						const message = `${userName} has split a bill with you. Kindly pay amount of Rs.${item.amount}.`
+						SmsAndroid.autoSend(
+							item.contactNo,
+							message,
+							(fail) => {
+							  console.log('Failed with this error: ' + fail);
+							},
+							(success) => {
+							  console.log('SMS sent successfully');
+							},
+						  );
+					})
+					
+				}
+
+				alert("Record Added Successfully");
+				navigation.replace("Root");
+				
+
+			}
 
 
 		} catch (e) {
@@ -314,7 +397,7 @@ export default function ManualAdditionOfExpense({navigation}) {
 
 	return (
 		<ImageBackground
-			source={require('../../Assets/background.jpg')}
+			source={require('../../Assets/Background.jpeg')}
 			style={{ width: width, height: height, marginTop: insets.top }}
 		>
 			<Text style={styles.Title}>Add Expense</Text>
@@ -379,14 +462,6 @@ export default function ManualAdditionOfExpense({navigation}) {
 										setVisibilityOfCatModal(true);
 									}
 								}}
-							// renderLeftIcon={() => (
-							//   <AntDesign
-							//     style={styles.icon}
-							//     color="black"
-							//     name="Safety"
-							//     size={20}
-							//   />
-							// )}
 							/>
 						</View>
 

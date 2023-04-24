@@ -4,6 +4,11 @@ import { SafeAreaView, StyleSheet, Text, View, TextInput, FlatList, Image, Touch
 import { Dropdown } from 'react-native-element-dropdown';
 import MonthPicker from 'react-native-month-year-picker';
 import { auth, db, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc} from "../../Firebase/config";
+import FiftyThirtyTwenty from './FiftyThirtyTwenty';
+import Envelope from './Envelope';
+import ZeroBased from './ZeroBased';
+
+
 
 
 const budgetMethods = [
@@ -53,14 +58,16 @@ const SetBudget = ({navigation}) => {
     const fetchExpCategories = async () => {
 
         try {
+            // const querySnapshot = await getDocs(collection(db, "ExpCategory"));
+            // const tempCategories = [];
+            // querySnapshot.forEach((doc) => {
+            //     const tempCategory = doc.data();
+            //     tempCategories.push({ label: tempCategory.ExpCatName, value: tempCategory.ExpCatName });
+            // });
             const docRef = doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1");
             const user = await getDoc(docRef);
-            console.log(user.data().expCategories, " Categories **");
-            const tempCategories = [];
-            user.data().expCategories.forEach((item)=> {
-                tempCategories.push({ label: item, value: item });
-            })
-            setCategories(tempCategories);
+            setCategories(user.data().expCategories);
+            // setCategories(tempCategories);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
@@ -71,89 +78,7 @@ const SetBudget = ({navigation}) => {
         console.log(categories);
     }, [categories]);
 
-
-    const addCategory = () => {
-
-        if (!monthlyInc) {
-            console.log("Please enter Monthly Income!")
-            alert("Please enter Monthly Income!")
-        }
-        else if (monthlyInc <= 0) {
-            alert("Please enter valid Monthly Income!")
-        }
-        else if (!selectedBudgetingMethod) {
-            alert("Please enter Budgeting Method!");
-        }
-        else {
-            setModalVisible(true);
-        }
-    }
-
-    const deleteCategory = (index) => {
-        const rm = categoryWiseBudget.splice(index, 1);
-        const rms = selectedCategories.splice(index, 1);
-        console.log(rm, "rm");
-        console.log(rms, "rms");
-        updateIsCategoryWiseBudgetChanged(true);
-    }
-
-    const editCategoryWiseBudget = (index) => {
-        setEditCatBudgetModalVisible(!editCatBudgetModalVisible)
-        console.log (index);
-        setEditIdx(index);
-    }
-
-    const setEditedCategoryWiseBudget = () => {
-
-        setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
-        console.log(editIdx, " ", categoryBudgetEdit);
-        
-        if(categoryBudgetEdit == null)
-        {
-            alert("Please enter budget amount!")
-        }
-        else if(categoryBudgetEdit<=0)
-        {
-            alert("Please enter valid budget amount!")
-        }
-        else if(editIdx>-1 && categoryWiseBudget.length>editIdx && categoryWiseBudget[editIdx]!=null)
-        {
-            console.log(categoryWiseBudget[editIdx], "****");
-            console.log(categoryWiseBudget[editIdx].budgetPlanned, "**");
-            categoryWiseBudget[editIdx].budgetPlanned = parseFloat(categoryBudgetEdit);
-            console.log(categoryWiseBudget[editIdx]);
-            setCategoryBudgetEdit(null);
-            setEditIdx(-1);
-        }
-    
-
-    }
-
-    const addCategoryWiseBudget = () => {
-
-        setModalVisible(!modalVisible);
-        if (selectedCategory == null) {
-            alert("Please select category!");
-        }
-        else if (selectedCategories.includes(selectedCategory)) {
-            alert(`You have already added ${selectedCategory} category in Budget!`);
-        }
-        else if (categoryBudget <= 0) {
-            alert("Please enter valid budget amount!");
-        }
-        else {
-            selectedCategories.push(selectedCategory);
-            categoryWiseBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent : 0});
-            console.log("categoryWiseBudget", categoryWiseBudget);
-            updateIsCategoryWiseBudgetChanged(true);
-            console.log(isCategoryWiseBudgetChanged);
-            setSelectedCategory(null);
-            setCategoryBudget(null);
-        }
-
-        updateIsCategoryWiseBudgetChanged(false);
-    }
-
+   
     const calculateTotalIncome = () => {
 
         var totalAmount = 0;
@@ -164,72 +89,7 @@ const SetBudget = ({navigation}) => {
         console.log("Total", totalAmount);
         return totalAmount;
     }
-
-    const validateBudget = () => {
-
-        const totalAmount = calculateTotalIncome();
-
-        if(totalAmount>monthlyInc)
-        {
-            alert("Your set budget amount total is exceeding your monthly income.")
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-        
-    }
-
-    const saveBudget = async() => {
-
-        const totalAmount = calculateTotalIncome();
-
-        if(!selectedCategories.includes("Other Expenses"))
-        {
-            categoryWiseBudget.push({ category: "Other Expenses", budgetPlanned: 0, budgetSpent : 0});
-        }
-
-        try{
-            
-            const recordId = months[date.getMonth()] + ""+ date.getFullYear();
-            const docRef = await setDoc(doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1", "Budget", recordId), {
-                method : selectedBudgetingMethod,
-                budget: categoryWiseBudget,
-                saving : monthlyInc - totalAmount,
-                monthlyInc : monthlyInc,
-                totalBudget : totalAmount
-              });
-              console.log("Saved");
-              navigation.navigate("Your Budget", {
-                  budgetChanged : true,
-              });
-              alert(`Budget for ${months[date.getMonth()] + " " + date.getFullYear()} is saved Successfully!`);
-              clearFields();
-        }
-        catch(e)
-        {
-            console.log(e)
-        }
-    }
-    const confirmBudget = () => {
-
-        if(validateBudget())
-        {
-            Alert.alert('Alert Title', 'Do you want to confirm a Budget?', [
-                {
-                    text: 'Cancel',
-                    onPress: () => console.log('Cancel Pressed'),
-                    style: 'cancel',
-                },
-                { 
-                    text: 'Yes', 
-                    onPress: () => saveBudget()
-                },
-            ]);
-        }
-        
-    }
+   
 
     const clearFields = () => {
         setDate(new Date());
@@ -288,115 +148,16 @@ const SetBudget = ({navigation}) => {
                 />
             </View>
             <View style={styles.categoryWiseBudget}>
-                <FlatList
-                    data={categoryWiseBudget}
-                    ListHeaderComponent={
-                        <View style={styles.categoryWiseBudgetTitle}>
-                            <Text style={styles.categoryWiseBudgetTitleText}>Budget Planned : </Text>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={addCategory} >
-                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    renderItem={({ item, index }) =>
-                        <View style={styles.budgetCategory}>
-                            <TouchableOpacity style={styles.budgetCategoryEdit} onPress={() => editCategoryWiseBudget(index)}>
-                                <View style={styles.budgetCategoryCenter}>
-                                    <Text style={styles.budgetCategoryText}>Category Name</Text>
-                                    <Text>{item.category}</Text>
-                                </View>
-                                <View style={styles.budgetCategoryCenter}>
-                                    <Text style={styles.budgetCategoryText}>Budget Planned</Text>
-                                    <Text>{item.budgetPlanned}</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index)}>
-                                <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    ListEmptyComponent={
-                        <View style={styles.noBudget}>
-                            <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                            <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
-                        </View>
-                    }
-                // extraData={isBudgetChanged}
-                />
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={editCatBudgetModalVisible}
-                    onRequestClose={() => {
-                        setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
-                    }}>
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>Enter Budget</Text>
-                            <TextInput
-                                style={styles.budgetAmountInput}
-                                onChangeText={text => setCategoryBudgetEdit(text)}
-                                value={categoryBudgetEdit}
-                                placeholder='Enter Budget for this category...'
-                                keyboardType="numeric"
-                            />
-                            <TouchableOpacity
-                                style={[styles.buttonModal, styles.buttonClose]}
-                                onPress={() => setEditedCategoryWiseBudget()}>
-                                <Text style={styles.textStyle}>Set</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => {
-                        setModalVisible(!modalVisible);
-                    }}>
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>Add Categorywise Budget</Text>
-                            <Dropdown
-                                style={styles.dropdown}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                itemTextStyle={{ color: "black" }}
-                                data={categories}
-                                search
-                                maxHeight={300}
-                                labelField="label"
-                                valueField="value"
-                                placeholder="Select Category"
-                                searchPlaceholder="Search..."
-                                value="category"
-                                onChange={(item) => {
-                                    setSelectedCategory(item.value);
-                                }}
-                            />
-                            <TextInput
-                                style={styles.budgetAmountInput}
-                                onChangeText={text => setCategoryBudget(text)}
-                                value={categoryBudget}
-                                placeholder='Enter Budget for selected category...'
-                                keyboardType="numeric"
-                            />
-                            <TouchableOpacity
-                                style={[styles.buttonModal, styles.buttonClose]}
-                                onPress={addCategoryWiseBudget}>
-                                <Text style={styles.textStyle}>Add</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
+                <View style={{marginBottom:10,justifyContent: 'center'}}>
+                    <Text style={styles.categoryWiseBudgetTitleText}>Budget Planned : </Text>
+                </View>
+                
+                {(selectedBudgetingMethod==="Envelop Method") && <Envelope monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date}/>}
+                {(selectedBudgetingMethod==="Zero Based Budgeting") && <ZeroBased monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date}/>}
+                {(selectedBudgetingMethod==="50-30-20") && <FiftyThirtyTwenty monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date}/>}
+
             </View>
-            <View style={styles.buttonContainer} >
-                <TouchableOpacity style={[styles.button, (categoryWiseBudget!=null && categoryWiseBudget.length > 0) ? styles.enabled : styles.disabled]} disabled={(categoryWiseBudget!=null && categoryWiseBudget.length > 0) ? false : true} onPress={confirmBudget}>
-                    <Text style={styles.buttonText}>Set Budget</Text>
-                </TouchableOpacity>
-            </View>
+            
         </SafeAreaView>
     );
 };

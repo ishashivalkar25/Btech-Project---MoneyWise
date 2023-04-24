@@ -357,7 +357,7 @@ export default function RedirectToPaymentApps(props) {
 
 	return (
 		<ImageBackground
-			source={require('../../Assets/background.jpg')}
+			source={require('../../Assets/Background.jpeg')}
 			style={{ width: width, height: height, marginTop: insets.top }}
 		>
 			<Text style={styles.Title}>Add Expense</Text>

@@ -6,23 +6,23 @@ import {
 	ContributionGraph,
 	StackedBarChart,
 } from "react-native-chart-kit";
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity} from "react-native";
 import { View, Text, Button } from "react-native";
 import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context";
 import Background from "../Background";
 import React, { useState } from 'react'
 import { auth, db, collection, getDocs, doc } from "../../Firebase/config";
 import { pink200 } from "react-native-paper/lib/typescript/src/styles/themes/v2/colors";
-
+import MonthPicker from 'react-native-month-year-picker';
 
 const { height, width } = Dimensions.get("window");
 
 const Visualisation = () => {
 	const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-
+	const [date, setDate] = React.useState(new Date());
+	const [show, setShow] = React.useState(false);
 	const [expenseRecords, setExpenseRecords] = useState([])
 	const [incomeRecords, setIncomeRecords] = useState([])
-
 	const [expenseRecordsDateWise, setExpenseRecordsDateWise] = useState([]);
 	const [expenseRecordsMonthWise, setExpenseRecordsMonthWise] = React.useState([]);
 	const [sortedMonthlyRecords, setsortedMonthlyRecords] = useState();
@@ -33,10 +33,26 @@ const Visualisation = () => {
 
 	const insets = useSafeAreaInsets();
 
+	const showPicker = React.useCallback((value) => setShow(value), []);
+	const onValueChange = React.useCallback(
+        (event, newDate) => {
+            const selectedDate = newDate || date;
+            showPicker(false);
+            setDate(selectedDate);
+        },
+        [date, showPicker],
+    );
+
 	React.useEffect(() => {
 		fetchIncomeRecords();
 		fetchExpenseRecords();
 	}, []);
+
+	React.useEffect(() => {
+		
+		fetchIncomeRecords();
+		fetchExpenseRecords();
+	}, [date]);
 
 	React.useEffect(() => {
 
@@ -104,22 +120,26 @@ const Visualisation = () => {
 
 	const filterExpRecordsMonthlyDateWise = () => {
 		const dateWiseAmt = [];
-		const date = [];
+		const dates = [];
+		console.log(date, '********************------------------')
+		const currMonth = date.getMonth();
+		const currYear = date.getFullYear();
 
 		expenseRecords.forEach((expenseRecord) => {
 
 			const tempDate = getDateFormat(expenseRecord.expDate.seconds)
 			const expDate = new Date(expenseRecord.expDate.seconds * 1000)
 			const expMonth = expDate.getMonth()
-			const currDate = new Date()
-			const currMonth = currDate.getMonth()
+			const expYear = expDate.getFullYear();
+			// const currDate = new Date()
+			
 
-			if (!date.includes(tempDate) && expMonth == currMonth) {
-				date.push(tempDate);
+			if (!dates.includes(tempDate) && expMonth == currMonth && expYear == currYear) {
+				dates.push(tempDate);
 				const data = { "name": tempDate, "amount": Number(expenseRecord.expAmount) };
 				dateWiseAmt.push(data);
 			}
-			else if (expMonth == currMonth) {
+			else if (expMonth == currMonth && expYear == currYear) {
 				dateWiseAmt.forEach((item) => {
 					console.log(item.name, tempDate)
 					if (item.name == tempDate) {
@@ -156,22 +176,24 @@ const Visualisation = () => {
 
 	const filterIncRecordsMonthlyDateWise = () => {
 		const dateWiseAmt = [];
-		const date = [];
+		const dates = [];
+		console.log(date, '********************------------------')
+		const currMonth = date.getMonth();
+		const currYear = date.getFullYear();
 
 		incomeRecords.forEach((incomeRecord) => {
 
 			const tempDate = getDateFormat(incomeRecord.incDate.seconds)
 			const incDate = new Date(incomeRecord.incDate.seconds * 1000)
 			const incMonth = incDate.getMonth()
-			const currDate = new Date()
-			const currMonth = currDate.getMonth()
+			const incYear = incDate.getFullYear();
 
-			if (!date.includes(tempDate) && incMonth == currMonth) {
-				date.push(tempDate);
+			if (!dates.includes(tempDate) && incMonth == currMonth && incYear==currYear) {
+				dates.push(tempDate);
 				const data = { "name": tempDate, "amount": Number(incomeRecord.incAmount) };
 				dateWiseAmt.push(data);
 			}
-			else if (incMonth == currMonth) {
+			else if (incMonth == currMonth && incYear==currYear) {
 				dateWiseAmt.forEach((item) => {
 					console.log(item.name, tempDate)
 					if (item.name == tempDate) {
@@ -211,10 +233,25 @@ const Visualisation = () => {
 				flex: 1,
 				justifyContent: "center",
 			}}>
-
-				<View style={styles.monthContainer}>
-				<Text style={styles.month}>Month : {months[new Date().getMonth()]}</Text>
+				<View style={styles.time}>
+					<TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
+						<Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
+					</TouchableOpacity>
+					{show && (
+						<MonthPicker
+							onChange={onValueChange}
+							value={date}
+							minimumDate={new Date(2020, 5)}
+							maximumDate={new Date(2025, 5)}
+							mode="short"
+						/>
+					)}
 				</View>
+
+				{/* <View style={styles.monthContainer}>
+				
+				<Text style={styles.month}>Month : {months[new Date().getMonth()]}</Text>
+				</View> */}
 				<View style={styles.chartContainer}>
 					<Text
 						style={{
@@ -330,5 +367,25 @@ const styles = StyleSheet.create({
 		fontWeight: "bold", 
 		textAlign: "center" ,
 		textDecorationLine : 'underline',
-	}
+	},
+	time: {
+        padding: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    monthYear: {
+        width: '50%',
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 43,
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
+		backgroundColor: 'rgba(255,255,255,0.9)',
+    },
+    monthYearText: {
+        textAlign: "center",
+		fontWeight:'bold'
+    },
+   
 })

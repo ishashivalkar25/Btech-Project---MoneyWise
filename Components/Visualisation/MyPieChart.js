@@ -11,9 +11,9 @@ export default function MyPieChart(props) {
         var pieData = [];
         console.log(props.data, "*******************123456***************" );
 
-        const r = 102;
-        const g = 255;
-        const b = 102;
+        const r = 170;
+        const g = 0;
+        const b = 0;
         var i = 1;
         var l = props.data.length;
         props.data.forEach((item)=>{
@@ -29,20 +29,6 @@ export default function MyPieChart(props) {
             i = i+1;
         })
 
-        // props.data.forEach((item)=>{
-        //     do {
-        //         var color = Math.floor((Math.random()*1000000)+1);
-        //     } while (colors.indexOf(color) >= 0);
-
-        //     const tempData = {
-        //         name : item.name ,       
-        //         amount: item.amount ,  
-        //         color: "#" + ("000000" + color.toString(16)).slice(-6),
-        //         legendFontColor: '#7F7F7F',
-        //         legendFontSize: 15,
-        //     }
-        //     pieData.push(tempData);
-        // })
 
         // setColors(colors);
         setData(pieData);

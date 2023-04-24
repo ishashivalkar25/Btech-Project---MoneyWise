@@ -43,6 +43,7 @@ import {
 import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 
 const { width, height } = Dimensions.get('window');
+let notifyTime=0
 
 const FixedExp = ({ navigation, route }) => {
 
@@ -50,7 +51,8 @@ const FixedExp = ({ navigation, route }) => {
 	const [extraData, setExtraData] = useState(false);
 	const [isEnabled, setIsEnabled] = React.useState(false);
 	const [ExpName,setExpName] = React.useState();
-	const [date,setDate] = React.useState();
+	const [date,setDate] = React.useState(new Date());
+	const [notificationId,setNotificationId] = React.useState("")
 
 
 	React.useEffect(() => {
@@ -69,6 +71,11 @@ const FixedExp = ({ navigation, route }) => {
 		// Return the function to unsubscribe from the event so it gets removed on unmount
 		return unsubscribe;
 	}, [navigation]);
+
+	React.useEffect(()=>{
+		onCreateTriggerNotificationToAddExpenses();
+		console.log("Add expenses notification triggered....")
+	},[])
 
 	const fetchFixedExp = async () => {
 		try {
@@ -117,36 +124,84 @@ const FixedExp = ({ navigation, route }) => {
 		return tempDate.getDate() + '/' + (tempDate.getMonth() + 1) + '/' + tempDate.getFullYear();
 	}
 
-	async function onCreateTriggerNotification() {
+	function onCreateTriggerNotification(item) {
+		let notifyTime;
+		// if(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),16-5,52-30) < Date.now()) {
+		// 	const t = Date.now() + 1000 * 60 * 3;
+		// 	notifyTime = Date.now() + 1000 * 60 * 1;
+		// } else {
+		// 	notifyTime = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),16-5,52-30);
+		// }
 
+		notifyTime = Date.now() + 1000 * 60 * 1;
+	
 		// Create a channel (required for Android)
-		const channelId = await notifee.createChannel({
-		  id: 'default',
-		  name: 'Default Channel',
+		let channelId;
+		notifee.createChannel({
+			id: 'default',
+			name: 'Default Channel',
+		}).then((id) => {
+			channelId = id;
+	
+			// Create a time-based trigger
+			const trigger = {
+				id: notificationId+ExpName,
+				type: TriggerType.TIMESTAMP,
+				timestamp: notifyTime,
+			};
+	
+			// Create a trigger notification
+			notifee.createTriggerNotification({
+			    id: notificationId+ExpName,
+			    title: 'Time to pay fixed expense',
+			    body: ExpName,
+			    android: {
+			        channelId,
+			    },
+			}, trigger).then((notId) => {
+			    item.triggerNotificationId = notId;
+			});
 		});
-		
-		
-		// Create a time-based trigger
-		const trigger = {
-		  id:ExpName,
-		  type: TriggerType.TIMESTAMP,
-		  timestamp: notifyTime  , 
-		};
-		
-		// Create a trigger notification
-		await notifee.createTriggerNotification({
-		  title: 'Time to pay fixed expense',
-		  body: ExpName,
-		  android: {
-			channelId,
-		  },
-		}, trigger);
-		
-		}
+	}
+
+	function onCreateTriggerNotificationToAddExpenses() {
+		// if(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),16-5,52-30) < Date.now()) {
+		// 	const t = Date.now() + 1000 * 60 * 3;
+		// 	notifyTime = Date.now() + 1000 * 60 * 1;
+		// } else {
+		// 	notifyTime = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),16-5,52-30);
+		// }
+
+		notifyTime = Date.now() + 1000 * 60 * 1;
+	
+		// Create a channel (required for Android)
+		let channelId;
+		notifee.createChannel({
+			id: 'default',
+			name: 'Default Channel',
+		}).then((id) => {
+			channelId = id;
+	
+			// Create a time-based trigger
+			const trigger = {
+				type: TriggerType.TIMESTAMP,
+				timestamp: notifyTime,
+			};
+	
+			// Create a trigger notification
+			notifee.createTriggerNotification({
+			    title: 'Time to add your expenses',
+			    body: ExpName,
+			    android: {
+			        channelId,
+			    },
+			}, trigger)
+		});
+	}
+	
 
 	async function cancelNotifee(notificationId) {
 		console.log('canceling notification', notificationId)
-
 		await notifee.cancelTriggerNotification(notificationId);
 	  }
 
@@ -165,7 +220,9 @@ const FixedExp = ({ navigation, route }) => {
 			updateFixedExpStatus(item,"Paid");
 			notifee.getTriggerNotifications();
 			console.log(notifee.getTriggerNotifications());
-			cancelNotifee(item.ExpName);
+			setExpName(item.ExpName);
+			setNotificationId(item.triggerNotificationId);
+			cancelNotifee(item.triggerNotificationId);
 		}
 		else
 		{
@@ -173,7 +230,7 @@ const FixedExp = ({ navigation, route }) => {
 			updateFixedExpStatus(item,"Unpaid");
 			setExpName(item.ExpName);
 			setDate(item.dueDate);
-			onCreateTriggerNotification()
+			onCreateTriggerNotification(item)
 		}
 	}
 
@@ -195,7 +252,7 @@ const FixedExp = ({ navigation, route }) => {
 
 	return (
 		<ImageBackground
-			source={require('../../Assets/background.jpg')}
+			source={require('../../Assets/Background.jpeg')}
 			style={{ width: width, height: height }}>
 			<View>
 				<Text style={styles.Title}>Fixed Expense</Text>

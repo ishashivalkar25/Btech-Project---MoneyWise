@@ -3,9 +3,11 @@ import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image } 
 
 import { selectContactPhone } from 'react-native-select-contact';
 import { PermissionsAndroid, Platform } from 'react-native';
+import { NavigationRouteContext } from '@react-navigation/native';
 
 
-const AddGrpExpMembers = ({route}) => {
+
+const AddGrpExpMembers = ({ route, navigation}) => {
 
     const [membersList, setMembersList] = React.useState([]);
     const [extraData, setExtraData] = React.useState(false);
@@ -27,41 +29,57 @@ const AddGrpExpMembers = ({route}) => {
 
         // Here we are sure permission is granted for android or that platform is not android
         const selection = await selectContactPhone().
-        then(function(response){
-        console.log('Successfully Fetched Contact');
-        })
-        .catch(function(error) {
-        console.log('There has been a problem with your fetch operation: ' + error.message);
-        // ADD THIS THROW error
-        throw error;
-        });
+            then(function (selection) {
+                console.log('Successfully Fetched Contact');
+                if (!selection) {
+                    return null;
+                }
+
+                let { contact, selectedPhone } = selection;
+
+                const phoneNo = selectedPhone.number.replaceAll(" ", "");
+                const tempMember = { contactName: contact.name, contactNo: phoneNo, amount: 0 };
+
+                if (validatePhoneNo(phoneNo) && validateMember(tempMember)) {
+                    setMembersList([...membersList, tempMember])
+                    setExtraData(true);
+                }
+                console.log(`Selected ${selectedPhone.type} phone number ${phoneNo} from ${contact.name}`);
+                // membersList.push({contactName : contact.name, contactNo : selectedPhone.number});
+
+                return selectedPhone.number;
+            })
+            .catch(function (error) {
+                console.log('There has been a problem with your fetch operation: ' + error.message);
+                // ADD THIS THROW error
+                // throw error;
+                return null;
+            });
 
         if (!selection) {
             return null;
         }
 
-        let { contact, selectedPhone } = selection;
+        // let { contact, selectedPhone } = selection;
 
-        const phoneNo = selectedPhone.number.replaceAll(" ", "");
-        const tempMember = { contactName: contact.name, contactNo: phoneNo, amount: 0 };
+        // const phoneNo = selectedPhone.number.replaceAll(" ", "");
+        // const tempMember = { contactName: contact.name, contactNo: phoneNo, amount: 0 };
 
-        if(validatePhoneNo(phoneNo) && validateMember(tempMember))
-        {
-            setMembersList([...membersList, tempMember])
-            setExtraData(true);
-        }
-        console.log(`Selected ${selectedPhone.type} phone number ${phoneNo} from ${contact.name}`);
-        // membersList.push({contactName : contact.name, contactNo : selectedPhone.number});
-        
-        return selectedPhone.number;
+        // if (validatePhoneNo(phoneNo) && validateMember(tempMember)) {
+        //     setMembersList([...membersList, tempMember])
+        //     setExtraData(true);
+        // }
+        // console.log(`Selected ${selectedPhone.type} phone number ${phoneNo} from ${contact.name}`);
+        // // membersList.push({contactName : contact.name, contactNo : selectedPhone.number});
+
+        // return selectedPhone.number;
     }
 
     const validateMember = (member) => {
 
         var flag = true;
         membersList.forEach((item) => {
-            if(item.contactName==member.contactName && item.contactNo == member.contactNo)
-            {
+            if (item.contactName == member.contactName && item.contactNo == member.contactNo) {
                 alert("Member is already added to list");
                 flag = false;
             }
@@ -71,7 +89,7 @@ const AddGrpExpMembers = ({route}) => {
     }
     const validatePhoneNo = (phoneNo) => {
         var phoneNoRegex = /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
-        
+
         console.log(phoneNo);
         if (phoneNoRegex.test(phoneNo)) {
             return true;
@@ -87,12 +105,30 @@ const AddGrpExpMembers = ({route}) => {
         setExtraData(true);
     }, [membersList])
 
+
+    React.useEffect(() => {
+        addUser();
+    }, [])
+
+    const addUser = async() =>
+    {
+        try{
+            const document = await getDoc(doc(db, "User", auth.currentUser.uid));
+            const userName = document.data().name;
+            setMembersList([{ contactName: userName, contactNo: phoneNo, amount: 0 }]);
+        }catch(e)
+        {
+            console.log(e);
+        }
+        
+    }
+
     const deleteMember = (item) => {
         const filterData = membersList.filter(curr => curr !== item);
         console.log(filterData);
         console.log(filterData.length);
         setMembersList(filterData);
-        
+
     }
 
     const splitEvenly = () => {
@@ -101,16 +137,14 @@ const AddGrpExpMembers = ({route}) => {
 
         const members = membersList.length;
 
-        const splitPerHead = parseFloat((parseFloat(splitAmount)/members).toFixed(2));
+        const splitPerHead = parseFloat((parseFloat(splitAmount) / members).toFixed(2));
 
         var totalAmount = 0;
-        membersList.forEach((item,index) => {
-            if(index==membersList.length-1)
-            {
+        membersList.forEach((item, index) => {
+            if (index == membersList.length - 1) {
                 item.amount = parseFloat((splitAmount - totalAmount).toFixed(2));
             }
-            else
-            {
+            else {
                 item.amount = splitPerHead;
                 totalAmount = totalAmount + splitPerHead;
             }
@@ -127,15 +161,15 @@ const AddGrpExpMembers = ({route}) => {
         });
         console.log(totalAmount);
         const splitAmount = route.params.splitAmount;
-        if(totalAmount<splitAmount)
-        {
-            alert(`${splitAmount-totalAmount} less than total`)
+        if (totalAmount < splitAmount) {
+            alert(`${splitAmount - totalAmount} less than total`)
         }
-        else if(totalAmount>splitAmount)
-        {
-            alert(`Exceeds total by ${totalAmount-splitAmount}`);
+        else if (totalAmount > splitAmount) {
+            alert(`Exceeds total by ${totalAmount - splitAmount}`);
         }
-        else{
+        else {
+
+            navigation.navigate('Manual', {grpMembersList : membersList});
             alert('Saved');
         }
     }
@@ -145,10 +179,10 @@ const AddGrpExpMembers = ({route}) => {
                 <Text style={styles.splitAmtText}>Total</Text>
                 <Text style={styles.splitAmtVal}>{route.params.splitAmount}</Text>
             </View>
-            {membersList.length==0 && (<View style={styles.memberContainer}>
+            {membersList.length == 0 && (<View style={styles.memberContainer}>
                 <Text style={styles.emptyList}>Please Add Members!</Text>
             </View>)}
-            {membersList.length>0 && (<TouchableOpacity style={styles.splitEvenlyBtn} onPress={() => splitEvenly()}>
+            {membersList.length > 0 && (<TouchableOpacity style={styles.splitEvenlyBtn} onPress={() => splitEvenly()}>
                 <Text style={styles.splitEvenlyBtnText}>Split Evenly</Text>
             </TouchableOpacity>)}
             <FlatList
@@ -165,7 +199,7 @@ const AddGrpExpMembers = ({route}) => {
                                     // setMembersList(membersList);
                                     console.log(membersList, '22')
                                 }}
-                                editable ={true}
+                                editable={true}
                                 placeholder="0.0"
                                 keyboardType="numeric"
                             >{item.amount}</TextInput>
@@ -177,12 +211,12 @@ const AddGrpExpMembers = ({route}) => {
                 }
                 extraData={extraData}
             />
-            
+
 
             <TouchableOpacity style={styles.addMembersBtn} onPress={getPhoneNumber}>
                 <Image source={require('../../Assets/new-user.png')} style={{ width: 30, height: 30, tintColor: "white" }} />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.submitGrpExpBtn, (membersList!=null && membersList.length > 0) ? styles.enabled : styles.disabled]} disabled={(membersList!=null && membersList.length > 0) ? false : true} onPress={() => validateSplit()}>
+            <TouchableOpacity style={[styles.submitGrpExpBtn, (membersList != null && membersList.length > 0) ? styles.enabled : styles.disabled]} disabled={(membersList != null && membersList.length > 0) ? false : true} onPress={() => validateSplit()}>
                 <Text style={styles.submitGrpExpBtnText}>Save Split</Text>
             </TouchableOpacity>
         </View>
@@ -192,37 +226,37 @@ const AddGrpExpMembers = ({route}) => {
 export default AddGrpExpMembers;
 
 const styles = StyleSheet.create({
-    container : {
-        height: "100%" ,
+    container: {
+        height: "100%",
     },
-    emptyList : {
-        fontSize : 16,
-        textAlign :"center",
-        width : "100%"
+    emptyList: {
+        fontSize: 16,
+        textAlign: "center",
+        width: "100%"
     },
-    splitAmt : {
-        flexDirection : "column",
-        justifyContent : "center",
-        alignItems : 'center',
-        padding : 5,
+    splitAmt: {
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: 'center',
+        padding: 5,
     },
-    splitAmtText : {
-        fontSize : 16,
-        textDecorationLine : "underline",
+    splitAmtText: {
+        fontSize: 16,
+        textDecorationLine: "underline",
     },
-    splitAmtVal : {
-        fontSize : 25,
-        fontWeight : 'bold'
+    splitAmtVal: {
+        fontSize: 25,
+        fontWeight: 'bold'
     },
-    splitEvenlyBtn : {
+    splitEvenlyBtn: {
         // backgroundColor:"pink"
     },
-    splitEvenlyBtnText : {
-        fontSize : 15,
-        fontWeight : 'bold',
-        textAlign :"right",
-        paddingHorizontal : 20,
-        textDecorationLine : "underline",
+    splitEvenlyBtnText: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        textAlign: "right",
+        paddingHorizontal: 20,
+        textDecorationLine: "underline",
     },
     addMembersBtn: {
         backgroundColor: "green",
@@ -258,8 +292,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     memberContri: {
-        textDecorationLine : "underline",
-        textDecorationStyle :'dashed',
+        textDecorationLine: "underline",
+        textDecorationStyle: 'dashed',
         padding: 0,
         margin: 0,
         textAlign: 'center'
@@ -269,17 +303,17 @@ const styles = StyleSheet.create({
         height: 15,
         tintColor: "red"
     },
-    submitGrpExpBtn : {
-        backgroundColor : "green",
-        padding : 10,
-        borderRadius : 10,
-        margin : "auto",
+    submitGrpExpBtn: {
+        backgroundColor: "green",
+        padding: 10,
+        borderRadius: 10,
+        margin: "auto",
     },
-    submitGrpExpBtnText : {
-        fontSize : 15,
-        textAlign : "center",
-        color : "white",
-        fontWeight : "bold"
+    submitGrpExpBtnText: {
+        fontSize: 15,
+        textAlign: "center",
+        color: "white",
+        fontWeight: "bold"
     },
     disabled: {
         opacity: 0.7
