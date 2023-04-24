@@ -45,6 +45,16 @@ export function DrawerContent(props) {
         
     }
 
+    const signOutFromAcc = () => {
+        auth
+            .signOut()
+            .then(() => {
+                props.navigation.replace("Login");
+                console.log("Sign out");
+            })
+            .catch((error) => alert("Cannot signout from the application!!"));
+    };
+
     return(
         <View style={{flex:1}}>
             <DrawerContentScrollView {...props}>
@@ -105,7 +115,7 @@ export function DrawerContent(props) {
             <Drawer.Section style={styles.bottomDrawerSection}>
                 <DrawerItem 
                     label="Sign Out"
-                    onPress={() => {}}
+                    onPress={() => {signOutFromAcc()}}
                 />
             </Drawer.Section>
         </View>

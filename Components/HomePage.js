@@ -75,26 +75,26 @@ export default function HompePage(props) {
                             style={{ width: 25, height: 25, alignSelf: "center" }}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={signOutFromAcc}>
+                    {/* <TouchableOpacity onPress={signOutFromAcc}>
                         <Image
                             source={require("../Assets/log-out.png")}
                             style={{ width: 25, height: 25, alignSelf: "center" }}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             ),
         });
     }, [props.navigation]);
 
-    const signOutFromAcc = () => {
-        auth
-            .signOut()
-            .then(() => {
-                navigation.replace("Login");
-                console.log("Sign out");
-            })
-            .catch((error) => alert("Cannot signout from the application!!"));
-    };
+    // const signOutFromAcc = () => {
+    //     auth
+    //         .signOut()
+    //         .then(() => {
+    //             navigation.replace("Login");
+    //             console.log("Sign out");
+    //         })
+    //         .catch((error) => alert("Cannot signout from the application!!"));
+    // };
     return (
         // <NavigationContainer independent={true}>
         <View style={{ flex: 1, flexDirection: "column" }}>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     header_right: {
         flexDirection: 'row',
         justifyContent: "space-between",
-        width: 75,
+        width: 50,
         marginRight : 10,
     },
     container: {

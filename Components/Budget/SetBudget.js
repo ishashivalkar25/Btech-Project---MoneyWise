@@ -1,15 +1,13 @@
 import { AuthErrorCodes } from 'firebase/auth';
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, TextInput, FlatList, Image, TouchableOpacity, Modal, Alert} from 'react-native';
+import { SafeAreaView, ImageBackground, StyleSheet, Text, View, TextInput, FlatList, Image, TouchableOpacity, Modal, Alert } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import MonthPicker from 'react-native-month-year-picker';
-import { auth, db, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc} from "../../Firebase/config";
+import { auth, db, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc } from "../../Firebase/config";
 import FiftyThirtyTwenty from './FiftyThirtyTwenty';
 import Envelope from './Envelope';
 import ZeroBased from './ZeroBased';
-
-
-
+import  Background from '../Background';
 
 const budgetMethods = [
     { label: 'Envelop Method', value: 'Envelop Method' },
@@ -19,7 +17,7 @@ const budgetMethods = [
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-const SetBudget = ({navigation}) => {
+const SetBudget = ({ navigation }) => {
     const [date, setDate] = React.useState(new Date());
     const [show, setShow] = React.useState(false);
     const [modalVisible, setModalVisible] = React.useState(false);
@@ -78,7 +76,7 @@ const SetBudget = ({navigation}) => {
         console.log(categories);
     }, [categories]);
 
-   
+
     const calculateTotalIncome = () => {
 
         var totalAmount = 0;
@@ -89,7 +87,7 @@ const SetBudget = ({navigation}) => {
         console.log("Total", totalAmount);
         return totalAmount;
     }
-   
+
 
     const clearFields = () => {
         setDate(new Date());
@@ -102,62 +100,63 @@ const SetBudget = ({navigation}) => {
 
     return (
         <SafeAreaView>
-            <View style={styles.setBudgetContainer}>
-                <View style={styles.time}>
-                    <TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
-                        <Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
-                    </TouchableOpacity>
-                    {show && (
-                        <MonthPicker
-                            onChange={onValueChange}
-                            value={date}
-                            minimumDate={new Date(2020, 5)}
-                            maximumDate={new Date(2025, 5)}
-                            mode="short"
-                        />
-                    )}
-                </View>
+         
+                <View style={styles.setBudgetContainer}>
+                    <View style={styles.time}>
+                        <TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
+                            <Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
+                        </TouchableOpacity>
+                        {show && (
+                            <MonthPicker
+                                onChange={onValueChange}
+                                value={date}
+                                minimumDate={new Date(2020, 5)}
+                                maximumDate={new Date(2025, 5)}
+                                mode="short"
+                            />
+                        )}
+                    </View>
 
-                <View style={styles.monthlyIncContainer}>
-                    <Text style={styles.monthlyInc}>Monthly Income</Text>
-                    <TextInput
-                        style={styles.monthlyIncInput}
-                        onChangeText={text => setMonthlyInc(text)}
-                        value={monthlyInc}
-                        placeholder="Enter Monthly Income here..."
-                        keyboardType="numeric"
+                    <View style={styles.monthlyIncContainer}>
+                        <Text style={styles.monthlyInc}>Monthly Income</Text>
+                        <TextInput
+                            style={styles.monthlyIncInput}
+                            onChangeText={text => setMonthlyInc(text)}
+                            value={monthlyInc}
+                            placeholder="Enter Monthly Income here..."
+                            keyboardType="numeric"
+                        />
+                    </View>
+                    <Dropdown
+                        style={styles.dropdown}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        itemTextStyle={{ color: 'black' }}
+                        data={budgetMethods}
+                        search
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder="Select Budgeting Method"
+                        searchPlaceholder="Search..."
+                        value={selectedBudgetingMethod}
+                        onChange={(item) => {
+                            setSelectedBudgetingMethod(item.value);
+                        }}
                     />
                 </View>
-                <Dropdown
-                    style={styles.dropdown}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    inputSearchStyle={styles.inputSearchStyle}
-                    itemTextStyle={{ color: 'black' }}
-                    data={budgetMethods}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder="Select Budgeting Method"
-                    searchPlaceholder="Search..."
-                    value={selectedBudgetingMethod}
-                    onChange={(item) => {
-                        setSelectedBudgetingMethod(item.value);
-                    }}
-                />
-            </View>
-            <View style={styles.categoryWiseBudget}>
-                <View style={{marginBottom:10,justifyContent: 'center'}}>
-                    <Text style={styles.categoryWiseBudgetTitleText}>Budget Planned : </Text>
-                </View>
-                
-                {(selectedBudgetingMethod==="Envelop Method") && <Envelope monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date}/>}
-                {(selectedBudgetingMethod==="Zero Based Budgeting") && <ZeroBased monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date}/>}
-                {(selectedBudgetingMethod==="50-30-20") && <FiftyThirtyTwenty monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date}/>}
+                <View style={styles.categoryWiseBudget}>
+                    <View style={{ marginBottom: 10, justifyContent: 'center' }}>
+                        <Text style={styles.categoryWiseBudgetTitleText}>Budget Planned : </Text>
+                    </View>
 
-            </View>
-            
+                    {(selectedBudgetingMethod === "Envelop Method") && <Envelope monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date} />}
+                    {(selectedBudgetingMethod === "Zero Based Budgeting") && <ZeroBased monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date} />}
+                    {(selectedBudgetingMethod === "50-30-20") && <FiftyThirtyTwenty monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date} />}
+
+                </View>
+
         </SafeAreaView>
     );
 };
@@ -269,9 +268,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
     },
-    budgetCategoryEdit : {
+    budgetCategoryEdit: {
         flexDirection: "row",
-        width : "90%",
+        width: "90%",
         justifyContent: "space-around",
     },
     budgetCategoryText: {

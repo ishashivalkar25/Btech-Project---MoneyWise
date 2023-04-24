@@ -1,5 +1,5 @@
-import {React, useState, useEffect} from 'react'
-import { StyleSheet,Pressable, ScrollView,TextInput, Switch, Text, Dimensions, Image, View ,Button, Modal, TouchableOpacity} from 'react-native'
+import { React, useState, useEffect } from 'react'
+import { StyleSheet, Pressable, ScrollView, TextInput, Switch, Text, Dimensions, Image, View, Button, Modal, TouchableOpacity } from 'react-native'
 import Background from '../Background';
 import { darkGreen } from "../Constants";
 import * as ImagePicker from "react-native-image-picker";
@@ -26,29 +26,29 @@ let downloadURL = ""
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-export default function ScanBills({route, navigation}) {
+export default function ScanBills({ route, navigation }) {
 
-  const [file, setFile] = useState(null);
-  const [fetchedData,setFetchedData] = useState("")
-  const [ocrCategory,setOcrCategory] = useState(null)
-  const [ocrAmount,setOcrAmount] = useState(null)
-  const [ocrDate,setOcrDate] = useState(null)
-  const [isImgModalVisible, setVisibilityOfImgModal] = useState(false);
-  const [pickedImagePath, setPickedImagePath] = useState(
-    Image.resolveAssetSource(uploadImg).uri
-  );
-  const [date, setDate] = useState(new Date());
-  const [amount, setAmount] = useState(0);
-  const [description, setDescription] = useState("");
-  const [mounted,setMounted] = useState(false);
-  const [category, setCategory] = useState([]);
-  const [isCatModalVisible, setVisibilityOfCatModal] = useState(false);
-  const [userExpCategories, setUserExpCategories] = useState([]);
-  const [grpMembersList, setGrpMembersList] = useState([]);
-  
-  const [datePicker, setDatePicker] = useState(false);
+	const [file, setFile] = useState(null);
+	const [fetchedData, setFetchedData] = useState("")
+	const [ocrCategory, setOcrCategory] = useState(null)
+	const [ocrAmount, setOcrAmount] = useState(null)
+	const [ocrDate, setOcrDate] = useState(null)
+	const [isImgModalVisible, setVisibilityOfImgModal] = useState(false);
+	const [pickedImagePath, setPickedImagePath] = useState(
+		Image.resolveAssetSource(uploadImg).uri
+	);
+	const [date, setDate] = useState(new Date());
+	const [amount, setAmount] = useState(0);
+	const [description, setDescription] = useState("");
+	const [mounted, setMounted] = useState(false);
+	const [category, setCategory] = useState([]);
+	const [isCatModalVisible, setVisibilityOfCatModal] = useState(false);
+	const [userExpCategories, setUserExpCategories] = useState([]);
+	const [grpMembersList, setGrpMembersList] = useState([]);
 
-  const [isEnabled, setIsEnabled] = useState(false);
+	const [datePicker, setDatePicker] = useState(false);
+
+	const [isEnabled, setIsEnabled] = useState(false);
 
 	const toggleSwitch = (val) => {
 
@@ -58,7 +58,7 @@ export default function ScanBills({route, navigation}) {
 			if (val) {
 				navigation.navigate("AddGrpExpMembers", {
 					splitAmount: amount,
-          previous_screen: 'ScanBills'
+					previous_screen: 'ScanBills'
 				})
 			}
 		}
@@ -76,30 +76,27 @@ export default function ScanBills({route, navigation}) {
 	}, [route.params])
 
 
-  useEffect(() => {
-    if(fetchedData!="")
-     {
-      var flag = false;
-      userExpCategories.forEach((item) => {
-        if(item.toUpperCase() == fetchedData.document.inference.prediction.category.value.toUpperCase())
-        {
-          setOcrCategory(item);
-          setSelectedCategory(item);
-          flag = true;
-        }
-      })
+	useEffect(() => {
+		if (fetchedData != "") {
+			var flag = false;
+			userExpCategories.forEach((item) => {
+				if (item.toUpperCase() == fetchedData.document.inference.prediction.category.value.toUpperCase()) {
+					setOcrCategory(item);
+					setSelectedCategory(item);
+					flag = true;
+				}
+			})
 
-      if(!flag)
-      {
-        setOcrCategory(fetchedData.document.inference.prediction.category.value);
-        setSelectedCategory(fetchedData.document.inference.prediction.category.value);
-      }
-      setAmount(fetchedData.document.inference.prediction.total_amount.value+"");
-      setOcrAmount(fetchedData.document.inference.prediction.total_amount.value)
-      setOcrDate(fetchedData.document.inference.prediction.date.value)
-      console.log(ocrCategory,ocrAmount,ocrDate,typeof(new Date(ocrDate)), '-------------------------------')
-     }
-  }, [fetchedData])
+			if (!flag) {
+				setOcrCategory(fetchedData.document.inference.prediction.category.value);
+				setSelectedCategory(fetchedData.document.inference.prediction.category.value);
+			}
+			setAmount(fetchedData.document.inference.prediction.total_amount.value + "");
+			setOcrAmount(fetchedData.document.inference.prediction.total_amount.value)
+			setOcrDate(fetchedData.document.inference.prediction.date.value)
+			console.log(ocrCategory, ocrAmount, ocrDate, typeof (new Date(ocrDate)), '-------------------------------')
+		}
+	}, [fetchedData])
 
 	useEffect(() => {
 		const loadData = async () => {
@@ -129,20 +126,20 @@ export default function ScanBills({route, navigation}) {
 	}
 		, []);
 
-  
-  function showDatePicker() {
-    setDatePicker(true);
-  }
+
+	function showDatePicker() {
+		setDatePicker(true);
+	}
 
 
-  function onDateSelected(event, value) {
-    setDate(value);
-    setDatePicker(false);
-  }
+	function onDateSelected(event, value) {
+		setDate(value);
+		setDatePicker(false);
+	}
 
-  const [selectedCategory, setSelectedCategory] = useState("");
+	const [selectedCategory, setSelectedCategory] = useState("");
 
-  const showImagePicker = () => {
+	const showImagePicker = () => {
 		ImagePicker.launchImageLibrary()
 			.then((result) => {
 				if (result) {
@@ -166,64 +163,64 @@ export default function ScanBills({route, navigation}) {
 			});
 	};
 
-  const handleFilePick = async () => {
-    try {
-      const result = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
-      });
-      setFile(result);
-      console.log(result[0].uri);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+	const handleFilePick = async () => {
+		try {
+			const result = await DocumentPicker.pick({
+				type: [DocumentPicker.types.allFiles],
+			});
+			setFile(result);
+			console.log(result[0].uri);
+		} catch (err) {
+			console.log(err);
+		}
+	};
 
-  const makeRequest = async () => {
-    
-    const fileUri = pickedImagePath;
-    // const fileName = Platform.OS === 'android' ? file.split('/').pop() : 'Receipt.jpg';
-    // const fileData = await RNFetchBlob.fs.readFile(fileUri, 'base64');
-    const mimeType = 'image/jpeg';
+	const makeRequest = async () => {
 
-  // if(fileUri)
-  // {
-    const data = new FormData();
-    data.append('document', { uri: fileUri,type: 'image/jpeg',name: 'receipt',});
-    console.log(data._parts)
-  
-    const config = {
-      method: 'POST',
-      url: 'http://192.168.203.144/products/mindee/expense_receipts/v4/predict',
-      headers: {
-        Authorization: '4da01f1a7338330c1fcf93e3db139a16',
-      },
-      data,
-    };
-  // }
-  
-    try {
-      // const response = await fetch(config);
-      let xhr = new XMLHttpRequest();
-      
+		const fileUri = pickedImagePath;
+		// const fileName = Platform.OS === 'android' ? file.split('/').pop() : 'Receipt.jpg';
+		// const fileData = await RNFetchBlob.fs.readFile(fileUri, 'base64');
+		const mimeType = 'image/jpeg';
 
-        xhr.addEventListener("readystatechange", function () {
-            if (this.readyState === 4) {
-                console.log("Response ", this.responseText.document);
-                setFetchedData(JSON.parse(this.responseText));
-            }
-        });
+		// if(fileUri)
+		// {
+		const data = new FormData();
+		data.append('document', { uri: fileUri, type: 'image/jpeg', name: 'receipt', });
+		console.log(data._parts)
 
-        xhr.open("POST", "https://api.mindee.net/v1/products/mindee/expense_receipts/v4/predict");
-        xhr.setRequestHeader("Authorization", "4da01f1a7338330c1fcf93e3db139a16");
-        xhr.setRequestHeader('content-type', 'multipart/form-data');
-        
-        xhr.send(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+		const config = {
+			method: 'POST',
+			url: 'http://192.168.203.144/products/mindee/expense_receipts/v4/predict',
+			headers: {
+				Authorization: '4da01f1a7338330c1fcf93e3db139a16',
+			},
+			data,
+		};
+		// }
 
- const saveExpense = async () => {
+		try {
+			// const response = await fetch(config);
+			let xhr = new XMLHttpRequest();
+
+
+			xhr.addEventListener("readystatechange", function () {
+				if (this.readyState === 4) {
+					console.log("Response ", this.responseText.document);
+					setFetchedData(JSON.parse(this.responseText));
+				}
+			});
+
+			xhr.open("POST", "https://api.mindee.net/v1/products/mindee/expense_receipts/v4/predict");
+			xhr.setRequestHeader("Authorization", "4da01f1a7338330c1fcf93e3db139a16");
+			xhr.setRequestHeader('content-type', 'multipart/form-data');
+
+			xhr.send(data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const saveExpense = async () => {
 
 		console.log(grpMembersList, 'grpMembersListIn')
 		try {
@@ -234,7 +231,7 @@ export default function ScanBills({route, navigation}) {
 				setTimeout(function hideToast() {
 					Toast.hide(toast);
 				}, 800);
-				return ;
+				return;
 			}
 
 			if (selectedCategory == "") {
@@ -244,7 +241,7 @@ export default function ScanBills({route, navigation}) {
 				setTimeout(function hideToast() {
 					Toast.hide(toast);
 				}, 800);
-				return ;
+				return;
 			}
 
 			if (isEnabled && !route.params && route.params.grpMembersList) {
@@ -259,9 +256,9 @@ export default function ScanBills({route, navigation}) {
 					Toast.hide(toast);
 				}, 800);
 
-				return ;
+				return;
 			}
-			
+
 			let promise = Promise.resolve();
 			if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
 				promise = new Promise((resolve, reject) => {
@@ -277,7 +274,7 @@ export default function ScanBills({route, navigation}) {
 							"state_changed",
 							(snapshot) => {
 								const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-	
+
 								// console.log("Upload is " + progress + "% done");
 								switch (snapshot.state) {
 									case "paused":
@@ -335,34 +332,34 @@ export default function ScanBills({route, navigation}) {
 				if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri && downloadURL != "") {
 					data_1.expImage = downloadURL;
 				}
-	
+
 				if (isEnabled) {
 					data_1.grpMembersList = route.params.grpMembersList;
 				}
-				
+
 
 				// const docRef = await addDoc(
 				// 	collection(doc(db, "User", auth.currentUser.uid), "Expense"), data_1);
-	
+
 				const docRef = await addDoc(
 					collection(doc(db, "User", auth.currentUser.uid), "Expense"), data_1);
-	
+
 				const querySnapshotExp = await getDocs(collection(db, "Expense"));
 				querySnapshotExp.forEach((doc) => {
 					// console.log(doc.id, JSON.stringify(doc.data()));
 				});
-	
+
 				//Update budget
 				const recordId = months[date.getMonth()] + "" + date.getFullYear();
 				console.log(recordId);
 				const document = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
-	
+
 				const categoryWiseBudget = document.data()
 				var isCategoryBudgetSet = false;
 				var otherExpIdx = -1;
 				var savingsIdx = -1;
 				var done = false;
-	
+
 				console.log(categoryWiseBudget);
 				if (categoryWiseBudget.method === 'Envelop Method') {
 					categoryWiseBudget.budget.forEach((item, idx) => {
@@ -370,12 +367,12 @@ export default function ScanBills({route, navigation}) {
 							item.budgetSpent = item.budgetSpent + parseFloat(amount);
 							isCategoryBudgetSet = true;
 						}
-	
+
 						if (item.category == "Other Expenses") {
 							otherExpIdx = idx;
 						}
 					});
-	
+
 					if (!isCategoryBudgetSet && otherExpIdx > -1) {
 						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
 					}
@@ -386,16 +383,16 @@ export default function ScanBills({route, navigation}) {
 							item.budgetSpent = item.budgetSpent + parseFloat(amount);
 							isCategoryBudgetSet = true;
 						}
-	
+
 						if (item.category == "Other Expenses") {
 							otherExpIdx = idx;
 						}
-	
+
 						if (item.category == "Savings") {
 							savingsIdx = idx;
 						}
 					});
-	
+
 					if (!isCategoryBudgetSet && otherExpIdx > -1) {
 						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
 						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
@@ -411,17 +408,17 @@ export default function ScanBills({route, navigation}) {
 							isCategoryBudgetSet = true;
 							done = true;
 						}
-	
+
 						if (item.category == "Other Needs") {
 							otherExpIdx = idx;
 						}
 					});
-	
+
 					if (!isCategoryBudgetSet && otherExpIdx > -1) {
 						categoryWiseBudget.needs[otherExpIdx].budgetSpent = categoryWiseBudget.needs[otherExpIdx].budgetSpent + parseFloat(amount);
 						done = true;
 					}
-	
+
 					if (!done) {
 						categoryWiseBudget.wants.forEach((item, idx) => {
 							if (item.category == selectedCategory) {
@@ -429,19 +426,19 @@ export default function ScanBills({route, navigation}) {
 								isCategoryBudgetSet = true;
 								done = true;
 							}
-	
+
 							if (item.category == "Other Wants") {
 								otherExpIdx = idx;
 							}
 						});
-	
+
 						if (!isCategoryBudgetSet && otherExpIdx > -1) {
 							categoryWiseBudget.wants[otherExpIdx].budgetSpent = categoryWiseBudget.wants[otherExpIdx].budgetSpent + parseFloat(amount);
 							done = true;
 						}
-	
+
 					}
-	
+
 					if (!done) {
 						categoryWiseBudget.needs.forEach((item, idx) => {
 							if (item.category == selectedCategory) {
@@ -449,33 +446,32 @@ export default function ScanBills({route, navigation}) {
 								isCategoryBudgetSet = true;
 								done = true;
 							}
-	
+
 							if (item.category == "Other Savings") {
 								otherExpIdx = idx;
 							}
 						});
-	
+
 						if (!isCategoryBudgetSet && otherExpIdx > -1) {
 							categoryWiseBudget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.savings[otherExpIdx].budgetSpent + parseFloat(amount);
 							done = true;
 						}
 					}
 				}
-	
+
 				await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
-	
+
 				const querySnapshot = await getDocs(collection(db, "expense"));
 				querySnapshot.forEach((doc) => {
 					console.log(doc.id, JSON.stringify(doc.data()));
 				});
-	
+
 				if (isEnabled) {
 					const document = await getDoc(doc(db, "User", auth.currentUser.uid));
 					const userName = document.data().name;
 					route.params.grpMembersList.forEach((item) => {
 
-						if(userName != item.name)
-						{
+						if (userName != item.name) {
 							const message = `${userName} has split a bill with you. Kindly pay amount of Rs.${item.amount}.`
 							SmsAndroid.autoSend(
 								item.contactNo,
@@ -488,242 +484,243 @@ export default function ScanBills({route, navigation}) {
 								},
 							);
 						}
-						
+
 					})
 
 				}
 
 				alert("Record Added Successfully");
 				navigation.navigate("Root");
-				
+
 			} catch (error_1) {
 				console.error("Error adding document: ", error_1);
 				throw error_1;
 			}
 
-			
+
 
 		} catch (e) {
 			console.error("Error adding document: ", e);
 		}
 	};
 
-   
-    return (
-        <Background>
-          
-        <View style={styles.container2}>
-        
-          <Text style={styles.headCenter}>Add Image</Text>
 
-          <Modal
-            animationType="slide"
-            transparent
-            visible={isImgModalVisible}
-            presentationStyle="overFullScreen"
-            onDismiss={() => {
-              setVisibilityOfImgModal(!isImgModalVisible);
-            }}
-          >
-            <View style={styles.viewWrapper}>
-            <View style={styles.modalView}>
-                <TouchableOpacity onPress={showImagePicker} style={styles.selImg}>
-                   <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Upload image </Text>
-                </TouchableOpacity>
+	return (
+		<Background>
 
-                <TouchableOpacity onPress={openCamera} style={styles.selImg}>
-                   <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Take Photo </Text>
-                </TouchableOpacity>
+			<View style={styles.container2}>
 
-                <TouchableOpacity onPress={() => {
-                  setVisibilityOfImgModal(!isImgModalVisible); }}>
-                   <Text style={{color: darkGreen, fontSize: 15, marginTop:30}}> Close </Text>
-                </TouchableOpacity>
-            </View>
-          </View>
-          </Modal>
-          <TouchableOpacity
-            onPress={() => {
-              console.log("image clicked");
-              setVisibilityOfImgModal(true);
-            }}
-          >
-            {pickedImagePath !== "" && (
-              <Image
-                source={{ uri: pickedImagePath }}
-                style={{ width: 50, height: 50, margin:15, alignSelf:'center'}}
-                onPress={() => {
-                  console.log("image clicked");
-                  setVisibilityOfImgModal(true);
-                }}
-              />
-            )}
-          </TouchableOpacity>
+				<Text style={styles.headCenter}>Add Image</Text>
 
-          <TouchableOpacity
-            onPress={makeRequest}
-            style={{
-            backgroundColor: darkGreen,
-            borderRadius: 200,
-            alignItems: 'center',
-            width: 250,
-            paddingVertical: 5,
-            marginVertical: 10,
-            alignSelf:'center',
-            //marginTop:30,
-          }}>
-        <Text style={{color: "white", fontSize: 20, fontWeight: 'bold', margin:0}}> Save </Text>
-        </TouchableOpacity>
-        </View>
+				<Modal
+					animationType="slide"
+					transparent
+					visible={isImgModalVisible}
+					presentationStyle="overFullScreen"
+					onDismiss={() => {
+						setVisibilityOfImgModal(!isImgModalVisible);
+					}}
+				>
+					<View style={styles.viewWrapper}>
+						<View style={styles.modalView}>
+							<TouchableOpacity onPress={showImagePicker} style={styles.selImg}>
+								<Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Upload image </Text>
+							</TouchableOpacity>
 
-        <View style={styles.container2}>
-        
-        <Text style={styles.headCenter}>Fetched Data</Text>
+							<TouchableOpacity onPress={openCamera} style={styles.selImg}>
+								<Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Take Photo </Text>
+							</TouchableOpacity>
 
-        {(ocrCategory!==null && ocrAmount!=null && ocrDate!=null) && (
-        <View style={styles.mainContainer}>
-					<ScrollView>
-						<View style={styles.container1}>
-							<View style={styles.inputPair}>
-								<Text style={styles.head}>Amount:</Text>
-								<TextInput
-                 keyboardType="numeric"
-                 style={styles.inputText}
-                 defaultValue={(ocrAmount).toString()}
-                 onChangeText={setAmount}
-               />
-							</View>
-
-            {console.log(new Date(ocrDate), '**********************123*****************************************')}
-              {datePicker && (
-                 <DateTimePicker
-                   value={new Date(ocrDate)}
-                   mode={"date"}
-                   display={Platform.OS === "ios" ? "spinner" : "default"}
-                   is24Hour={true}
-                   onChange={onDateSelected}
-                   style={styles.datePicker}
-                 />
-               )}
-
-              <View View style={styles.inputPair}>
-               <Text style={styles.head}>Date: </Text>
-               {!datePicker && (
-                 <View style={styles.inputText}>
-                   <Pressable style={styles.dateButton} onPress={showDatePicker}>
-                     <Text>{date!=null ? (date.getDate() + ' / '+ (date.getMonth()+1) + ' / ' +date.getFullYear()) : ocrDate}</Text>
-                   </Pressable>
-                 </View>
-               )}
-            </View>
+							<TouchableOpacity onPress={() => {
+								setVisibilityOfImgModal(!isImgModalVisible);
+							}}>
+								<Text style={{ color: darkGreen, fontSize: 15, marginTop: 30 }}> Close </Text>
+							</TouchableOpacity>
 						</View>
-
-						<View style={styles.container1}>
-							<Text style={styles.headCenter}>Select Category</Text>
-
-							<Dropdown
-
-								style={styles.dropdown}
-								placeholderStyle={styles.placeholderStyle}
-								selectedTextStyle={styles.selectedTextStyle}
-								inputSearchStyle={styles.inputSearchStyle}
-								iconStyle={styles.iconStyle}
-								data={category}
-								search
-								maxHeight={300}
-								labelField="label"
-								valueField="value"
-								placeholder={ocrCategory}
-								searchPlaceholder="Search..."
-								value={ocrCategory}
-								onChange={(item) => {
-									if (item.value != "other") setSelectedCategory(item.value);
-									else {
-										setVisibilityOfCatModal(true);
-									}
-								}}
-							/>
-						</View>
-
-
-						<Modal
-							animationType="slide"
-							transparent
-							visible={isCatModalVisible}
-							presentationStyle="overFullScreen"
-							onDismiss={() => {
-								setVisibilityOfCatModal(!isCatModalVisible);
+					</View>
+				</Modal>
+				<TouchableOpacity
+					onPress={() => {
+						console.log("image clicked");
+						setVisibilityOfImgModal(true);
+					}}
+				>
+					{pickedImagePath !== "" && (
+						<Image
+							source={{ uri: pickedImagePath }}
+							style={{ width: 50, height: 50, margin: 15, alignSelf: 'center' }}
+							onPress={() => {
+								console.log("image clicked");
+								setVisibilityOfImgModal(true);
 							}}
-						>
-							<View style={styles.viewWrapper}>
-								<View style={styles.modalView}>
-									<TextInput
-										placeholder="Enter Category"
-										style={styles.textInput}
-										onChangeText={(value) => {
-											setSelectedCategory(value);
-										}}
-									/>
+						/>
+					)}
+				</TouchableOpacity>
 
-									{/** This button is responsible to close the modal */}
-									<Button
-										title="Add Category"
-										onPress={() => {
-											setVisibilityOfCatModal(!isCatModalVisible);
-											setCategory([
-												...category,
-												{ label: selectedCategory, value: selectedCategory },
-											]);
-											// addCategoryToFD(selectedCategory);
-										}}
+				<TouchableOpacity
+					onPress={makeRequest}
+					style={{
+						backgroundColor: darkGreen,
+						borderRadius: 200,
+						alignItems: 'center',
+						width: 250,
+						paddingVertical: 5,
+						marginVertical: 10,
+						alignSelf: 'center',
+						//marginTop:30,
+					}}>
+					<Text style={{ color: "white", fontSize: 20, fontWeight: 'bold', margin: 0 }}> Save </Text>
+				</TouchableOpacity>
+			</View>
+
+			<View style={styles.container2}>
+
+				<Text style={styles.headCenter}>Fetched Data</Text>
+
+				{(ocrCategory !== null && ocrAmount != null && ocrDate != null) && (
+					<View style={styles.mainContainer}>
+						<ScrollView>
+							<View style={styles.container1}>
+								<View style={styles.inputPair}>
+									<Text style={styles.head}>Amount:</Text>
+									<TextInput
+										keyboardType="numeric"
+										style={styles.inputText}
+										defaultValue={(ocrAmount).toString()}
+										onChangeText={setAmount}
 									/>
 								</View>
+
+								{console.log(new Date(ocrDate), '**********************123*****************************************')}
+								{datePicker && (
+									<DateTimePicker
+										value={new Date(ocrDate)}
+										mode={"date"}
+										display={Platform.OS === "ios" ? "spinner" : "default"}
+										is24Hour={true}
+										onChange={onDateSelected}
+										style={styles.datePicker}
+									/>
+								)}
+
+								<View View style={styles.inputPair}>
+									<Text style={styles.head}>Date: </Text>
+									{!datePicker && (
+										<View style={styles.inputText}>
+											<Pressable style={styles.dateButton} onPress={showDatePicker}>
+												<Text>{date != null ? (date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()) : ocrDate}</Text>
+											</Pressable>
+										</View>
+									)}
+								</View>
 							</View>
-						</Modal>
 
-						<View style={[styles.grpExpcontainer, styles.container1]}>
-							<Text style={styles.grpExpText}>Group Expense : </Text>
-							<Switch
-								trackColor={{ false: '#767577', true: 'lightgreen' }}
-								thumbColor={isEnabled ? 'green' : 'white'}
-								onValueChange={(val) => toggleSwitch(val)}
-								value={isEnabled}
-							/>
-						</View>
-						<View style={styles.container2}>
-							<Text style={styles.head}>Add note</Text>
-							<TextInput
-								placeholder="Description"
-								style={styles.input1}
-								onChangeText={(value) => {
-									setDescription(value);
+							<View style={styles.container1}>
+								<Text style={styles.headCenter}>Select Category</Text>
+
+								<Dropdown
+
+									style={styles.dropdown}
+									placeholderStyle={styles.placeholderStyle}
+									selectedTextStyle={styles.selectedTextStyle}
+									inputSearchStyle={styles.inputSearchStyle}
+									iconStyle={styles.iconStyle}
+									data={category}
+									search
+									maxHeight={300}
+									labelField="label"
+									valueField="value"
+									placeholder={ocrCategory}
+									searchPlaceholder="Search..."
+									value={ocrCategory}
+									onChange={(item) => {
+										if (item.value != "other") setSelectedCategory(item.value);
+										else {
+											setVisibilityOfCatModal(true);
+										}
+									}}
+								/>
+							</View>
+
+
+							<Modal
+								animationType="slide"
+								transparent
+								visible={isCatModalVisible}
+								presentationStyle="overFullScreen"
+								onDismiss={() => {
+									setVisibilityOfCatModal(!isCatModalVisible);
 								}}
-							/>
-	
-						</View>
+							>
+								<View style={styles.viewWrapper}>
+									<View style={styles.modalView}>
+										<TextInput
+											placeholder="Enter Category"
+											style={styles.textInput}
+											onChangeText={(value) => {
+												setSelectedCategory(value);
+											}}
+										/>
+
+										{/** This button is responsible to close the modal */}
+										<Button
+											title="Add Category"
+											onPress={() => {
+												setVisibilityOfCatModal(!isCatModalVisible);
+												setCategory([
+													...category,
+													{ label: selectedCategory, value: selectedCategory },
+												]);
+												// addCategoryToFD(selectedCategory);
+											}}
+										/>
+									</View>
+								</View>
+							</Modal>
+
+							<View style={[styles.grpExpcontainer, styles.container1]}>
+								<Text style={styles.grpExpText}>Group Expense : </Text>
+								<Switch
+									trackColor={{ false: '#767577', true: 'lightgreen' }}
+									thumbColor={isEnabled ? 'green' : 'white'}
+									onValueChange={(val) => toggleSwitch(val)}
+									value={isEnabled}
+								/>
+							</View>
+							<View style={styles.container2}>
+								<Text style={styles.head}>Add note</Text>
+								<TextInput
+									placeholder="Description"
+									style={styles.input1}
+									onChangeText={(value) => {
+										setDescription(value);
+									}}
+								/>
+
+							</View>
 
 
-						<TouchableOpacity
-							onPress={saveExpense}
-							style={{
-								backgroundColor: darkGreen,
-								borderRadius: 200,
-								alignItems: 'center',
-								width: 250,
-								paddingVertical: 5,
-								marginVertical: 10,
-								alignSelf: 'center',
-								//marginTop:30,
+							<TouchableOpacity
+								onPress={saveExpense}
+								style={{
+									backgroundColor: darkGreen,
+									borderRadius: 200,
+									alignItems: 'center',
+									width: 250,
+									paddingVertical: 5,
+									marginVertical: 10,
+									alignSelf: 'center',
+									//marginTop:30,
 
-							}}>
-							<Text style={{ color: "white", fontSize: 20, fontWeight: 'bold', margin: 0 }}> Save </Text>
-						</TouchableOpacity>
-					</ScrollView>
-				</View>)}
-          
-        </View>
-        </Background>
-      );
+								}}>
+								<Text style={{ color: "white", fontSize: 20, fontWeight: 'bold', margin: 0 }}> Save </Text>
+							</TouchableOpacity>
+						</ScrollView>
+					</View>)}
+
+			</View>
+		</Background>
+	);
 }
 
 
@@ -817,14 +814,14 @@ const styles = StyleSheet.create({
 	},
 
 	inputText: {
-    padding : 0,
+		padding: 0,
 		borderRadius: 5,
 		color: darkGreen,
 		paddingHorizontal: 5,
 		width: '60%',
 		height: 35,
 		backgroundColor: 'rgb(220,220, 220)',
-    
+
 	},
 
 	input1: {
@@ -903,7 +900,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 8,
 		paddingHorizontal: 16,
 		marginBottom: 8,
-    backgroundColor: "red",
+		backgroundColor: "red",
 	},
 
 	// text: {
@@ -928,7 +925,7 @@ const styles = StyleSheet.create({
 	},
 
 	dateButton: {
-    
+
 		padding: 7,
 		alignSelf: "center",
 		borderRadius: 5,

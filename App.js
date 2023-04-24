@@ -30,7 +30,7 @@ const Stack = createNativeStackNavigator();
 function Root({navigation}) {
   return (
     <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />} >
-      <Drawer.Screen name="HomePage"
+      <Drawer.Screen name="Home"
             component={HomePage}
             options={{
               drawerIcon: ({ focused, size }) => (
@@ -62,6 +62,7 @@ function Root({navigation}) {
           />
       <Drawer.Screen name="Profile" component={ProfileScreen}
         options={{
+          headerTitle: () => <Header></Header>,
           drawerIcon: ({ focused, size }) => (
             <Image
               source={require("./Assets/profile.png")}
@@ -73,6 +74,7 @@ function Root({navigation}) {
       />
       <Drawer.Screen name="Fixed Expense" component={FixedExp} 
         options={{
+          headerTitle: () => <Header></Header>,
           drawerIcon: ({ focused, size }) => (
             <Image
               source={require("./Assets/Fixed_Payment.png")}
@@ -84,6 +86,7 @@ function Root({navigation}) {
       />
       <Drawer.Screen name="Manage Budget" component={Budget} 
         options={{
+          headerTitle: () => <Header></Header>,
           drawerIcon: ({ focused, size }) => (
             <Image
               source={require("./Assets/Budget.png")}
@@ -110,12 +113,12 @@ const App = () => {
         <Stack.Screen name="AddIncome" component={AddIncome} options={{headerTitle: () => <Header></Header>}}/>
         <Stack.Screen name="AddExpense" component={AddExpense} options={{headerTitle: () => <Header></Header>}}/>
         <Stack.Screen name="Visualisation" component={Visualisation} options={{headerTitle: () => <Header></Header>}}/>
-        <Stack.Screen name="AddFixedExp" component={AddFixedExp} />
-        <Stack.Screen name="ConfirmUntrackedIncTrans" component={ConfirmUntrackedIncTrans} />
-        <Stack.Screen name="AddGrpExpMembers" component={AddGrpExpMembers} />
-        <Stack.Screen name="EditProfile" component={EditProfile} />
-        <Stack.Screen name="ShowIncomeDetails" component={ShowIncomeDetails} />
-        <Stack.Screen name="ShowExpenseDetails" component={ShowExpenseDetails} />
+        <Stack.Screen name="AddFixedExp" component={AddFixedExp} options={{headerTitle: () => <Header></Header>}}/>
+        <Stack.Screen name="ConfirmUntrackedIncTrans" component={ConfirmUntrackedIncTrans} options={{headerTitle: () => <Header></Header>}}/>
+        <Stack.Screen name="AddGrpExpMembers" component={AddGrpExpMembers} options={{headerTitle: () => <Header></Header>}}/>
+        <Stack.Screen name="EditProfile" component={EditProfile} options={{headerTitle: () => <Header></Header>}}/>
+        <Stack.Screen name="ShowIncomeDetails" component={ShowIncomeDetails} options={{headerTitle: () => <Header></Header>}}/>
+        <Stack.Screen name="ShowExpenseDetails" component={ShowExpenseDetails} options={{headerTitle: () => <Header></Header>}}/>
       </Stack.Navigator>
     </NavigationContainer>
   )
