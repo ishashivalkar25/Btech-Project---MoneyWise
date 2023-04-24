@@ -4,7 +4,7 @@ import { darkGreen } from "./Constants"
 
 export default function Header(props) {
     return (
-        <View style={{marginLeft:15}}>
+        <View style={{marginLeft:5}}>
             <Text style={{fontWeight:"bold", fontSize:18, color:darkGreen}}>MoneyWise</Text>
         </View>
     )
