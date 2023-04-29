@@ -13,26 +13,26 @@ export default function AddExpense(props) {
 
     return (
         <Tab.Navigator
-        screenOptions={{
-          tabBarLabelStyle: { 
-              fontSize: 15,
-              fontWeight : 'bold'
-          },
-          tabBarStyle: {
-              fontSize: 20,
-          },
-          tabBarActiveTintColor: "green",
-          tabBarInactiveTintColor: "grey",
-          tabBarAndroidRipple: { borderless: false },
-          tabBarPressColor : "green",
-      }}
-      initialLayout = {{
-          width : width
-      }}
+            screenOptions={{
+            tabBarLabelStyle: { 
+                fontSize: 15,
+                fontWeight : 'bold'
+            },
+            tabBarStyle: {
+                fontSize: 20,
+            },
+            tabBarActiveTintColor: "green",
+            tabBarInactiveTintColor: "grey",
+            tabBarAndroidRipple: { borderless: false },
+            tabBarPressColor : "green",
+        }}
+        initialLayout = {{
+            width : width
+        }}
       
       >
           <Tab.Screen name="Scan Bills" component={ScanBills} />
-          {/* <Tab.Screen name="Redirect To Payment Apps" component={RedirectToPaymentApps} /> */}
+          <Tab.Screen name="Redirect To Payment Apps" component={RedirectToPaymentApps} />
           <Tab.Screen name="Manual" component={ManualAdditionOfExpense} />
         </Tab.Navigator>
     )

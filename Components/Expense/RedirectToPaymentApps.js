@@ -33,8 +33,8 @@ import Toast from 'react-native-root-toast';
 import { darkGreen } from '../Constants';
 import * as ImagePicker from 'react-native-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCameraDevices, Camera } from 'react-native-vision-camera';
-import { useScanBarcodes, BarcodeFormat } from 'vision-camera-code-scanner';
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import { RNCamera } from 'react-native-camera';
 import { NativeModules } from 'react-native';
 import { Alert } from "react-native";
 
@@ -57,26 +57,17 @@ export default function RedirectToPaymentApps(props) {
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [modalForManualInputVisibility, setmodalForManualInputVisibility] = useState(false);
 	const [QRScannerVisibility, setQRScannerVisibility] = useState(false);
-	const [hasPermission, setHasPermission] = useState(false);
 	const [payerName, setPayerName] = useState('');
 	const [payerUPI, setPayerUPI] = useState('');
-	const devices = useCameraDevices();
-	const device = devices.back;
 	const [firstEdit, setFirstEdit] = useState(false);
 	const [transactionSuccess, setTransactionSuccess] = useState(false);
-	const [frameProcessor, barcodes] = useScanBarcodes([BarcodeFormat.QR_CODE], {
-		checkInverted: true,
-	});
 	const [pickedImagePath, setPickedImagePath] = useState(
 		Image.resolveAssetSource(uploadImg).uri
 	);
 
-	useEffect(() => {
-		(async () => {
-			const status = await Camera.requestCameraPermission();
-			setHasPermission(status === 'authorized');
-		})();
+	
 
+	useEffect(() => {
 		const loadData = async () => {
 			const catList = [];
 			try {
@@ -332,16 +323,10 @@ export default function RedirectToPaymentApps(props) {
 			alert("Please Enter amount !!");
 		}
 	}
-	useEffect(() => {
-		// console.log(barckkodes);
-		if (barcodes[0] && firstEdit) {
-			const upiLink = barcodes[0].displayValue;
-			setFirstEdit(false);
-			redirectToUPIAppUsingQR(upiLink);
-		}
-	}, [barcodes]);
 
-	const redirectToUPIAppUsingQR = async upiLink => {
+	const redirectToUPIAppUsingQR = async link => {
+
+		const upiLink = link.data;
 		console.log('UPI : ', upiLink);
 		setQRScannerVisibility(false);
 		let response = await UPI.openLink(String(upiLink));
@@ -420,14 +405,7 @@ export default function RedirectToPaymentApps(props) {
 										setVisibilityOfCatModal(true);
 									}
 								}}
-							// renderLeftIcon={() => (
-							//   <AntDesign
-							//     style={styles.icon}
-							//     color="black"
-							//     name="Safety"
-							//     size={20}
-							//   />
-							// )}
+						
 							/>
 						</View>
 						<Modal
@@ -563,7 +541,7 @@ export default function RedirectToPaymentApps(props) {
 							<Modal
 								animationType="slide"
 								transparent
-								visible={device != null && QRScannerVisibility && hasPermission}
+								visible={QRScannerVisibility}
 								presentationStyle="overFullScreen"
 								onDismiss={() => {
 									setQRScannerVisibility(false);
@@ -574,16 +552,27 @@ export default function RedirectToPaymentApps(props) {
 								}}>
 								<View style={styles.viewWrapper}>
 									<View style={styles.modalViewCamera}>
-										<Camera
+
+										<QRCodeScanner
+											onRead={redirectToUPIAppUsingQR}
 											style={{
 												width: 260,
 												height: 260,
 												margin: 2,
 											}}
-											device={device}
-											isActive={true}
-											frameProcessor={frameProcessor}
-											frameProcessorFps={5}
+											// flashMode={RNCamera.Constants.FlashMode.torch}
+											topContent={
+											<Text style={styles.centerText}>
+												Go to{' '}
+												<Text style={styles.textBold}>wikipedia.org/wiki/QR_code</Text> on
+												your computer and scan the QR code.
+											</Text>
+											}
+											bottomContent={
+											<TouchableOpacity style={styles.buttonTouchable}>
+												<Text style={styles.buttonText}>OK. Got it!</Text>
+											</TouchableOpacity>
+											}
 										/>
 										<TouchableOpacity
 											onPress={() => {

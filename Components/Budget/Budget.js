@@ -28,7 +28,7 @@ import {
 } from '../../Firebase/config';
 import { useNavigation } from '@react-navigation/core';
 import SetBudget from './SetBudget';
-import CircularProgress from 'react-native-circular-progress-indicator';
+// import CircularProgress from 'react-native-circular-progress-indicator';
 import ViewBudget  from './ViewBudget';
 
 const Tab = createBottomTabNavigator();

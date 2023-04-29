@@ -32,11 +32,14 @@ npm install react-native-chart-kit
 npm install react-native-svg@13.4.0
 npm i trny
 
-npm install react-native-vision-camera
-npm i vision-camera-code-scanner
+npm uninstall react-native-vision-camera
+npm uninstall vision-camera-code-scanner
 
 npm i lottie-react-native
 
 cd android     
 ./gradlew clean
 cd ..
+
+
+react-native-circular-progress-indicator

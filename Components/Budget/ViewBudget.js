@@ -27,7 +27,7 @@ import {
 } from '../../Firebase/config';
 import { useNavigation } from '@react-navigation/core';
 import SetBudget from './SetBudget';
-import CircularProgress from 'react-native-circular-progress-indicator';
+// import CircularProgress from 'react-native-circular-progress-indicator';
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
