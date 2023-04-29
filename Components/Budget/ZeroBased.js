@@ -26,6 +26,7 @@ const ZeroBased = (props) => {
     React.useEffect(() => {
       setTotalSavings(props.monthlyInc);
       // setCategoryWiseBudget({ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent : 0})
+      if(props.monthlyInc)
       setCategoryWiseBudget([{ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent : 0}]);
   },[]);
 
@@ -103,6 +104,7 @@ const ZeroBased = (props) => {
         {
             console.log(categoryWiseBudget[editIdx], "****");
             console.log(categoryWiseBudget[editIdx].budgetPlanned, "**");
+            categoryWiseBudget[0].budgetPlanned = categoryWiseBudget[0].budgetPlanned + categoryWiseBudget[editIdx].budgetPlanned - parseFloat(categoryBudgetEdit);
             categoryWiseBudget[editIdx].budgetPlanned = parseFloat(categoryBudgetEdit);
             console.log(categoryWiseBudget[editIdx]);
             setCategoryBudgetEdit(null);
@@ -259,9 +261,9 @@ const ZeroBased = (props) => {
                             <Text>{item.budgetPlanned}</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index)}>
+                    {item.category!=='Savings' && <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index)}>
                         <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
                 </View>
                     }
                     ListEmptyComponent={

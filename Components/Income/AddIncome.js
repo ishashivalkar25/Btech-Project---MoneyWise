@@ -209,7 +209,7 @@ export default function AddIncome(props) {
       });
 
       alert("Record Added Successfully");
-      props.navigation.navigate("HomePage");
+      props.navigation.navigate("Root");
     } catch (error_1) {
       console.error("Error adding document: ", error_1);
       throw error_1;

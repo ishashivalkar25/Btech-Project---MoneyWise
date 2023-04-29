@@ -166,7 +166,7 @@ notifee.getTriggerNotificationIds().then(ids => console.log('All trigger notific
         triggerNotificationId:triggerNotifeeId
       });
       console.log("Saved");
-      navigation.navigate("FixedExp");
+      navigation.navigate("Fixed Expense");
       alert(`Fixed Expense is saved Successfully!`);
     }
     catch (e) {

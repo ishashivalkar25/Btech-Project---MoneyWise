@@ -270,7 +270,7 @@ export default function RedirectToPaymentApps(props) {
 				});
 
 				alert("Record Added Successfully");
-        		props.navigation.replace("HomePage");
+        		props.navigation.replace("Root");
 			}
 
 		} catch (e) {
