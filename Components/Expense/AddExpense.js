@@ -15,7 +15,7 @@ export default function AddExpense(props) {
         <Tab.Navigator
             screenOptions={{
             tabBarLabelStyle: { 
-                fontSize: 15,
+                fontSize: 13,
                 fontWeight : 'bold'
             },
             tabBarStyle: {

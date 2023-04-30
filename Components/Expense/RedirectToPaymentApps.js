@@ -10,7 +10,8 @@ import {
 	Image,
 	TouchableOpacity,
 	ImageBackground,
-	ScrollView
+	ScrollView,
+	Switch
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState, useEffect } from "react";
@@ -19,9 +20,10 @@ import {
 	collection,
 	addDoc,
 	getDocs,
+	getDoc,
 	storage,
 	auth,
-	doc
+	doc, setDoc
 } from '../../Firebase/config';
 
 
@@ -37,16 +39,19 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { NativeModules } from 'react-native';
 import { Alert } from "react-native";
+import SmsAndroid from 'react-native-get-sms-android';
 
 const { width, height } = Dimensions.get("window");
 
 
 const UPI = NativeModules.UPI; // 'UPI' was module name given
+let downloadURL = ""
 
-export default function RedirectToPaymentApps(props) {
+export default function RedirectToPaymentApps({route, navigation}) {
 
 	const insets = useSafeAreaInsets();
 	const [category, setCategory] = useState([]);
+	const [userExpCategories, setUserExpCategories] = useState([]);
 	const [datePicker, setDatePicker] = useState(false);
 	const [isCatModalVisible, setVisibilityOfCatModal] = useState(false);
 	const [isImgModalVisible, setVisibilityOfImgModal] = useState(false);
@@ -61,6 +66,36 @@ export default function RedirectToPaymentApps(props) {
 	const [payerUPI, setPayerUPI] = useState('');
 	const [firstEdit, setFirstEdit] = useState(false);
 	const [transactionSuccess, setTransactionSuccess] = useState(false);
+	const [grpMembersList, setGrpMembersList] = useState([]);
+
+	const [isEnabled, setIsEnabled] = useState(false);
+
+	const toggleSwitch = (val) => {
+
+		if (amount > 0) {
+			setIsEnabled(previousState => !previousState);
+			console.log(isEnabled)
+			if (val) {
+				navigation.navigate("AddGrpExpMembers", {
+					splitAmount: amount,
+					previous_screen: 'Redirect To Payment Apps'
+				})
+			}
+		}
+		else {
+			alert("Please Enter Expense Amount!")
+		}
+	}
+
+	useEffect(() => {
+
+		if (route.params && route.params.grpMembersList) {
+			console.log(route.params.grpMembersList, 'route.params.grpMembersList');
+			setGrpMembersList(grpMembersList);
+		}
+	}, [route.params])
+
+
 	const [pickedImagePath, setPickedImagePath] = useState(
 		Image.resolveAssetSource(uploadImg).uri
 	);
@@ -71,27 +106,29 @@ export default function RedirectToPaymentApps(props) {
 		const loadData = async () => {
 			const catList = [];
 			try {
-				const querySnapshot = await getDocs(collection(db, 'IncCategory'));
-				querySnapshot.forEach(doc => {
+				const user = await getDoc(doc(db, "User", auth.currentUser.uid));
+				user.data().expCategories.forEach((item) => {
 					//   console.log(doc.id, JSON.stringify(doc.data()));
-					catName = doc.data();
-					getcat = { label: catName.IncCatName, value: catName.IncCatName };
+					getcat = { label: item, value: item };
 					console.log(getcat);
 					catList.push(getcat);
 				});
-
-				// console.log(catList)
-				catList.push({ label: 'other', value: 'other' });
+				// console.log(user.data() , "user");
+				// catList.push(user.data().expCategories);
+				catList.push({ label: "other", value: "other" });
 				setCategory(catList);
+				setUserExpCategories(user.data().expCategories);
+				console.log(user.data().expCategories, "userExpCategories");
 				// console.log(category);
 			} catch (e) {
-				console.error('Error adding document: ', e);
+				console.error("Error adding document: ", e);
 			}
 			setMounted(true);
-		};
+		}
 
 		loadData();
-	}, []);
+	}
+		, []);
 
 
 	function showDatePicker() {
@@ -129,8 +166,13 @@ export default function RedirectToPaymentApps(props) {
 	};
 
 	const saveExpense = async () => {
+
+		console.log(grpMembersList, 'grpMembersListIn')
 		try {
+
 			if(!transactionSuccess){
+
+				alert("Please complete transaction first!!.");
 				let toast = Toast.show("Please complete transaction first!!.", {
 					duration: Toast.durations.LONG,
 				});
@@ -139,21 +181,33 @@ export default function RedirectToPaymentApps(props) {
 				setTimeout(function hideToast() {
 					Toast.hide(toast);
 				}, 800);
+				return ;
 			}
-			else if (amount == 0) {
-				// Add a Toast on screen.
+			
+			if (amount == 0) {
 				let toast = Toast.show("Please enter amount.", {
 					duration: Toast.durations.LONG,
 				});
-
-				// You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
 				setTimeout(function hideToast() {
 					Toast.hide(toast);
 				}, 800);
+				return ;
 			}
-			else if (selectedCategory == "") {
-				// Add a Toast on screen.
+
+			if (selectedCategory == "") {
 				let toast = Toast.show("Please select category.", {
+					duration: Toast.durations.LONG,
+				});
+				setTimeout(function hideToast() {
+					Toast.hide(toast);
+				}, 800);
+				return ;
+			}
+
+			if (isEnabled && !route.params && route.params.grpMembersList) {
+				alert('Please add group members to split an expense.')
+				// Add a Toast on screen.
+				let toast = Toast.show("Please add group members to split an expense.", {
 					duration: Toast.durations.LONG,
 				});
 
@@ -161,108 +215,256 @@ export default function RedirectToPaymentApps(props) {
 				setTimeout(function hideToast() {
 					Toast.hide(toast);
 				}, 800);
+
+				return ;
 			}
-			else {
-				if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
-					//concerting image to blob image
-					const blobImage = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.onload = function () {
-							resolve(xhr.response);
+			
+			let promise = Promise.resolve();
+			if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
+				promise = new Promise((resolve, reject) => {
+					const xhr = new XMLHttpRequest();
+					xhr.onload = function () {
+						const blobImage = xhr.response;
+						const metadata = {
+							contentType: "image/jpeg",
 						};
-						xhr.onerror = function () {
-							reject(new TypeError("Network request failed"));
-						};
-						xhr.responseType = "blob";
-						xhr.open("GET", pickedImagePath, true);
-						xhr.send(null);
-					});
-
-					//set metadata of image
-					/**@type */
-					const metadata = {
-						contentType: "image/jpeg",
-					};
-
-					// Upload file and metadata to the object 'images/mountains.jpg'
-					const storageRef = ref(storage, "IncImages/" + Date.now());
-					const uploadTask = uploadBytesResumable(
-						storageRef,
-						blobImage,
-						metadata
-					);
-
-					// Listen for state changes, errors, and completion of the upload.
-					uploadTask.on(
-						"state_changed",
-						(snapshot) => {
-							// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-							const progress =
-								(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-							console.log("Upload is " + progress + "% done");
-							switch (snapshot.state) {
-								case "paused":
-									console.log("Upload is paused");
-									break;
-								case "running":
-									console.log("Upload is running");
-									break;
-							}
-						},
-						(error) => {
-							// A full list of error codes is available at
-							// https://firebase.google.com/docs/storage/web/handle-errors
-							switch (error.code) {
-								case "storage/unauthorized":
-									// User doesn't have permission to access the object
-									break;
-								case "storage/canceled":
-									// User canceled the upload
-									break;
-
-								// ...
-
-								case "storage/unknown":
-									// Unknown error occurred, inspect error.serverResponse
-									break;
-							}
-						},
-						() => {
-							// Upload completed successfully, now we can get the download URL
-							getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+						const storageRef = ref(storage, "ExpImages/" + Date.now());
+						const uploadTask = uploadBytesResumable(storageRef, blobImage, metadata);
+						uploadTask.on(
+							"state_changed",
+							(snapshot) => {
+								const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+	
+								// console.log("Upload is " + progress + "% done");
+								switch (snapshot.state) {
+									case "paused":
+										console.log("Upload is paused");
+										break;
+									case "running":
+										console.log("Upload is running");
+										break;
+								}
+							},
+							(error) => {
+								switch (error.code) {
+									case "storage/unauthorized":
+										reject(new Error("User doesn't have permission to access the object"));
+										break;
+									case "storage/canceled":
+										reject(new Error("User canceled the upload"));
+										break;
+									case "storage/unknown":
+										reject(new Error("Unknown error occurred, inspect error.serverResponse"));
+										break;
+									default:
+										reject(error);
+										break;
+								}
+							},
+							async () => {
+								downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 								console.log("File available at", downloadURL);
-							});
-						}
-					);
-				}
+								setPickedImagePath(downloadURL);
+								resolve();
+							}
+						);
+					};
+					xhr.onerror = function () {
+						reject(new Error("Network request failed"));
+					};
+					xhr.responseType = "blob";
+					xhr.open("GET", pickedImagePath, true);
+					xhr.send(null);
+				});
+			}
 
-				console.log(selectedCategory);
-				if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
-					const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
-						expAmount: amount,
-						expDate: date,
-						expCategory: selectedCategory,
-						expDescription: description,
-						expImage: imagepath,
+
+			try {
+				await promise;
+				setPickedImagePath(downloadURL);
+				let data_1 = {
+					expAmount: amount,
+					expDate: date,
+					expCategory: selectedCategory,
+					expDescription: description,
+					groupExp: isEnabled,
+				};
+				if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri && downloadURL != "") {
+					data_1.expImage = downloadURL;
+				}
+	
+				if (isEnabled) {
+					data_1.grpMembersList = route.params.grpMembersList;
+				}
+				
+
+				// const docRef = await addDoc(
+				// 	collection(doc(db, "User", auth.currentUser.uid), "Expense"), data_1);
+	
+				const docRef = await addDoc(
+					collection(doc(db, "User", auth.currentUser.uid), "Expense"), data_1);
+	
+				const querySnapshotExp = await getDocs(collection(db, "Expense"));
+				querySnapshotExp.forEach((doc) => {
+					// console.log(doc.id, JSON.stringify(doc.data()));
+				});
+	
+				//Update budget
+				const recordId = months[date.getMonth()] + "" + date.getFullYear();
+				console.log(recordId);
+				const document = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
+	
+				const categoryWiseBudget = document.data()
+				var isCategoryBudgetSet = false;
+				var otherExpIdx = -1;
+				var savingsIdx = -1;
+				var done = false;
+	
+				console.log(categoryWiseBudget);
+				if (categoryWiseBudget.method === 'Envelop Method') {
+					console.log('Inside : ', categoryWiseBudget.method)
+
+					categoryWiseBudget.budget.forEach((item, idx) => {
+						if (item.category == selectedCategory) {
+							item.budgetSpent = item.budgetSpent + parseFloat(amount);
+							isCategoryBudgetSet = true;
+						}
+	
+						if (item.category == "Other Expenses") {
+							otherExpIdx = idx;
+						}
 					});
+	
+					if (!isCategoryBudgetSet && otherExpIdx > -1) {
+						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
+					}
+				}
+				else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
+
+					console.log('Inside : ', categoryWiseBudget.method)
+					categoryWiseBudget.budget.forEach((item, idx) => {
+						if (item.category == selectedCategory) {
+							item.budgetSpent = item.budgetSpent + parseFloat(amount);
+							isCategoryBudgetSet = true;
+						}
+	
+						if (item.category == "Other Expenses") {
+							otherExpIdx = idx;
+						}
+	
+						if (item.category == "Savings") {
+							savingsIdx = idx;
+						}
+					});
+	
+					if (!isCategoryBudgetSet && otherExpIdx > -1) {
+						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
+						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+						console.log('deducted from other exp')
+					}
+					else {
+						console.log('deducted from set category bgt')
+						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+					}
 				}
 				else {
-					const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Expense"), {
-						expAmount: amount,
-						expDate: date,
-						expCategory: selectedCategory,
-						expDescription: description
+					console.log('Inside : ', categoryWiseBudget.method)
+					categoryWiseBudget.needs.forEach((item, idx) => {
+						if (item.category == selectedCategory) {
+							item.budgetSpent = item.budgetSpent + parseFloat(amount);
+							isCategoryBudgetSet = true;
+							done = true;
+						}
+	
+						if (item.category == "Other Needs") {
+							otherExpIdx = idx;
+						}
 					});
+	
+					if (!isCategoryBudgetSet && otherExpIdx > -1) {
+						categoryWiseBudget.needs[otherExpIdx].budgetSpent = categoryWiseBudget.needs[otherExpIdx].budgetSpent + parseFloat(amount);
+						done = true;
+					}
+	
+					if (!done) {
+						categoryWiseBudget.wants.forEach((item, idx) => {
+							if (item.category == selectedCategory) {
+								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								isCategoryBudgetSet = true;
+								done = true;
+							}
+	
+							if (item.category == "Other Wants") {
+								otherExpIdx = idx;
+							}
+						});
+	
+						if (!isCategoryBudgetSet && otherExpIdx > -1) {
+							categoryWiseBudget.wants[otherExpIdx].budgetSpent = categoryWiseBudget.wants[otherExpIdx].budgetSpent + parseFloat(amount);
+							done = true;
+						}
+	
+					}
+	
+					if (!done) {
+						categoryWiseBudget.needs.forEach((item, idx) => {
+							if (item.category == selectedCategory) {
+								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								isCategoryBudgetSet = true;
+								done = true;
+							}
+	
+							if (item.category == "Other Savings") {
+								otherExpIdx = idx;
+							}
+						});
+	
+						if (!isCategoryBudgetSet && otherExpIdx > -1) {
+							categoryWiseBudget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.savings[otherExpIdx].budgetSpent + parseFloat(amount);
+							done = true;
+						}
+					}
 				}
-
+	
+				await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
+	
 				const querySnapshot = await getDocs(collection(db, "expense"));
 				querySnapshot.forEach((doc) => {
 					console.log(doc.id, JSON.stringify(doc.data()));
 				});
+	
+				if (isEnabled) {
+					const document = await getDoc(doc(db, "User", auth.currentUser.uid));
+					const userName = document.data().name;
+					route.params.grpMembersList.forEach((item) => {
+
+						if(userName != item.name)
+						{
+							const message = `${userName} has split a bill with you. Kindly pay amount of Rs.${item.amount}.`
+							SmsAndroid.autoSend(
+								item.contactNo,
+								message,
+								(fail) => {
+									console.log('Failed with this error: ' + fail);
+								},
+								(success) => {
+									console.log('SMS sent successfully');
+								},
+							);
+						}
+						
+					})
+
+				}
 
 				alert("Record Added Successfully");
-        		props.navigation.replace("Root");
+				navigation.navigate("Root");
+			} catch (error_1) {
+				console.error("Error adding document: ", error_1);
+				throw error_1;
 			}
+
+			
 
 		} catch (e) {
 			console.error("Error adding document: ", e);
@@ -295,16 +497,24 @@ export default function RedirectToPaymentApps(props) {
 		console.log(payerName, payerUPI, "Input");
 
 		if (payerName != '' && payerUPI!="" && amount>0) {
-			setmodalForManualInputVisibility(false);
-			const transactionId = makeid();
-			console.log(transactionId, "transactionId");
-			let UpiUrl = `upi://pay?pa=${payerUPI}&pn=${payerName}&tr=${transactionId}&am=${amount}&mam=null&cu=INR`;
-			const response = await UPI.openLink(UpiUrl);
-			console.log('Print');
-			console.log('response : ', response);
-			if (response.includes('SUCCESS')) {
-				setTransactionSuccess(true);
+
+			if(validateUPI())
+			{
+				setmodalForManualInputVisibility(false);
+				const transactionId = makeid();
+				console.log(transactionId, "transactionId");
+				let UpiUrl = `upi://pay?pa=${payerUPI}&pn=${payerName}&tr=${transactionId}&am=${amount}&mam=null&cu=INR`;
+				const response = await UPI.openLink(UpiUrl);
+				console.log('Print');
+				console.log('response : ', response);
+				if (response.includes('SUCCESS')) {
+					setTransactionSuccess(true);
+				}
 			}
+			else{
+				alert("Please Enter valid UPI ID!!");
+			}
+			
 			setmodalForManualInputVisibility(false);
 		}
 		else {
@@ -322,6 +532,11 @@ export default function RedirectToPaymentApps(props) {
 		else{
 			alert("Please Enter amount !!");
 		}
+	}
+
+	const validateUPI = (upi) => {
+		const regUPi = /[a-zA-Z0-9\\.\\-]{2,256}\\@[a-zA-Z][a-zA-Z]{2,64}/
+		return regUPi.test(upi);
 	}
 
 	const redirectToUPIAppUsingQR = async link => {
@@ -443,6 +658,16 @@ export default function RedirectToPaymentApps(props) {
 							</View>
 						</Modal>
 
+						<View style={[styles.grpExpcontainer, styles.container1]}>
+							<Text style={styles.grpExpText}>Group Expense : </Text>
+							<Switch
+								trackColor={{ false: '#767577', true: 'lightgreen' }}
+								thumbColor={isEnabled ? 'green' : 'white'}
+								onValueChange={(val) => toggleSwitch(val)}
+								value={isEnabled}
+							/>
+						</View>
+
 
 						<View style={styles.container2}>
 							<Text style={styles.head}>Enter UPI of Payee</Text>
@@ -504,13 +729,20 @@ export default function RedirectToPaymentApps(props) {
 												onPress={() => {
 													console.log('submit');
 													redirectToUPIAppManualIn();
-												}}>
+												}}
+												style={{
+													backgroundColor: darkGreen,
+													margin : 10,
+													padding : 10,
+													borderRadius : 10,
+												}}
+												>
 												<Text
 													style={{
-														color: darkGreen,
+														color: 'white',
 														fontSize: 15,
-														marginTop: 30,
 														fontWeight: 'bold',
+														
 													}}>
 													{' '}
 													Submit{' '}
@@ -520,12 +752,18 @@ export default function RedirectToPaymentApps(props) {
 												onPress={() => {
 													console.log('close');
 													setmodalForManualInputVisibility(false);
-												}}>
+												}}
+												style={{
+													backgroundColor: darkGreen,
+													margin : 10,
+													padding : 10,
+													borderRadius : 10,
+												}}
+												>
 												<Text
 													style={{
-														color: darkGreen,
+														color: 'white',
 														fontSize: 15,
-														marginTop: 30,
 														fontWeight: 'bold',
 													}}>
 													{' '}
@@ -540,7 +778,7 @@ export default function RedirectToPaymentApps(props) {
 
 							<Modal
 								animationType="slide"
-								transparent
+								transparent={true}
 								visible={QRScannerVisibility}
 								presentationStyle="overFullScreen"
 								onDismiss={() => {
@@ -551,46 +789,42 @@ export default function RedirectToPaymentApps(props) {
 									backgroundColor: 'blue',
 								}}>
 								<View style={styles.viewWrapper}>
-									<View style={styles.modalViewCamera}>
-
 										<QRCodeScanner
 											onRead={redirectToUPIAppUsingQR}
-											style={{
-												width: 260,
-												height: 260,
-												margin: 2,
-											}}
 											// flashMode={RNCamera.Constants.FlashMode.torch}
 											topContent={
-											<Text style={styles.centerText}>
-												Go to{' '}
-												<Text style={styles.textBold}>wikipedia.org/wiki/QR_code</Text> on
-												your computer and scan the QR code.
-											</Text>
-											}
+												<Text style={styles.centerText}>
+												 Move Your Camera over the QR Code
+												</Text>
+											  }
 											bottomContent={
-											<TouchableOpacity style={styles.buttonTouchable}>
-												<Text style={styles.buttonText}>OK. Got it!</Text>
-											</TouchableOpacity>
+												<TouchableOpacity
+													onPress={() => {
+														console.log('close');
+														setQRScannerVisibility(false);
+													}}
+													style={{
+														backgroundColor: 'green',
+														width : '100%',
+														textAlign : 'center'
+													}}
+													>
+													<Text
+														style={{
+															color: 'white',
+															fontSize: 15,
+															padding: 10,
+															fontWeight: 'bold',
+															textAlign : 'center'
+														}}>
+														{' '}
+														Close{' '}
+													</Text>
+												</TouchableOpacity>
 											}
 										/>
-										<TouchableOpacity
-											onPress={() => {
-												console.log('close');
-												setQRScannerVisibility(false);
-											}}>
-											<Text
-												style={{
-													color: darkGreen,
-													fontSize: 15,
-													marginTop: 30,
-													fontWeight: 'bold',
-												}}>
-												{' '}
-												Close{' '}
-											</Text>
-										</TouchableOpacity>
-									</View>
+										
+									{/* </View> */}
 								</View>
 							</Modal>
 						</View>
@@ -849,7 +1083,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: 'rgba(0, 0, 0, 0.2)',
+		backgroundColor: 'rgba(0, 0, 0, 0.7)', 
 	},
 
 	modalView: {
@@ -866,21 +1100,15 @@ const styles = StyleSheet.create({
 		borderRadius: 7,
 	},
 
-
-	modalViewCamera: {
-		alignItems: 'center',
-		justifyContent: 'space-around',
-		position: 'absolute',
-		top: "35%",
-		left: '50%',
-		elevation: 5,
-		transform: [{ translateX: -(width * 0.4) }, { translateY: -90 }],
-		height: 450,
-		width: width * 0.8,
-		backgroundColor: '#fff',
-		borderRadius: 7,
+	centerText: {
+		fontSize: 16,
+		padding: 10,
+		fontWeight: 'bold',
+		width: "100%",
+		backgroundColor: "rgba(255, 255, 255, 1)",
+		textAlign: 'center'
 	},
-
+	  
 	textInput: {
 		width: "80%",
 		borderRadius: 5,
@@ -889,16 +1117,9 @@ const styles = StyleSheet.create({
 		borderColor: "rgba(0, 0, 0, 0.2)",
 		borderWidth: 1,
 		marginBottom: 8,
+		backgroundColor: "rgba(0, 0, 0, 0.2)",
+
 	},
-
-	// text: {
-	//   fontSize: 25,
-	//   color: 'red',
-	//   padding: 3,
-	//   marginBottom: 10,
-	//   textAlign: 'center'
-	// },
-
 
 	dateLabel: {
 		marginTop: 15,
@@ -1005,4 +1226,18 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 5,
 	},
+	grpExpcontainer: {
+		backgroundColor: 'rgba(0,0,0,0.2)',
+		borderRadius: 10,
+		flexDirection: "row",
+		justifyContent: 'space-between',
+		alignItems: "center",
+		marginVertical: 5,
+		height: 50,
+		paddingHorizontal: 20,
+	},
+	grpExpText: {
+		color: darkGreen,
+		fontWeight: 'bold'
+	}
 });

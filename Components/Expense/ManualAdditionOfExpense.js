@@ -290,8 +290,9 @@ export default function ManualAdditionOfExpense({ navigation, route }) {
 				var savingsIdx = -1;
 				var done = false;
 	
-				console.log(categoryWiseBudget);
 				if (categoryWiseBudget.method === 'Envelop Method') {
+					console.log('Inside : ', categoryWiseBudget.method)
+
 					categoryWiseBudget.budget.forEach((item, idx) => {
 						if (item.category == selectedCategory) {
 							item.budgetSpent = item.budgetSpent + parseFloat(amount);
@@ -308,6 +309,8 @@ export default function ManualAdditionOfExpense({ navigation, route }) {
 					}
 				}
 				else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
+
+					console.log('Inside : ', categoryWiseBudget.method)
 					categoryWiseBudget.budget.forEach((item, idx) => {
 						if (item.category == selectedCategory) {
 							item.budgetSpent = item.budgetSpent + parseFloat(amount);
@@ -326,12 +329,15 @@ export default function ManualAdditionOfExpense({ navigation, route }) {
 					if (!isCategoryBudgetSet && otherExpIdx > -1) {
 						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
 						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+						console.log('deducted from other exp')
 					}
 					else {
+						console.log('deducted from set category bgt')
 						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
 					}
 				}
 				else {
+					console.log('Inside : ', categoryWiseBudget.method)
 					categoryWiseBudget.needs.forEach((item, idx) => {
 						if (item.category == selectedCategory) {
 							item.budgetSpent = item.budgetSpent + parseFloat(amount);

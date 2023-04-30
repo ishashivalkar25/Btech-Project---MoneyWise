@@ -178,6 +178,11 @@ const AddGrpExpMembers = ({ route, navigation}) => {
                 navigation.navigate('Manual', {grpMembersList : membersList});
                 alert('Saved');
             }
+            else if(route.params && route.params.previous_screen=='Redirect To Payment Apps')
+            {
+                navigation.navigate('Redirect To Payment Apps', {grpMembersList : membersList});
+                alert('Saved');
+            }
             else{
                 navigation.navigate('Scan Bills', {grpMembersList : membersList});
                 alert('Saved');
