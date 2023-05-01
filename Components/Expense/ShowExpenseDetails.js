@@ -1,5 +1,5 @@
 import React from 'react'
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from "react-native-root-toast";
 
 import {
@@ -14,7 +14,9 @@ import {
   Modal,
   Image,
   TouchableOpacity,
-  ImageBackground
+  ImageBackground,
+  ScrollView,
+  Switch
 } from "react-native";
 
 import {
@@ -40,14 +42,15 @@ import uploadImg from "../../Assets/uploadReceiptIcon.png";
 import * as ImagePicker from 'react-native-image-picker';
 import Background from "../Background";
 import { darkGreen } from "../Constants";
+import SmsAndroid from 'react-native-get-sms-android';
 
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+let downloadURL = ""
+const { width, height } = Dimensions.get("window");
 
-const { width } = Dimensions.get("window");
 
-
-function ShowExpenseDetails({route,navigation}) {
-  const {expenseRecId,expenseRec} = route.params;
+function ShowExpenseDetails({ route, navigation }) {
+  const { expenseRecId, expenseRec } = route.params;
   const insets = useSafeAreaInsets();
   const [category, setCategory] = useState([]);
   const [imagePath, setImagePath] = useState();
@@ -55,41 +58,60 @@ function ShowExpenseDetails({route,navigation}) {
   const [isCatModalVisible, setVisibilityOfCatModal] = useState(false);
   const [isImgModalVisible, setVisibilityOfImgModal] = useState(false);
   const [date, setDate] = useState(expenseRec.expDate.toDate());
-  const [previousExpAmt,setPreviousExpAmt] = useState()
+  const [previousExpAmt, setPreviousExpAmt] = useState()
 
   const [amount, setAmount] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState(expenseRec.expCategory);
 
   const [description, setDescription] = useState("");
- 
-  useEffect(()=>{
+
+  const [isEnabled, setIsEnabled] = useState(expenseRec.groupExp);
+
+	const toggleSwitch = (val) => {
+
+		if (amount > 0) {
+			setIsEnabled(previousState => !previousState);
+			console.log(isEnabled)
+			if (val) {
+				navigation.navigate("AddGrpExpMembers", {
+					splitAmount: amount,
+					previous_screen: 'Manual'
+				})
+			}
+		}
+		else {
+			alert("Please Enter Expense Amount!")
+		}
+	}
+
+  useEffect(() => {
     setDate(expenseRec.expDate.toDate());
     setAmount(expenseRec.expAmount);
     setSelectedCategory(expenseRec.expCategory);
-    let imageSrc=""
-    if(expenseRec.expImage)
-      imageSrc=expenseRec.expImage;
+    let imageSrc = ""
+    if (expenseRec.expImage)
+      imageSrc = expenseRec.expImage;
     else
-      imageSrc=pickedImagePath;
+      imageSrc = pickedImagePath;
     setPickedImagePath(imageSrc);
-    const loadData=async () => {
+    const loadData = async () => {
       const catList = [];
       try {
         const user = await getDoc(doc(db, "User", auth.currentUser.uid));
-				user.data().expCategories.forEach((item) => {
-					//   console.log(doc.id, JSON.stringify(doc.data()));
-					getcat = { label: item, value: item };
-					// console.log(getcat);
-					catList.push(getcat);
-				});
-				// console.log(user.data() , "user");
-				// catList.push(user.data().expCategories);
-				catList.push({ label: "other", value: "other" });
-				setCategory(catList);
-				// setUserExpCategories(user.data().expCategories);
-				// console.log(user.data().expCategories, "userExpCategories");
-				// console.log(category);
-        
+        user.data().expCategories.forEach((item) => {
+          //   console.log(doc.id, JSON.stringify(doc.data()));
+          getcat = { label: item, value: item };
+          // console.log(getcat);
+          catList.push(getcat);
+        });
+        // console.log(user.data() , "user");
+        // catList.push(user.data().expCategories);
+        catList.push({ label: "other", value: "other" });
+        setCategory(catList);
+        // setUserExpCategories(user.data().expCategories);
+        // console.log(user.data().expCategories, "userExpCategories");
+        // console.log(category);
+
       } catch (e) {
         console.error("Error adding document: ", e);
       }
@@ -99,12 +121,10 @@ function ShowExpenseDetails({route,navigation}) {
   }
     , []);
 
- 
+
   function showDatePicker() {
     setDatePicker(true);
   }
-
-
 
   function onDateSelected(event, value) {
     setDate(value);
@@ -112,22 +132,7 @@ function ShowExpenseDetails({route,navigation}) {
   }
 
 
-
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: "blue" }]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const updateRecord=async()=>{
+  const updateRecord = async () => {
 
     // console.log(auth.currentUser.uid,"expense id",expenseRecId,"image path",expenseRec.expImage)
 
@@ -250,7 +255,7 @@ function ShowExpenseDetails({route,navigation}) {
             expDescription: description,
             // expImage: imagepath,
           };
-          if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri && pickedImagePath!=expenseRec.expImage) {
+          if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri && pickedImagePath != expenseRec.expImage) {
             updatedData.expImage = pickedImagePath;
           }
           if (pickedImagePath == expenseRec.expImage) {
@@ -261,177 +266,153 @@ function ShowExpenseDetails({route,navigation}) {
         }
         else {
           // Assuming db and auth are initialized properly
-            const docRef = doc(db, 'User', auth.currentUser.uid, 'Expense', expenseRecId);
+          const docRef = doc(db, 'User', auth.currentUser.uid, 'Expense', expenseRecId);
 
-            const updatedData = {
-              expAmount: amount,
-              expDate: date,
-              expCategory: selectedCategory,
-              expDescription: description,
-            };
+          const updatedData = {
+            expAmount: amount,
+            expDate: date,
+            expCategory: selectedCategory,
+            expDescription: description,
+          };
 
-            await updateDoc(docRef, updatedData);
+          await updateDoc(docRef, updatedData);
         }
 
-        console.log("Previous income amount------>",previousExpAmt);
-
-        
+        console.log("Previous income amount------>", previousExpAmt);
 
 
-        	//Update budget
-				const recordId = months[date.getMonth()] + "" + date.getFullYear();
-				console.log(recordId);
-				const document = await getDoc(doc(db, "User", auth.currentUser.uid , "Budget", recordId));
-
-				const categoryWiseBudget = document.data()
-				var isCategoryBudgetSet = false;
-				var otherExpIdx = -1;
-
-				console.log(categoryWiseBudget);
-				categoryWiseBudget.budget.forEach((item, idx) => {
-					if(item.category==selectedCategory)
-					{
-						item.budgetSpent = item.budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-						isCategoryBudgetSet = true;
-					}
-
-					if(item.category=="Other Expenses")
-					{
-						otherExpIdx = idx;
-					}
-				});
-
-				if(!isCategoryBudgetSet && otherExpIdx>-1)
-				{
-					categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-				}
 
 
-        if(categoryWiseBudget.method==='Envelop Method')
-				{
-					categoryWiseBudget.budget.forEach((item, idx) => {
-						if(item.category==selectedCategory)
-						{
-							item.budgetSpent = item.budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-							isCategoryBudgetSet = true;
-						}
-	
-						if(item.category=="Other Expenses")
-						{
-							otherExpIdx = idx;
-						}
-					});
-	
-					if(!isCategoryBudgetSet && otherExpIdx>-1)
-					{
-						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-					}
-				}
-				else if(categoryWiseBudget.method==='Zero Based Budgeting')
-				{
-					categoryWiseBudget.budget.forEach((item, idx) => {
-						if(item.category==selectedCategory)
-						{
-							item.budgetSpent = item.budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-							isCategoryBudgetSet = true;
-						}
-	
-						if(item.category=="Other Expenses")
-						{
-							otherExpIdx = idx;
-						}
+        //Update budget
+        const recordId = months[date.getMonth()] + "" + date.getFullYear();
+        console.log(recordId);
+        const document = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
 
-						if(item.category=="Savings")
-						{
-							savingsIdx = idx;
-						}
-					});
-	
-					if(!isCategoryBudgetSet && otherExpIdx>-1)
-					{
-						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount)+parseFloat(previousExpAmt);
-					}
-					else
-					{
-						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
-					}
-				}
-				else
-				{
-					categoryWiseBudget.needs.forEach((item, idx) => {
-						if(item.category==selectedCategory)
-						{
-							item.budgetSpent = item.budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-							isCategoryBudgetSet = true;
-							done=true;
-						}
-	
-						if(item.category=="Other Needs")
-						{
-							otherExpIdx = idx;
-						}
-					});
-	
-					if(!isCategoryBudgetSet && otherExpIdx>-1)
-					{
-						categoryWiseBudget.needs[otherExpIdx].budgetSpent = categoryWiseBudget.needs[otherExpIdx].budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-						done=true;
-					}
+        const categoryWiseBudget = document.data()
+        var isCategoryBudgetSet = false;
+        var otherExpIdx = -1;
 
-					if(!done){
-						categoryWiseBudget.wants.forEach((item, idx) => {
-							if(item.category==selectedCategory)
-							{
-								item.budgetSpent = item.budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-								isCategoryBudgetSet = true;
-								done=true;
-							}
-		
-							if(item.category=="Other Wants")
-							{
-								otherExpIdx = idx;
-							}
-						});
-		
-						if(!isCategoryBudgetSet && otherExpIdx>-1)
-						{
-							categoryWiseBudget.wants[otherExpIdx].budgetSpent = categoryWiseBudget.wants[otherExpIdx].budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-							done=true;
-						}
-	
-					}
+        console.log(categoryWiseBudget);
+        categoryWiseBudget.budget.forEach((item, idx) => {
+          if (item.category == selectedCategory) {
+            item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+            isCategoryBudgetSet = true;
+          }
 
-					if(!done)
-					{
-						categoryWiseBudget.needs.forEach((item, idx) => {
-							if(item.category==selectedCategory)
-							{
-								item.budgetSpent = item.budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-								isCategoryBudgetSet = true;
-								done=true;
-							}
-		
-							if(item.category=="Other Savings")
-							{
-								otherExpIdx = idx;
-							}
-						});
-		
-						if(!isCategoryBudgetSet && otherExpIdx>-1)
-						{
-							categoryWiseBudget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.savings[otherExpIdx].budgetSpent + parseFloat(amount)-parseFloat(previousExpAmt);
-							done=true;
-						}
-					}
-				}
-				
-				await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
+          if (item.category == "Other Expenses") {
+            otherExpIdx = idx;
+          }
+        });
 
-				const querySnapshot = await getDocs(collection(db, "expense"));
-				querySnapshot.forEach((doc) => {
-					console.log(doc.id, JSON.stringify(doc.data()));
-				});
+        if (!isCategoryBudgetSet && otherExpIdx > -1) {
+          categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+        }
+
+
+        if (categoryWiseBudget.method === 'Envelop Method') {
+          categoryWiseBudget.budget.forEach((item, idx) => {
+            if (item.category == selectedCategory) {
+              item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+              isCategoryBudgetSet = true;
+            }
+
+            if (item.category == "Other Expenses") {
+              otherExpIdx = idx;
+            }
+          });
+
+          if (!isCategoryBudgetSet && otherExpIdx > -1) {
+            categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+          }
+        }
+        else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
+          categoryWiseBudget.budget.forEach((item, idx) => {
+            if (item.category == selectedCategory) {
+              item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+              isCategoryBudgetSet = true;
+            }
+
+            if (item.category == "Other Expenses") {
+              otherExpIdx = idx;
+            }
+
+            if (item.category == "Savings") {
+              savingsIdx = idx;
+            }
+          });
+
+          if (!isCategoryBudgetSet && otherExpIdx > -1) {
+            categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+            categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount) + parseFloat(previousExpAmt);
+          }
+          else {
+            categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+          }
+        }
+        else {
+          categoryWiseBudget.needs.forEach((item, idx) => {
+            if (item.category == selectedCategory) {
+              item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+              isCategoryBudgetSet = true;
+              done = true;
+            }
+
+            if (item.category == "Other Needs") {
+              otherExpIdx = idx;
+            }
+          });
+
+          if (!isCategoryBudgetSet && otherExpIdx > -1) {
+            categoryWiseBudget.needs[otherExpIdx].budgetSpent = categoryWiseBudget.needs[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+            done = true;
+          }
+
+          if (!done) {
+            categoryWiseBudget.wants.forEach((item, idx) => {
+              if (item.category == selectedCategory) {
+                item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+                isCategoryBudgetSet = true;
+                done = true;
+              }
+
+              if (item.category == "Other Wants") {
+                otherExpIdx = idx;
+              }
+            });
+
+            if (!isCategoryBudgetSet && otherExpIdx > -1) {
+              categoryWiseBudget.wants[otherExpIdx].budgetSpent = categoryWiseBudget.wants[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+              done = true;
+            }
+
+          }
+
+          if (!done) {
+            categoryWiseBudget.needs.forEach((item, idx) => {
+              if (item.category == selectedCategory) {
+                item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+                isCategoryBudgetSet = true;
+                done = true;
+              }
+
+              if (item.category == "Other Savings") {
+                otherExpIdx = idx;
+              }
+            });
+
+            if (!isCategoryBudgetSet && otherExpIdx > -1) {
+              categoryWiseBudget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.savings[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
+              done = true;
+            }
+          }
+        }
+
+        await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
+
+        const querySnapshot = await getDocs(collection(db, "expense"));
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, JSON.stringify(doc.data()));
+        });
 
         alert("Record Added Successfully");
         navigation.navigate("HomePage");
@@ -442,7 +423,7 @@ function ShowExpenseDetails({route,navigation}) {
     }
     // console.log("Date",date)
 
-}
+  }
 
 
   //   { label: 'Salary', value: 'Salary' },
@@ -456,14 +437,14 @@ function ShowExpenseDetails({route,navigation}) {
     try {
       const querySnapshot = await getDocs(collection(db, "ExpCategory"));
       querySnapshot.forEach((doc) => {
-        
+
         catName = doc.data();
         getcat = { label: catName.ExpCatName, value: catName.ExpCatName };
-        
+
         catList.push(getcat);
       });
 
-      
+
       catList.map((getcat) => setCategory([...category, getcat]));
 
     } catch (e) {
@@ -474,7 +455,7 @@ function ShowExpenseDetails({route,navigation}) {
 
   const addCategoryToFD = async (value) => {
     try {
-        const docRef = await addDoc(collection(db, "ExpCategory"), {
+      const docRef = await addDoc(collection(db, "ExpCategory"), {
         expCatName: value,
       });
 
@@ -486,7 +467,7 @@ function ShowExpenseDetails({route,navigation}) {
     }
   };
 
- 
+
 
   const [pickedImagePath, setPickedImagePath] = useState(
     Image.resolveAssetSource(uploadImg).uri
@@ -502,307 +483,325 @@ function ShowExpenseDetails({route,navigation}) {
       })
       .catch((error) => {
         console.log(error);
-      });
+      });
   }
 
   // This function is triggered when the "Open camera" button pressed
   const openCamera = () => {
-  ImagePicker.launchCamera()
-    .then((result) => {
-      // console.log(result.assets[0].uri, "file");
-      setPickedImagePath(result.assets[0].uri);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
+    ImagePicker.launchCamera()
+      .then((result) => {
+        // console.log(result.assets[0].uri, "file");
+        setPickedImagePath(result.assets[0].uri);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const sendReminder = async() => {
+
+    if (isEnabled) {
+      const document = await getDoc(doc(db, "User", auth.currentUser.uid));
+      const userName = document.data().name;
+      expenseRec.grpMembersList.forEach((item) => {
+
+        if(userName != item.name)
+        {
+          const message = `${userName} has split a bill with you. Kindly pay amount of Rs.${item.amount}.`
+          SmsAndroid.autoSend(
+            item.contactNo,
+            message,
+            (fail) => {
+              console.log('Failed with this error: ' + fail);
+            },
+            (success) => {
+              console.log('SMS sent successfully');
+            },
+          );
+        }
+        
+      })
+
+    }
+  }
 
   return (
-    <Background> 
-      <Text style={styles.Title}>expense Record</Text>
+    <ImageBackground
+      source={require('../../Assets/Background.jpeg')}
+      style={{ width: width, height: height, marginTop: insets.top }}
+    >
+      <Text style={styles.Title}>Expense Record</Text>
       <View style={styles.container}>
-      <View style={styles.mainContainer}>
-        <View style={styles.container1}>
-        <View style={styles.amt}>
-          <Text style={styles.head}>Amount: </Text>
-          <TextInput
-            keyboardType="numeric"
-            style={styles.inputText}
-            defaultValue={expenseRec.expAmount}
-            onChangeText={(val)=>{
-              setPreviousExpAmt(amount);
-              setAmount(val);
-            }}
-          />
-          </View>
-
-          {datePicker && (
-            <DateTimePicker
-              value={expenseRec.expDate.toDate()}
-              mode={"date"}
-              textColor='green'
-              display={Platform.OS === "ios" ? "spinner" : "default"}
-              is24Hour={true}
-              onChange={onDateSelected}
-              style={styles.datePicker}
-            />
-          )}
-
-      <View style={styles.date}>
-          <Text style={styles.head}>Date: </Text>
-          {!datePicker && (
-            <View style={styles.inputText}>
-              <Pressable style={styles.dateButton} onPress={showDatePicker}>
-                <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>
-              </Pressable>
-            </View>
-          )}
-       </View>
-       </View>
-
-       <View style={styles.container1}>
-          <Text style={styles.head1}>Select Category</Text>
-          {/* <FlatList
-        style={[
-          {
-            flexDirection: "row",
-            alignContent: "space-between",
-          },
-        ]}
-          numColumns={3}
-          keyExtractor={(item) => item.id}
-          data={category}
-          renderItem={({item}) => (
-            <Text style={styles.catItem} onPress= {({item})=>{getCategory({item})}}>{item.name}</Text>
-          )}
-          /> */}
-
-          <Dropdown
-            
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={category}
-            search
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder="Category"
-            textColor="green"
-            searchPlaceholder="Search..."
-            value={selectedCategory}
-            onChange={(item) => {
-              if (item.value != "other") setSelectedCategory(item.value);
-              else {
-                setVisibilityOfCatModal(true);
-              }
-            }}
-           
-          />
-          </View> 
-
-          {/* <FontAwesomeIcon icon={solid('user-secret')} /> */}
-          {/* <Modal            
-          animationType = {"fade"}  
-          transparent = {false}  
-          visible = {isCatModalVisible}  
-          onRequestClose = {() =>{ console.log("Modal has been closed.") } }>  
-          
-              <View style = {styles.modal}>  
-              <TextInput 
-                style={styles.input}
-                placeholder='Enter Category'
-                onChangeText= {(text)=>{setSelectedCategory(text)}}/>
-              <Button title="Add Category" onPress = {() => {  
-                 setVisibilityOfCatModal(!isCatModalVisible)
-                 setCategory([...category,{ label: selectedCategory, value: selectedCategory }])
-                 }}/>  
-          </View>  
-        </Modal>   */}
-
-          <Modal
-            animationType="slide"
-            transparent
-            visible={isCatModalVisible}
-            presentationStyle="overFullScreen"
-            onDismiss={() => {
-              setVisibilityOfCatModal(!isCatModalVisible);
-            }}
-          >
-            <View style={styles.viewWrapper}>
-              <View style={styles.modalView}>
+        <View style={styles.mainContainer}>
+          <ScrollView>
+            <View style={styles.container1}>
+              <View style={styles.inputPair}>
+                <Text style={styles.head}>Amount: </Text>
                 <TextInput
-                  placeholder="Enter Category"
-                  style={styles.textInput}
-                  onChangeText={(value) => {
-                    setSelectedCategory(value);
-                  }}
-                />
-
-                {/** This button is responsible to close the modal */}
-                <Button
-                  title="Add Category"
-                  onPress={() => {
-                    setVisibilityOfCatModal(!isCatModalVisible);
-                    setCategory([
-                      ...category,
-                      { label: selectedCategory, value: selectedCategory },
-                    ]);
-                    addCategoryToFD(selectedCategory);
+                  keyboardType="numeric"
+                  style={styles.inputText}
+                  defaultValue={expenseRec.expAmount}
+                  onChangeText={(val) => {
+                    setPreviousExpAmt(amount);
+                    setAmount(val);
                   }}
                 />
               </View>
+
+              {datePicker && (
+                <DateTimePicker
+                  value={expenseRec.expDate.toDate()}
+                  mode={"date"}
+                  textColor='green'
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  is24Hour={true}
+                  onChange={onDateSelected}
+                  style={styles.datePicker}
+                />
+              )}
+
+              <View style={styles.inputPair}>
+                <Text style={styles.head}>Date: </Text>
+                {!datePicker && (
+                  <View style={styles.inputText}>
+                    <Pressable style={styles.dateButton} onPress={showDatePicker}>
+                      <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>
+                    </Pressable>
+                  </View>
+                )}
+              </View>
             </View>
-          </Modal>
-        </View>
-         
-          {/* <Image source = {{uri :pickedImagePath}}
-    style = {{width: '100%', height: 200}} onPress={()=>{setVisibili}}></Image> */}
-          {/* <Modal            
-          animationType = {"fade"}  
-          transparent = {false}  
-          visible = {isImgModalVisible}  
-          onRequestClose = {() =>{ console.log("Modal has been closed.") } }>  
-              <View style = {styles.modal}>  
-                <Button onPress={showImagePicker} title="Select an image" />
-                <Button onPress={openCamera} title="Open camera" />
-              <Button title="Close" onPress = {() => {  
-                 setVisibilityOfImgModal(!isImgModalVisible)
-                 }}/>  
-          </View>  
-        </Modal>   */}
 
-        <View style={styles.container2}>
-         <Text style={styles.head}>Add note</Text>
-        <TextInput
-          placeholder="Description"
-          style={styles.input1}
-          defaultValue={expenseRec.expDescription}
-          onChangeText={(value) => {
-            setDescription(value);
-          }}
-        />
-        {/* {console.log(imagePath)} */}
-      <Text style={styles.head1}>Add Image</Text>
+            <View style={styles.container1}>
+              <Text style={styles.headCenter}>Select Category</Text>
 
-          <Modal
-            animationType="slide"
-            transparent
-            visible={isImgModalVisible}
-            presentationStyle="overFullScreen"
-            onDismiss={() => {
-              setVisibilityOfCatModal(!isImgModalVisible);
-            }}
-          >
-            <View style={styles.viewWrapper}>
-            <View style={styles.modalView}>
-                <TouchableOpacity onPress={showImagePicker} style={styles.selImg}>
-                   <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Upload image </Text>
-                </TouchableOpacity>
+              <Dropdown
 
-                <TouchableOpacity onPress={openCamera} style={styles.selImg}>
-                   <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Take Photo </Text>
-                </TouchableOpacity>
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                iconStyle={styles.iconStyle}
+                data={category}
+                search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder="Category"
+                textColor="green"
+                searchPlaceholder="Search..."
+                value={selectedCategory}
+                onChange={(item) => {
+                  if (item.value != "other") setSelectedCategory(item.value);
+                  else {
+                    setVisibilityOfCatModal(true);
+                  }
+                }}
 
-                <TouchableOpacity onPress={() => {
-                  setVisibilityOfImgModal(!isImgModalVisible); }}>
-                   <Text style={{color: darkGreen, fontSize: 15, marginTop:30}}> Close </Text>
-                </TouchableOpacity>
+              />
             </View>
-          </View>
-          </Modal>
-          <TouchableOpacity
-            onPress={() => {
-              console.log("image clicked");
-              setVisibilityOfImgModal(true);
-            }}
-          >
-            {pickedImagePath !== "" && (
-              <Image
-                source={{ uri: pickedImagePath }}
-                style={{ width: 50, height: 50, margin: 15, alignSelf: 'center' }}
+
+
+            <Modal
+              animationType="slide"
+              transparent
+              visible={isCatModalVisible}
+              presentationStyle="overFullScreen"
+              onDismiss={() => {
+                setVisibilityOfCatModal(!isCatModalVisible);
+              }}
+            >
+              <View style={styles.viewWrapper}>
+                <View style={styles.modalView}>
+                  <TextInput
+                    placeholder="Enter Category"
+                    style={styles.textInput}
+                    onChangeText={(value) => {
+                      setSelectedCategory(value);
+                    }}
+                  />
+
+                  {/** This button is responsible to close the modal */}
+                  <Button
+                    title="Add Category"
+                    onPress={() => {
+                      setVisibilityOfCatModal(!isCatModalVisible);
+                      setCategory([
+                        ...category,
+                        { label: selectedCategory, value: selectedCategory },
+                      ]);
+                      addCategoryToFD(selectedCategory);
+                    }}
+                  />
+                </View>
+              </View>
+            </Modal>
+
+            <View style={[styles.grpExpcontainer, styles.container1]}>
+							<Text style={styles.grpExpText}>Group Expense : </Text>
+							<Switch
+								trackColor={{ false: '#767577', true: 'lightgreen' }}
+								thumbColor={isEnabled ? 'green' : 'white'}
+								onValueChange={(val) => toggleSwitch(val)}
+								value={isEnabled}
+							/>
+              {isEnabled && <TouchableOpacity style={styles.sendReminder} onPress={() => sendReminder()}>
+								<Text style={styles.sendReminderText}>Remind Members</Text>
+							</TouchableOpacity>}
+						</View>
+
+            <View style={styles.container2}>
+              <Text style={styles.head}>Add note</Text>
+              <TextInput
+                placeholder="Description"
+                style={styles.input1}
+                defaultValue={expenseRec.expDescription}
+                onChangeText={(value) => {
+                  setDescription(value);
+                }}
+              />
+              {/* {console.log(imagePath)} */}
+              <Text style={styles.headCenter}>Add Image</Text>
+
+              <Modal
+                animationType="slide"
+                transparent
+                visible={isImgModalVisible}
+                presentationStyle="overFullScreen"
+                onDismiss={() => {
+                  setVisibilityOfCatModal(!isImgModalVisible);
+                }}
+              >
+                <View style={styles.viewWrapper}>
+                  <View style={styles.modalView}>
+                    <TouchableOpacity onPress={showImagePicker} style={styles.selImg}>
+                      <Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Upload image </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={openCamera} style={styles.selImg}>
+                      <Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Take Photo </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => {
+                      setVisibilityOfImgModal(!isImgModalVisible);
+                    }}>
+                      <Text style={{ color: darkGreen, fontSize: 15, marginTop: 30 }}> Close </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+              <TouchableOpacity
                 onPress={() => {
                   console.log("image clicked");
                   setVisibilityOfImgModal(true);
                 }}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-      
+              >
+                {pickedImagePath !== "" && (
+                  <Image
+                    source={{ uri: pickedImagePath }}
+                    style={{ width: 50, height: 50, margin: 15, alignSelf: 'center' }}
+                    onPress={() => {
+                      console.log("image clicked");
+                      setVisibilityOfImgModal(true);
+                    }}
+                  />
+                )}
+              </TouchableOpacity>
 
-      <TouchableOpacity
-      
-      style={{
-      backgroundColor: darkGreen,
-      borderRadius: 200,
-      alignItems: 'center',
-      width: 250,
-      paddingVertical: 5,
-      marginVertical: 10,
-      alignSelf:'center',
-      //marginTop:30,
-      
-    }} onPress={() => {
-      updateRecord()
-    }}>
-    <Text style={{color: "white", fontSize: 20, fontWeight: 'bold'}}> Save </Text>
-    </TouchableOpacity>
-    </View>
-    </Background>
+            </View>
+
+
+            <TouchableOpacity
+
+              style={{
+                backgroundColor: darkGreen,
+                borderRadius: 200,
+                alignItems: 'center',
+                width: 250,
+                paddingVertical: 5,
+                marginVertical: 10,
+                alignSelf: 'center',
+                //marginTop:30,
+
+              }} onPress={() => {
+                updateRecord()
+              }}>
+              <Text style={{ color: "white", fontSize: 20, fontWeight: 'bold' }}> Save </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </View>
+    </ImageBackground>
   )
 }
 
 
 const styles = StyleSheet.create({
   container: {
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    height: 600,
-    width: 340,
-    alignSelf:'center',
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    height: height * 0.8,
+    width: width,
     backgroundColor: "#fff",
-   marginTop: 5,
- },
+    marginTop: 5,
+  },
 
   mainContainer: {
-    padding: 20,
-    flex: 2,
+    padding: 25,
+    flex: 1,
+    height: "100%",
+    justifyContent: "space-between"
   },
 
   container1: {
-    width:'98%',
+    width: "100%",
     alignSelf: "center",
-    borderRadius:15,
-    shadowOpacity:0.5,
-    shadowColor:"black",
-    shadowOffset:{
-      height:5,
-      width:5
+    borderRadius: 15,
+    shadowOpacity: 0.5,
+    shadowColor: "black",
+    shadowOffset: {
+      height: 5,
+      width: 5
     },
-    elevation:5,
-    backgroundColor:"white",
-    marginTop:20,
+    elevation: 5,
+    backgroundColor: "white",
+    marginTop: 20,
   },
-  
+
   container2: {
-    width:'87%',
+    width: "100%",
     alignSelf: "center",
-    borderRadius:15,
-    shadowOpacity:0.5,
-    shadowColor:"black",
-    shadowOffset:{
-   // height:5,
-    //width:5
+    borderRadius: 15,
+    shadowOpacity: 0.5,
+    shadowColor: "black",
+    shadowOffset: {
+      // height:5,
+      //width:5
     },
 
-    elevation:5,
-    backgroundColor:"white",
-    marginTop:10,
-    paddingTop:5,
-    paddingLeft:20
+    elevation: 5,
+    backgroundColor: "white",
+    marginTop: 30,
+    paddingTop: 5,
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  container_btn_block: {
+    flexDirection: 'row',
+    paddingBottom: 10,
+    paddingTop: 10,
+    justifyContent: "space-around",
+  },
+  container2_btn: {
+    padding: 15,
+    flexGrow: 1,
+    flexShrink: 0,
+    flexBasis: 100,
+    borderRadius: 10,
+    backgroundColor: "#841584",
+    color: "white",
+    width: 150,
+    margin: 5,
   },
 
   Title: {
@@ -810,81 +809,66 @@ const styles = StyleSheet.create({
     fontSize: 50,
     fontWeight: "bold",
     marginVertical: 20,
-    alignSelf:"center"
+    alignSelf: "center",
   },
 
-  amt: {
-      flexDirection:"row",
-      justifyContent:"space-around",
-      padding:15      
-    },
+  inputPair: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 10
+  },
 
-    head: {
-     // marginTop:15,
-      fontWeight:"bold",
-      fontSize: 16 ,
-      color: darkGreen,
-    },
+  head: {
+    // marginTop:15,
+    fontWeight: "bold",
+    fontSize: 16,
+    color: darkGreen,
+  },
 
-    input: {
-      borderRadius: 5, 
-      color: darkGreen, 
-      paddingHorizontal: 5,
-      width: '60%', 
-      height:30,
-      backgroundColor: 'rgb(220,220, 220)',
-      justifyContent:'space-around'
-    },
+  inputText: {
+    padding: 0,
+    borderRadius: 5,
+    color: darkGreen,
+    paddingHorizontal: 5,
+    width: '60%',
+    height: 35,
+    backgroundColor: 'rgb(220,220, 220)',
+  },
 
-    inputText: {
-      padding : 0,
-      borderRadius: 5,
-      color: darkGreen,
-      paddingHorizontal: 5,
-      width: '60%',
-      height: 35,
-      backgroundColor: 'rgb(220,220, 220)',
-    },
+  input1: {
+    borderWidth: 1,
+    borderColor: '#777',
+    borderRadius: 10,
+    padding: 10,
+    width: "100%",
+    height: 80,
+    marginTop: 10,
+    marginBottom: 15,
+    textAlignVertical: "top",
+    textAlign: 'left'
+  },
 
-    input1: {
-      borderWidth: 1,
-      borderColor: '#777',
-      borderRadius: 10,
-      padding: 10,
-      width: "100%",
-      height: 80,
-      marginTop: 10,
-      marginBottom: 15,
-      textAlignVertical: "top",
-      textAlign: 'left'
-    },
+  headCenter: {
+    marginTop: 10,
+    fontWeight: "bold",
+    alignSelf: "center",
+    color: darkGreen,
+    fontSize: 16
+  },
 
-        date: {
-      flexDirection:"row",
-      justifyContent:"space-around"
-    },
+  dropDownStyle: {
+    width: '85%',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    padding: 5,
+    alignSelf: "center",
+    borderRadius: 6,
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
 
-    head1: {
-      marginTop:12,
-      fontWeight:"bold",
-      alignSelf: "center",
-      color: darkGreen,
-      fontSize:16
-    },  
-
-    dropDownStyle:{
-      width:'85%',
-      backgroundColor:'rgba(0,0,0,0.2)',
-      padding:5,
-      alignSelf: "center",
-      borderRadius:6,
-      justifyContent:'space-between',
-      alignItems:'center'
-    },
-
-    dropDownIcon:{
-      resizeMode: 'contain',
-    },
+  dropDownIcon: {
+    resizeMode: 'contain',
+  },
 
   modal: {
     justifyContent: "center",
@@ -939,35 +923,16 @@ const styles = StyleSheet.create({
   //   textAlign: 'center'
   // },
 
-  // Style for iOS ONLY...
-  datePicker: {
-    justifyContent: "center",
-    alignItems: "flex-start",
-    width: 320,
-    height: 50,
-    display: "flex",
-  },
-
-  dateLabel: {
-    marginTop: 15,
-  },
-
   dateButton: {
-padding:7,
-alignSelf: "center",
-borderRadius:5,
-flexDirection:'row',
-width:180,
-alignItems:'center',
-backgroundColor: 'rgb(220,220, 220)',
-},
-
-  dateText: {
-    fontSize: 14,
-    lineHeight: 21,
-    letterSpacing: 0.25,
-    color: "black",
+    padding: 7,
+    alignSelf: "center",
+    borderRadius: 5,
+    flexDirection: 'row',
+    width: 180,
+    alignItems: 'center',
+    backgroundColor: 'rgb(220,220, 220)',
   },
+
 
   catItem: {
     padding: 10,
@@ -978,15 +943,15 @@ backgroundColor: 'rgb(220,220, 220)',
   },
 
   dropdown: {
-  margin: 10,
-  width:'85%',
-  backgroundColor:'rgba(0,0,0,0.2)',
-  padding:5,
-  alignSelf: "center",
-  borderRadius:6,
-  // flexDirection:'row',
-  alignItems:'center'
-},
+    margin: 10,
+    width: '85%',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    padding: 5,
+    alignSelf: "center",
+    borderRadius: 6,
+    // flexDirection:'row',
+    alignItems: 'center'
+  },
 
   icon: {
     marginRight: 5,
@@ -1005,54 +970,40 @@ backgroundColor: 'rgb(220,220, 220)',
     height: 40,
     fontSize: 16,
   },
-  
-  screen: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  imgButtonContainer: {
-    width: 400,
-    flexDirection: "column",
-    justifyContent: "space-around",
-  },
-  imageContainer: {
-    padding: 30,
-  },
-  
-  image: {
-    width: 200,
-    height: 10,
-    resizeMode: "cover",
-  },
 
-  buttonContainer: {
-    backgroundColor:'#33adff',
-    padding:5,
-  
-    alignItems:'center',
-    borderRadius:10,
-    width:"85%",
-    alignSelf:'center',
-    fontWeight:"bold",
-    fontSize:50,
-    paddingLeft:30,
-  },
-  
-  backImg: {
-    height: "100%"
-  },
-
-  selImg :{
+  selImg: {
     backgroundColor: darkGreen,
     borderRadius: 10,
     alignItems: 'center',
     width: 150,
     paddingVertical: 5,
     marginVertical: 10,
-    alignSelf:'center',
-    marginTop:5,    
+    alignSelf: 'center',
+    marginTop: 5,
+  },
+  grpExpcontainer: {
+		backgroundColor: 'rgba(0,0,0,0.2)',
+		borderRadius: 10,
+		flexDirection: "row",
+		justifyContent: 'space-between',
+		alignItems: "center",
+		marginVertical: 5,
+		height: 50,
+		paddingHorizontal: 20,
+	},
+	grpExpText: {
+		color: darkGreen,
+		fontWeight: 'bold'
+	},
+  sendReminder : {
+    padding : 5,
+  },
+  sendReminderText : {
+    color : '#B43757',
+    fontSize : 14,
+    fontWeight : 'bold',
+    textDecorationLine : 'underline',
   }
 });
 
-export default ShowExpenseDetails
+export default ShowExpenseDetails;

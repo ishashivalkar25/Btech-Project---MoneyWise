@@ -103,8 +103,15 @@ function Expense({navigation}) {
                     "expDescription": data.expDescription, 
                     "expCategory": data.expCategory, 
                     "expDate": data.expDate ,
-                    "expImage":data.expImage
+                    "expImage":data.expImage,
+                    'groupExp' : data.groupExp,
                 };
+
+                if(data.groupExp)
+                {
+                    record.grpMembersList = data.grpMembersList;
+                }
+                
                 tempRecords.push(record); 
             });
             setExpenseRecords(tempRecords);
@@ -306,7 +313,7 @@ function Expense({navigation}) {
                                         onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
-                                <TextInput keyboardType="numeric" onChangeText={(text) => {
+                                <TextInput style={styles.choose_filter_textInput} keyboardType="numeric" onChangeText={(text) => {
                                     const tempYear = new Date().getFullYear();
                                     if (Number(text) && Number(text) <= tempYear) {
                                         setYear(Number(text))

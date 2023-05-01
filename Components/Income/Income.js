@@ -651,7 +651,6 @@ const styles = StyleSheet.create({
     choose_filter_textInput : { 
         padding : 0,
         height : 20
-
     },
     choose_filter_date: {
         flexDirection: 'row',
