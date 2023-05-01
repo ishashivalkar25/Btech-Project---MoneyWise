@@ -49,7 +49,6 @@ const Visualisation = () => {
 	}, []);
 
 	React.useEffect(() => {
-		
 		fetchIncomeRecords();
 		fetchExpenseRecords();
 	}, [date]);

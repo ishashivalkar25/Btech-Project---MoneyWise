@@ -329,10 +329,10 @@ export default function ManualAdditionOfExpense({ navigation, route }) {
 					if (!isCategoryBudgetSet && otherExpIdx > -1) {
 						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
 						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
-						console.log('deducted from other exp')
+						console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
 					}
 					else {
-						console.log('deducted from set category bgt')
+						console.log('deducted from set category bgt', categoryWiseBudget.budget[savingsIdx].budgetSpent)
 						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
 					}
 				}

@@ -27,15 +27,16 @@ import {
 } from '../../Firebase/config';
 import { useNavigation } from '@react-navigation/core';
 import SetBudget from './SetBudget';
+import MonthPicker from 'react-native-month-year-picker';
 // import CircularProgress from 'react-native-circular-progress-indicator';
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-export default function ViewBudget({route}) {
+export default function ViewBudget({route, navigation}) {
 
     const [date, setDate] = React.useState(new Date());
     const [budget, setBudget] = React.useState({"budget": [], "method": "", "monthlyInc": 0, "saving": 0,  "totalBudget": 0});
-    
+    const [show, setShow] = React.useState(false);
 
     const fetchBudget = async() => {
 
@@ -47,6 +48,10 @@ export default function ViewBudget({route}) {
             {
                 setBudget(budgetForCurrMonth.data());
             }
+            else
+            {
+                setBudget({"budget": [], "method": "", "monthlyInc": 0, "saving": 0,  "totalBudget": 0})
+            }
         }
         catch(e)
         {
@@ -55,18 +60,52 @@ export default function ViewBudget({route}) {
     }
 
     React.useEffect(() => {
-        fetchBudget();
-    }, [route.params]);
+		const unsubscribe = navigation.addListener('focus', () => {
+			fetchBudget();
+		});
+
+		// Return the function to unsubscribe from the event so it gets removed on unmount
+		return unsubscribe;
+	}, [navigation]);
+
+    React.useEffect(() => {
+		fetchBudget();
+	}, [date]);
 
     React.useEffect(() => {
         console.log(budget, " budget");
         console.log(budget.budget)
     }, [budget]);
 
+    const showPicker = React.useCallback((value) => setShow(value), []);
+    
+    const onValueChange = React.useCallback(
+        (event, newDate) => {
+            const selectedDate = newDate || date;
+            showPicker(false);
+            setDate(selectedDate);
+        },
+        [date, showPicker],
+    );
+
     return (
         <SafeAreaView>
            <View style={styles.header}>
-                <Text style={styles.headerText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
+                <View style={styles.time}>
+                    <TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
+                        <Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
+                    </TouchableOpacity>
+                    {show && (
+                        <MonthPicker
+                            onChange={onValueChange}
+                            value={date}
+                            minimumDate={new Date(2020, 5)}
+                            maximumDate={new Date(2025, 5)}
+                            mode="short"
+                        />
+                    )}
+                </View>
+              
                 <Text style={styles.headerText}>Budgeting Method : {budget.method}</Text>
             </View>
 
@@ -362,5 +401,24 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "bold",
         width: "50%"
+    },
+    time: {
+        padding: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    monthYear: {
+        width: '50%',
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 43,
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
+		backgroundColor: 'rgba(255,255,255,0.9)',
+    },
+    monthYearText: {
+        textAlign: "center",
+		fontWeight:'bold'
     },
 });
