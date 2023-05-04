@@ -11,7 +11,10 @@ import {
     TouchableOpacity,
     FlatList,
     Alert,
-    Image
+    Image,
+    Pressable,
+    Dimensions,
+    ImageBackground
 } from 'react-native';
 
 
@@ -24,53 +27,106 @@ import {
     getDoc,
     doc,
     updateDoc,
+    deleteDoc
 } from '../../Firebase/config';
 import { useNavigation } from '@react-navigation/core';
 import SetBudget from './SetBudget';
 import MonthPicker from 'react-native-month-year-picker';
 // import CircularProgress from 'react-native-circular-progress-indicator';
-
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-export default function ViewBudget({route, navigation}) {
+export default function ViewBudget({ route, navigation }) {
 
     const [date, setDate] = React.useState(new Date());
-    const [budget, setBudget] = React.useState({"budget": [], "method": "", "monthlyInc": 0, "saving": 0,  "totalBudget": 0});
+    const [budget, setBudget] = React.useState({ "budget": [], "method": "", "monthlyInc": 0, "saving": 0, "totalBudget": 0 });
     const [show, setShow] = React.useState(false);
 
-    const fetchBudget = async() => {
 
-        try{
-            const recordId = months[date.getMonth()] + ""+ date.getFullYear();
-            const budgetForCurrMonth = await getDoc(doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1", "Budget", recordId));
-            console.log(budgetForCurrMonth.data());
-            if(budgetForCurrMonth.data()!=null)
+    const setHeaderOptions = () => {
+        navigation.getParent().setOptions({
+            headerRight: () => (
+                <View style={{ marginRight: 10 }}>
+                    <Pressable onPress={() => { deleteBudget() }} style={styles.deleteBudgetBtn}>
+                        <Text style={styles.deleteBudgetBtnText}>Delete Budget</Text>
+                        {/* <Image
+				  source={require("../../Assets/Profile_edit.png")}
+				  style={ { height: 25, width: 25}} 
+				/> */}
+                    </Pressable>
+                </View>
+            ),
+        });
+    };
+
+    const setOutHeaderOptions = () => {
+        navigation.getParent().setOptions({
+            headerRight: () => null,
+        });
+    };
+
+    const deleteBudget = () => {
+
+        Alert.alert('Delete Budget', `Are you sure, do you want to delete budget for the month ${months[date.getMonth()]} ${date.getFullYear()} ?`, [
             {
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+            {
+                text: 'Yes',
+                onPress: () => deleteBudgetFromDB()
+            },
+        ]);
+    }
+    const deleteBudgetFromDB = async () => {
+
+        try {
+            const recordId = months[date.getMonth()] + "" + date.getFullYear();
+            console.log(recordId, "delete")
+            await deleteDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
+            console.log("Deleted");
+            fetchBudget();
+        }
+        catch (e) {
+            console.log(e)
+        }
+
+    }
+
+    const fetchBudget = async () => {
+
+        try {
+            const recordId = months[date.getMonth()] + "" + date.getFullYear();
+            const budgetForCurrMonth = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
+            console.log(budgetForCurrMonth.data());
+            if (budgetForCurrMonth.data() != null) {
                 setBudget(budgetForCurrMonth.data());
             }
-            else
-            {
-                setBudget({"budget": [], "method": "", "monthlyInc": 0, "saving": 0,  "totalBudget": 0})
+            else {
+                setBudget({ "budget": [], "method": "", "monthlyInc": 0, "saving": 0, "totalBudget": 0 })
             }
         }
-        catch(e)
-        {
+        catch (e) {
             console.log(e);
         }
     }
 
     React.useEffect(() => {
-		const unsubscribe = navigation.addListener('focus', () => {
-			fetchBudget();
-		});
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchBudget();
+            navigation.addListener('focus', setHeaderOptions);
+            navigation.addListener('blur', setOutHeaderOptions);
+        });
 
-		// Return the function to unsubscribe from the event so it gets removed on unmount
-		return unsubscribe;
-	}, [navigation]);
+        // Return the function to unsubscribe from the event so it gets removed on unmount
+        return unsubscribe;
+    }, [navigation]);
 
     React.useEffect(() => {
-		fetchBudget();
-	}, [date]);
+        fetchBudget();
+        navigation.addListener('focus', setHeaderOptions);
+        navigation.addListener('blur', setOutHeaderOptions);
+    }, [date]);
 
     React.useEffect(() => {
         console.log(budget, " budget");
@@ -78,7 +134,7 @@ export default function ViewBudget({route, navigation}) {
     }, [budget]);
 
     const showPicker = React.useCallback((value) => setShow(value), []);
-    
+
     const onValueChange = React.useCallback(
         (event, newDate) => {
             const selectedDate = newDate || date;
@@ -90,220 +146,226 @@ export default function ViewBudget({route, navigation}) {
 
     return (
         <SafeAreaView>
-           <View style={styles.header}>
-                <View style={styles.time}>
-                    <TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
-                        <Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
-                    </TouchableOpacity>
-                    {show && (
-                        <MonthPicker
-                            onChange={onValueChange}
-                            value={date}
-                            minimumDate={new Date(2020, 5)}
-                            maximumDate={new Date(2025, 5)}
-                            mode="short"
-                        />
-                    )}
-                </View>
-              
-                <Text style={styles.headerText}>Budgeting Method : {budget.method}</Text>
-            </View>
+            <ImageBackground
+                source={require("../../Assets/Background.jpeg")}
+                style={{
+                    height: "100%",
+                }}
+            >
+                <View style={styles.header}>
+                    <View style={styles.time}>
+                        <TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
+                            <Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
+                        </TouchableOpacity>
+                        {show && (
+                            <MonthPicker
+                                onChange={onValueChange}
+                                value={date}
+                                minimumDate={new Date(2020, 5)}
+                                maximumDate={new Date(2025, 5)}
+                                mode="short"
+                            />
+                        )}
+                    </View>
 
-            <View style={styles.monthlyInc}>
-                <Text style={styles.monthlyIncText}>Monthly Income : {budget.monthlyInc}</Text>
-            </View>
-            <View style={styles.categoryWiseBudget}>
-                {budget.method==='50-30-20' && 
-                <View>
-                    <FlatList
-                data={budget.budget.needs}
-                ListHeaderComponent={
-                    <View style={styles.categoryWiseBudgetTitle}>
-                        <Text style={styles.categoryWiseBudgetTitleText}>Needs : </Text>
-                        {/* <TouchableOpacity style={styles.button}>
+                    <Text style={styles.headerText}>Budgeting Method : {budget.method}</Text>
+                </View>
+
+                <View style={styles.monthlyInc}>
+                    <Text style={styles.monthlyIncText}>Monthly Income : {budget.monthlyInc}</Text>
+                </View>
+                <View style={styles.categoryWiseBudget}>
+                    {budget.method === '50-30-20' &&
+                        <ScrollView style={{height:"80%"}}>
+                            <FlatList
+                                data={budget.budget.needs}
+                                ListHeaderComponent={
+                                    <View style={styles.categoryWiseBudgetTitle}>
+                                        <Text style={styles.categoryWiseBudgetTitleText}>Needs : </Text>
+                                        {/* <TouchableOpacity style={styles.button}>
                                 <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
                             </TouchableOpacity> */}
-                    </View>
-                }
-                renderItem={({ item }) =>
-                //     {budget.method==="50-30-20" && 
-                    <View>
-                        <View style={styles.budgetCategory}>
-                        <View style={styles.budgetCategoryName}>
-                            <Text style={styles.budgetCategoryNameText}>{item.category}</Text>
-                        </View>
-                        <View style={styles.budgetCategoryAmount}>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Budget spent</Text>
-                                <Text>{item.budgetSpent}</Text>
-                            </View>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Budget Planned</Text>
-                                <Text>{item.budgetPlanned}</Text>
-                            </View>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Remaining</Text>
-                                <Text>{item.budgetPlanned - item.budgetSpent}</Text>
-                            </View>
-                        </View>
-                        </View>
-                </View>
-                // }
+                                    </View>
+                                }
+                                renderItem={({ item }) =>
+                                    //     {budget.method==="50-30-20" && 
+                                    <View>
+                                        <View style={styles.budgetCategory}>
+                                            <View style={styles.budgetCategoryName}>
+                                                <Text style={styles.budgetCategoryNameText}>{item.category}</Text>
+                                            </View>
+                                            <View style={styles.budgetCategoryAmount}>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Budget spent</Text>
+                                                    <Text>{item.budgetSpent}</Text>
+                                                </View>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Budget Planned</Text>
+                                                    <Text>{item.budgetPlanned}</Text>
+                                                </View>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Remaining</Text>
+                                                    <Text>{item.budgetPlanned - item.budgetSpent}</Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    // }
 
-                }
-                ListEmptyComponent={
-                    <View style={styles.noBudget}>
-                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                        <Text style={styles.noBudgetText}>You haven't set budget for the Month!</Text>
-                    </View>
-                }
-            // extraData={isBudgetChanged}
-            />
+                                }
+                                ListEmptyComponent={
+                                    <View style={styles.noBudget}>
+                                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
+                                        <Text style={styles.noBudgetText}>You haven't set budget for the Month!</Text>
+                                    </View>
+                                }
+                            // extraData={isBudgetChanged}
+                            />
 
-        <FlatList
-                data={budget.budget.wants}
-                ListHeaderComponent={
-                    <View style={styles.categoryWiseBudgetTitle}>
-                        <Text style={styles.categoryWiseBudgetTitleText}>Wants : </Text>
-                        {/* <TouchableOpacity style={styles.button}>
+                            <FlatList
+                                data={budget.budget.wants}
+                                ListHeaderComponent={
+                                    <View style={styles.categoryWiseBudgetTitle}>
+                                        <Text style={styles.categoryWiseBudgetTitleText}>Wants : </Text>
+                                        {/* <TouchableOpacity style={styles.button}>
                                 <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
                             </TouchableOpacity> */}
-                    </View>
-                }
-                renderItem={({ item }) =>
-                //     {budget.method==="50-30-20" && 
-                    <View>
-                        <View style={styles.budgetCategory}>
-                        <View style={styles.budgetCategoryName}>
-                            <Text style={styles.budgetCategoryNameText}>{item.category}</Text>
-                        </View>
-                        <View style={styles.budgetCategoryAmount}>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Budget spent</Text>
-                                <Text>{item.budgetSpent}</Text>
-                            </View>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Budget Planned</Text>
-                                <Text>{item.budgetPlanned}</Text>
-                            </View>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Remaining</Text>
-                                <Text>{item.budgetPlanned - item.budgetSpent}</Text>
-                            </View>
-                        </View>
-                        </View>
-                </View>
-                // }
+                                    </View>
+                                }
+                                renderItem={({ item }) =>
+                                    //     {budget.method==="50-30-20" && 
+                                    <View>
+                                        <View style={styles.budgetCategory}>
+                                            <View style={styles.budgetCategoryName}>
+                                                <Text style={styles.budgetCategoryNameText}>{item.category}</Text>
+                                            </View>
+                                            <View style={styles.budgetCategoryAmount}>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Budget spent</Text>
+                                                    <Text>{item.budgetSpent}</Text>
+                                                </View>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Budget Planned</Text>
+                                                    <Text>{item.budgetPlanned}</Text>
+                                                </View>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Remaining</Text>
+                                                    <Text>{item.budgetPlanned - item.budgetSpent}</Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    // }
 
-                }
-                ListEmptyComponent={
-                    <View style={styles.noBudget}>
-                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                        <Text style={styles.noBudgetText}>You haven't set budget for the Month!</Text>
-                    </View>
-                }
-            // extraData={isBudgetChanged}
-            />
+                                }
+                                ListEmptyComponent={
+                                    <View style={styles.noBudget}>
+                                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
+                                        <Text style={styles.noBudgetText}>You haven't set budget for the Month!</Text>
+                                    </View>
+                                }
+                            // extraData={isBudgetChanged}
+                            />
 
-            <FlatList
-                data={budget.budget.savings}
-                ListHeaderComponent={
-                    <View style={styles.categoryWiseBudgetTitle}>
-                        <Text style={styles.categoryWiseBudgetTitleText}>Savings : </Text>
-                        {/* <TouchableOpacity style={styles.button}>
+                            <FlatList
+                                data={budget.budget.savings}
+                                ListHeaderComponent={
+                                    <View style={styles.categoryWiseBudgetTitle}>
+                                        <Text style={styles.categoryWiseBudgetTitleText}>Savings : </Text>
+                                        {/* <TouchableOpacity style={styles.button}>
                                 <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
                             </TouchableOpacity> */}
-                    </View>
-                }
-                renderItem={({ item }) =>
-                //     {budget.method==="50-30-20" && 
-                    <View>
-                        <Text style={styles.categoryWiseBudgetTitleText}>Needs : </Text>
-                        <View style={styles.budgetCategory}>
-                        <View style={styles.budgetCategoryName}>
-                            <Text style={styles.budgetCategoryNameText}>{item.category}</Text>
-                        </View>
-                        <View style={styles.budgetCategoryAmount}>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Budget spent</Text>
-                                <Text>{item.budgetSpent}</Text>
-                            </View>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Budget Planned</Text>
-                                <Text>{item.budgetPlanned}</Text>
-                            </View>
-                            <View style={styles.budgetCategoryAmountCenter}>
-                                <Text>Remaining</Text>
-                                <Text>{item.budgetPlanned - item.budgetSpent}</Text>
-                            </View>
-                        </View>
-                        </View>
-                </View>
-                // }
+                                    </View>
+                                }
+                                renderItem={({ item }) =>
+                                    //     {budget.method==="50-30-20" && 
+                                    <View>
+                                        <View style={styles.budgetCategory}>
+                                            <View style={styles.budgetCategoryName}>
+                                                <Text style={styles.budgetCategoryNameText}>{item.category}</Text>
+                                            </View>
+                                            <View style={styles.budgetCategoryAmount}>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Budget spent</Text>
+                                                    <Text>{item.budgetSpent}</Text>
+                                                </View>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Budget Planned</Text>
+                                                    <Text>{item.budgetPlanned}</Text>
+                                                </View>
+                                                <View style={styles.budgetCategoryAmountCenter}>
+                                                    <Text>Remaining</Text>
+                                                    <Text>{item.budgetPlanned - item.budgetSpent}</Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    // }
 
-                }
-                ListEmptyComponent={
-                    <View style={styles.noBudget}>
-                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                        <Text style={styles.noBudgetText}>You haven't set budget for the Month!</Text>
-                    </View>
-                }
-            // extraData={isBudgetChanged}
-            />
-                </View>
-                }
+                                }
+                                ListEmptyComponent={
+                                    <View style={styles.noBudget}>
+                                        <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
+                                        <Text style={styles.noBudgetText}>You haven't set budget for the Month!</Text>
+                                    </View>
+                                }
+                            // extraData={isBudgetChanged}
+                            />
+                        </ScrollView>
+                    }
 
-                {(budget.method==='Envelop Method' || budget.method==='Zero Based Budgeting')  &&
-                <FlatList
-                    data={budget.budget}
-                    ListHeaderComponent={
-                        <View style={styles.categoryWiseBudgetTitle}>
-                            <Text style={styles.categoryWiseBudgetTitleText}>Budget : </Text>
-                            {/* <TouchableOpacity style={styles.button}>
+                    {(budget.method === 'Envelop Method' || budget.method === 'Zero Based Budgeting') &&
+                        <FlatList
+                            data={budget.budget}
+                            ListHeaderComponent={
+                                <View style={styles.categoryWiseBudgetTitle}>
+                                    <Text style={styles.categoryWiseBudgetTitleText}>Budget : </Text>
+                                    {/* <TouchableOpacity style={styles.button}>
                                     <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
                                 </TouchableOpacity> */}
-                        </View>
-                    }
-                    renderItem={({ item }) =>
-                        <View style={styles.budgetCategory}>
-                            <View style={styles.budgetCategoryName}>
-                                <Text style={styles.budgetCategoryNameText}>{item.category}</Text>
-                                {/* <TouchableOpacity style={styles.button}>
+                                </View>
+                            }
+                            renderItem={({ item }) =>
+                                <View style={styles.budgetCategory}>
+                                    <View style={styles.budgetCategoryName}>
+                                        <Text style={styles.budgetCategoryNameText}>{item.category}</Text>
+                                        {/* <TouchableOpacity style={styles.button}>
                                         <Image source={require('../../Assets/remove.png')} style={{ width: 25, height: 25, tintColor: "#cc1d10" }} />
                                     </TouchableOpacity> */}
-                            </View>
-                            <View style={styles.budgetCategoryAmount}>
-                                <View style={styles.budgetCategoryAmountCenter}>
-                                    <Text>Budget spent</Text>
-                                    <Text>{item.budgetSpent}</Text>
+                                    </View>
+                                    <View style={styles.budgetCategoryAmount}>
+                                        <View style={styles.budgetCategoryAmountCenter}>
+                                            <Text>Budget spent</Text>
+                                            <Text>{item.budgetSpent}</Text>
+                                        </View>
+                                        <View style={styles.budgetCategoryAmountCenter}>
+                                            <Text>Budget Planned</Text>
+                                            <Text>{item.budgetPlanned}</Text>
+                                        </View>
+                                        <View style={styles.budgetCategoryAmountCenter}>
+                                            <Text>Remaining</Text>
+                                            <Text>{item.budgetPlanned - item.budgetSpent}</Text>
+                                        </View>
+                                    </View>
                                 </View>
-                                <View style={styles.budgetCategoryAmountCenter}>
-                                    <Text>Budget Planned</Text>
-                                    <Text>{item.budgetPlanned}</Text>
+                            }
+                            ListEmptyComponent={
+                                <View style={styles.noBudget}>
+                                    <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
+                                    <Text style={styles.noBudgetText}>You haven't set budget for the Month!</Text>
                                 </View>
-                                <View style={styles.budgetCategoryAmountCenter}>
-                                    <Text>Remaining</Text>
-                                    <Text>{item.budgetPlanned - item.budgetSpent}</Text>
-                                </View>
-                            </View>
-                        </View>
-                    }
-                    ListEmptyComponent={
-                        <View style={styles.noBudget}>
-                            <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                            <Text style={styles.noBudgetText}>You haven't set budget for the Month!</Text>
-                        </View>
-                    }
-                // extraData={isBudgetChanged}
-                />}
-            </View>
+                            }
+                        // extraData={isBudgetChanged}
+                        />}
+                </View>
+            </ImageBackground>
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     header: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
+        backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 10,
         marginHorizontal: 10,
         marginVertical: 5,
@@ -315,7 +377,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     },
     monthlyInc: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
+        backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 10,
         marginHorizontal: 10,
         marginBottom: 5,
@@ -327,7 +389,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     },
     progressBarView: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
+        backgroundColor: 'rgba(255,255,255,0.9)',
         flexDirection: "row",
         justifyContent: "space-around",
         padding: 20,
@@ -339,13 +401,13 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         marginHorizontal: 10,
         borderRadius: 10,
-        height: "100%",
+        height: "71%",
         paddingBottom: 10,
     },
     categoryWiseBudgetTitle: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        borderBottomColor: 'grey',
+        backgroundColor: 'rgba(255,255,255,0.6)',
         borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: 'grey',
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         width: "100%",
@@ -359,13 +421,13 @@ const styles = StyleSheet.create({
     categoryWiseBudgetTitleText: {
         fontSize: 15,
         fontWeight: "bold",
-        color: "green"
+        color: "white"
     },
     budgetCategory: {
         height: 100,
         fontSize: 10,
         padding: 10,
-        backgroundColor: 'rgba(0,0,0,0.11)',
+        backgroundColor: 'rgba(255,255,255,0.9)',
         marginBottom: 2
     },
     budgetCategoryName: {
@@ -415,10 +477,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: "center",
         alignItems: "center",
-		backgroundColor: 'rgba(255,255,255,0.9)',
+        backgroundColor: 'rgba(255,255,255,0.9)',
     },
     monthYearText: {
         textAlign: "center",
-		fontWeight:'bold'
+        fontWeight: 'bold'
+    },
+    deleteBudgetBtn: {
+        backgroundColor: '#B43757',
+        borderRadius: 10,
+        padding: 10,
+
+    },
+    deleteBudgetBtnText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: 'bold'
     },
 });

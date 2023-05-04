@@ -58,7 +58,7 @@ const ProfileScreen = ({ navigation }) => {
 
 	const fetchUserDetails = async () => {
 		try {
-			const docRef = doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1");
+			const docRef = doc(db, "User", auth.currentUser.uid);
 			const data = await getDoc(docRef);
 			const userData = data.data();
 			setName(userData.name);

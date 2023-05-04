@@ -64,7 +64,8 @@ const Budget = ({ navigation }) => {
                     tabBarIcon: ({ color, size }) => (
                         <Image source={require('../../Assets/money-bag.png')} style={{ width: size, height: size, tintColor: color }} />
                     ),
-                }} />
+                }} 
+                />
             <Tab.Screen
                 name="Set Budget"
                 component={SetBudget}

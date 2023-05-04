@@ -18,9 +18,11 @@ import {
 	collection,
 	addDoc,
 	getDocs,
+	getDoc,
 	storage,
 	auth,
-	doc
+	doc,
+	updateDoc
   } from '../../Firebase/config';
 
 const ConfirmUntrackedIncTrans = ({ route, navigation }) => {
@@ -49,14 +51,22 @@ const ConfirmUntrackedIncTrans = ({ route, navigation }) => {
 
 	const saveToDB = async(item) => {
 
-		
 		try{
+
+			const user = await getDoc(doc(db, "User", auth.currentUser.uid));
+
 			const docRef = await addDoc(collection(doc(db, "User", auth.currentUser.uid), "Income"), {
 				incAmount: item.amount,
 				incDate: new Date(item.date),
 				incCategory: "Other",
 				incDescription : ""
 			  });
+
+			  //update account balance
+			  await updateDoc(doc(db,"User",auth.currentUser.uid), {
+                accBalance :parseFloat(user.data().accBalance) + parseFloat(item.amount) +""
+              });
+
 			  console.log("Saved To DB");
 		}
 		catch(e)

@@ -59,6 +59,7 @@ function ShowIncomeDetails({ route, navigation }) {
   const [date, setDate] = useState(incomeRec.incDate.toDate());
 
   const [amount, setAmount] = useState(0);
+  const [accBalance, setAccBalance] = useState(0);
   const [previousExpAmt, setPreviousExpAmt] = useState();
 
   const [description, setDescription] = useState("");
@@ -88,7 +89,7 @@ function ShowIncomeDetails({ route, navigation }) {
         catList.push({ label: "other", value: "other" });
         setCategory(catList);
         // setUserIncCategories(user.data().incCategories);
-
+        setAccBalance(user.data().accBalance);
 
       } catch (e) {
         console.error("Error adding document: ", e);
@@ -218,6 +219,12 @@ function ShowIncomeDetails({ route, navigation }) {
       querySnapshot.forEach((doc) => {
         // console.log(doc.id, JSON.stringify(doc.data()));
       });
+
+      //update account balance
+      await updateDoc(doc(db,"User",auth.currentUser.uid), {
+        accBalance : parseFloat(accBalance) - parseFloat(incomeRec.incAmount) + parseFloat(amount) +""
+      });
+
 
       console.log("Previous income amount------>", previousExpAmt);
 

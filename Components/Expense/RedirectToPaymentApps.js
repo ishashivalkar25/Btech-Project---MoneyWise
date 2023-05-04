@@ -23,7 +23,7 @@ import {
 	getDoc,
 	storage,
 	auth,
-	doc, setDoc
+	doc, setDoc, updateDoc
 } from '../../Firebase/config';
 
 
@@ -42,6 +42,8 @@ import { Alert } from "react-native";
 import SmsAndroid from 'react-native-get-sms-android';
 
 const { width, height } = Dimensions.get("window");
+
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 
 const UPI = NativeModules.UPI; // 'UPI' was module name given
@@ -67,7 +69,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 	const [firstEdit, setFirstEdit] = useState(false);
 	const [transactionSuccess, setTransactionSuccess] = useState(false);
 	const [grpMembersList, setGrpMembersList] = useState([]);
-
+	const [accBalance, setAccBalance] = useState(0);
 	const [isEnabled, setIsEnabled] = useState(false);
 
 	const toggleSwitch = (val) => {
@@ -89,7 +91,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 
 	useEffect(() => {
 
-		if (route.params && route.params.grpMembersList) {
+		if (route.params!=null && route.params.grpMembersList) {
 			console.log(route.params.grpMembersList, 'route.params.grpMembersList');
 			setGrpMembersList(grpMembersList);
 		}
@@ -118,6 +120,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 				catList.push({ label: "other", value: "other" });
 				setCategory(catList);
 				setUserExpCategories(user.data().expCategories);
+				setAccBalance(user.data().accBalance);
 				console.log(user.data().expCategories, "userExpCategories");
 				// console.log(category);
 			} catch (e) {
@@ -172,7 +175,6 @@ export default function RedirectToPaymentApps({route, navigation}) {
 
 			if(!transactionSuccess){
 
-				alert("Please complete transaction first!!.");
 				let toast = Toast.show("Please complete transaction first!!.", {
 					duration: Toast.durations.LONG,
 				});
@@ -204,8 +206,8 @@ export default function RedirectToPaymentApps({route, navigation}) {
 				return ;
 			}
 
-			if (isEnabled && !route.params && route.params.grpMembersList) {
-				alert('Please add group members to split an expense.')
+			if (isEnabled && (route.params==null || (route.params!=null && route.params.grpMembersList!=null && route.params.grpMembersList.length==0))) {
+				// alert('Please add group members to split an expense.')
 				// Add a Toast on screen.
 				let toast = Toast.show("Please add group members to split an expense.", {
 					duration: Toast.durations.LONG,
@@ -314,125 +316,119 @@ export default function RedirectToPaymentApps({route, navigation}) {
 				console.log(recordId);
 				const document = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
 	
-				const categoryWiseBudget = document.data()
-				var isCategoryBudgetSet = false;
-				var otherExpIdx = -1;
-				var savingsIdx = -1;
-				var done = false;
+				if(document.data())
+				{
+					const categoryWiseBudget = document.data()
+					var isCategoryBudgetSet = false;
+					var otherExpIdx = -1;
+					var savingsIdx = -1;
+					var done = false;
+		
+					if (categoryWiseBudget.method === 'Envelop Method') {
+						console.log('Inside : ', categoryWiseBudget.method)
 	
-				console.log(categoryWiseBudget);
-				if (categoryWiseBudget.method === 'Envelop Method') {
-					console.log('Inside : ', categoryWiseBudget.method)
-
-					categoryWiseBudget.budget.forEach((item, idx) => {
-						if (item.category == selectedCategory) {
-							item.budgetSpent = item.budgetSpent + parseFloat(amount);
-							isCategoryBudgetSet = true;
+						categoryWiseBudget.budget.forEach((item, idx) => {
+							if (item.category == selectedCategory) {
+								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								isCategoryBudgetSet = true;
+							}
+		
+							if (item.category == "Additional Expenses") {
+								otherExpIdx = idx;
+							}
+						});
+		
+						if (!isCategoryBudgetSet && otherExpIdx > -1) {
+							categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
 						}
-	
-						if (item.category == "Other Expenses") {
-							otherExpIdx = idx;
-						}
-					});
-	
-					if (!isCategoryBudgetSet && otherExpIdx > -1) {
-						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
 					}
-				}
-				else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
-
-					console.log('Inside : ', categoryWiseBudget.method)
-					categoryWiseBudget.budget.forEach((item, idx) => {
-						if (item.category == selectedCategory) {
-							item.budgetSpent = item.budgetSpent + parseFloat(amount);
-							isCategoryBudgetSet = true;
-						}
+					else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
 	
-						if (item.category == "Other Expenses") {
-							otherExpIdx = idx;
+						console.log('Inside : ', categoryWiseBudget.method)
+						categoryWiseBudget.budget.forEach((item, idx) => {
+							if (item.category == selectedCategory) {
+								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								isCategoryBudgetSet = true;
+							}
+		
+							if (item.category == "Savings") {
+								savingsIdx = idx;
+							}
+						});
+		
+						if (!isCategoryBudgetSet && savingsIdx > -1) {
+							categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent + parseFloat(amount);
+							categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+							console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
 						}
-	
-						if (item.category == "Savings") {
-							savingsIdx = idx;
-						}
-					});
-	
-					if (!isCategoryBudgetSet && otherExpIdx > -1) {
-						categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
-						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
-						console.log('deducted from other exp')
+		
 					}
 					else {
-						console.log('deducted from set category bgt')
-						categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+						console.log('Inside : ', categoryWiseBudget)
+						categoryWiseBudget.budget.needs.forEach((item, idx) => {
+							if (item.category == selectedCategory) {
+								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								isCategoryBudgetSet = true;
+								done = true;
+							}
+						});
+		
+						if (!done) {
+							categoryWiseBudget.budget.wants.forEach((item, idx) => {
+								if (item.category == selectedCategory) {
+									item.budgetSpent = item.budgetSpent + parseFloat(amount);
+									isCategoryBudgetSet = true;
+									done = true;
+								}
+							});
+		
+						}
+		
+						if (!done) {
+							categoryWiseBudget.budget.savings.forEach((item, idx) => {
+								if (item.category == selectedCategory) {
+									item.budgetSpent = item.budgetSpent + parseFloat(amount);
+									isCategoryBudgetSet = true;
+									done = true;
+								}
+		
+								if (item.category == "Other Savings") {
+									otherExpIdx = idx;
+								}
+							});
+		
+							if (!isCategoryBudgetSet && otherExpIdx > -1) {
+								categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent + parseFloat(amount);
+								done = true;
+							}
+						}
 					}
+		
+					await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
+		
 				}
-				else {
-					console.log('Inside : ', categoryWiseBudget.method)
-					categoryWiseBudget.needs.forEach((item, idx) => {
-						if (item.category == selectedCategory) {
-							item.budgetSpent = item.budgetSpent + parseFloat(amount);
-							isCategoryBudgetSet = true;
-							done = true;
-						}
-	
-						if (item.category == "Other Needs") {
-							otherExpIdx = idx;
-						}
+
+				//add category to user expense categories if not present
+				if(!userExpCategories.includes(selectedCategory))
+				{
+					userExpCategories.push(selectedCategory);
+					await updateDoc(doc(db, "User", auth.currentUser.uid), {
+						expCategories : userExpCategories,
 					});
-	
-					if (!isCategoryBudgetSet && otherExpIdx > -1) {
-						categoryWiseBudget.needs[otherExpIdx].budgetSpent = categoryWiseBudget.needs[otherExpIdx].budgetSpent + parseFloat(amount);
-						done = true;
-					}
-	
-					if (!done) {
-						categoryWiseBudget.wants.forEach((item, idx) => {
-							if (item.category == selectedCategory) {
-								item.budgetSpent = item.budgetSpent + parseFloat(amount);
-								isCategoryBudgetSet = true;
-								done = true;
-							}
-	
-							if (item.category == "Other Wants") {
-								otherExpIdx = idx;
-							}
-						});
-	
-						if (!isCategoryBudgetSet && otherExpIdx > -1) {
-							categoryWiseBudget.wants[otherExpIdx].budgetSpent = categoryWiseBudget.wants[otherExpIdx].budgetSpent + parseFloat(amount);
-							done = true;
-						}
-	
-					}
-	
-					if (!done) {
-						categoryWiseBudget.needs.forEach((item, idx) => {
-							if (item.category == selectedCategory) {
-								item.budgetSpent = item.budgetSpent + parseFloat(amount);
-								isCategoryBudgetSet = true;
-								done = true;
-							}
-	
-							if (item.category == "Other Savings") {
-								otherExpIdx = idx;
-							}
-						});
-	
-						if (!isCategoryBudgetSet && otherExpIdx > -1) {
-							categoryWiseBudget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.savings[otherExpIdx].budgetSpent + parseFloat(amount);
-							done = true;
-						}
-					}
 				}
-	
-				await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
-	
+
+
+
 				const querySnapshot = await getDocs(collection(db, "expense"));
 				querySnapshot.forEach((doc) => {
 					console.log(doc.id, JSON.stringify(doc.data()));
 				});
 	
+				//update account balance
+				await updateDoc(doc(db, "User", auth.currentUser.uid), {
+					accBalance: parseFloat(accBalance) - parseFloat(amount) + ""
+					});
+
 				if (isEnabled) {
 					const document = await getDoc(doc(db, "User", auth.currentUser.uid));
 					const userName = document.data().name;
@@ -536,6 +532,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 
 	const validateUPI = (upi) => {
 		const regUPi = /[a-zA-Z0-9\\.\\-]{2,256}\\@[a-zA-Z][a-zA-Z]{2,64}/
+		console.log(regUPi.test(upi))
 		return regUPi.test(upi);
 	}
 

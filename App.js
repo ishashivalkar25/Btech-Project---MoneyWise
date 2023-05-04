@@ -8,6 +8,7 @@ import EditProfile from "./Components/EditProfile";
 import FixedExp from "./Components/FixedExpenses/FixedExp";
 import AddFixedExp from "./Components/FixedExpenses/AddFixedExp";
 import Budget from "./Components/Budget/Budget";
+import Help from "./Components/Budget/Help";
 import Index from "./Components/Index";
 import Login from "./Components/Login";
 import SignUp from "./Components/SignUp";
@@ -119,6 +120,7 @@ const App = () => {
         <Stack.Screen name="EditProfile" component={EditProfile} options={{headerTitle: () => <Header></Header>}}/>
         <Stack.Screen name="ShowIncomeDetails" component={ShowIncomeDetails} options={{headerTitle: () => <Header></Header>}}/>
         <Stack.Screen name="ShowExpenseDetails" component={ShowExpenseDetails} options={{headerTitle: () => <Header></Header>}}/>
+        <Stack.Screen name="Help" component={Help} options={{headerTitle: () => <Header></Header>}}/>
       </Stack.Navigator>
     </NavigationContainer>
   )

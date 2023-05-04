@@ -157,7 +157,7 @@ notifee.getTriggerNotificationIds().then(ids => console.log('All trigger notific
   const addFixedExpToDB = async() => {
 
     try {
-      const docRef = await addDoc(collection(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1", "FixedExpenses"), {
+      const docRef = await addDoc(collection(db, "User", auth.currentUser.uid, "FixedExpenses"), {
         ExpName: ExpName,
         category: category,
         amount: amount,

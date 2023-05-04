@@ -6,7 +6,7 @@ import {
 	ContributionGraph,
 	StackedBarChart,
 } from "react-native-chart-kit";
-import { Dimensions, StyleSheet, TouchableOpacity} from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity, ScrollView} from "react-native";
 import { View, Text, Button } from "react-native";
 import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context";
 import Background from "../Background";
@@ -251,91 +251,98 @@ const Visualisation = () => {
 				
 				<Text style={styles.month}>Month : {months[new Date().getMonth()]}</Text>
 				</View> */}
-				<View style={styles.chartContainer}>
-					<Text
-						style={{
-							color: "green", fontSize: 20, fontWeight: "bold", padding : 10,
-						}}>Income Line Chart</Text>
-					<LineChart
-						data={{
-							labels: (incLabels.length == 0) ? [0] : incLabels,
-							datasets: [
-								{
-									data: (incData.length == 0) ? [0] : incData,
+				 
+					<View style={styles.chartContainer}>
+						<Text
+							style={{
+								color: "green", fontSize: 20, fontWeight: "bold", padding: 10,
+							}}>Income Line Chart</Text>
+						<ScrollView horizontal={true} contentContainerStyle={styles.displayChart}>
+						<LineChart
+							data={{
+								labels: (incLabels.length == 0) ? [0] : incLabels,
+								datasets: [
+									{
+										data: (incData.length == 0) ? [0] : incData,
+									},
+								],
+							}}
+							width={ Math.max(Dimensions.get("window").width * incData.length * 0.1 , Dimensions.get("window").width * 0.93)} // from react-native
+							height={250}
+							yAxisLabel="Rs "
+							yAxisInterval={1} // optional, defaults to 1
+							chartConfig={{
+								backgroundColor: "#674188",
+								backgroundGradientFrom: "#C3ACD0",
+								backgroundGradientTo: "#674188",
+								decimalPlaces: 2, // optional, defaults to 2dp
+								color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+								labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+								propsForDots: {
+									r: "4",
+									strokeWidth: "2",
+									stroke: "#ffa726"
 								},
-							],
-						}}
-						width={Dimensions.get("window").width * 0.93} // from react-native
-						height={250}
-						yAxisLabel="Rs "
-						yAxisInterval={1} // optional, defaults to 1
-						chartConfig={{
-							backgroundColor: "#674188",
-							backgroundGradientFrom: "#C3ACD0",
-							backgroundGradientTo: "#674188",
-							decimalPlaces: 2, // optional, defaults to 2dp
-							color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-							labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-							propsForDots: {
-								r: "4",
-								strokeWidth: "2",
-								stroke: "#ffa726"
-							},
-							propsForVerticalLabels :{
-								color:'green'
-							},
-							strokeWidth: 3,
-						}}
-						bezier
-						style={{
-							marginVertical: 8,
-							borderRadius: 16,
-							padding : 2,
-						}}
-					/>
-				</View>
+								propsForVerticalLabels: {
+									color: 'green'
+								},
+								strokeWidth: 3,
+							}}
+							bezier
+							style={{
+								marginVertical: 8,
+								borderRadius: 16,
+							}}
+						/>
+						</ScrollView>
+						
+					</View>
+				
 				<View style={styles.chartContainer}>
 					<Text
 						style={{
 							color: "green", fontSize: 20, fontWeight: "bold", padding : 10, 
 						}}>Expense Line Chart</Text>
-					<LineChart
-						data={{
-							labels: (expLabels.length == 0) ? [0] : expLabels,
-							datasets: [
-								{
-									data: (expData.length == 0) ? [0] : expData,
+					<ScrollView horizontal={true} contentContainerStyle={styles.displayChart}>
+						<LineChart
+							data={{
+								labels: (expLabels.length == 0) ? [0] : expLabels,
+								datasets: [
+									{
+										data: (expData.length == 0) ? [0] : expData,
+									},
+								],
+							}}
+							width={Math.max(Dimensions.get("window").width * expData.length * 0.1, Dimensions.get("window").width * 0.93)}  // from react-native
+							height={250}
+							yAxisLabel="Rs "
+							yAxisInterval={1} // optional, defaults to 1
+							chartConfig={{
+								backgroundColor: "#84D2C5",
+								backgroundGradientFrom: "#2146C7",
+								backgroundGradientTo: "#81C6E8",
+								decimalPlaces: 2, // optional, defaults to 2dp
+								color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+								labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+								propsForDots: {
+									r: "4",
+									strokeWidth: "2",
+									stroke: "#ffa726"
 								},
-							],
-						}}
-						width={Dimensions.get("window").width * 0.93} // from react-native
-						height={250}
-						yAxisLabel="Rs "
-						yAxisInterval={1} // optional, defaults to 1
-						chartConfig={{
-							backgroundColor: "#84D2C5",
-							backgroundGradientFrom: "#2146C7",
-							backgroundGradientTo: "#81C6E8",
-							decimalPlaces: 2, // optional, defaults to 2dp
-							color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-							labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-							propsForDots: {
-								r: "4",
-								strokeWidth: "2",
-								stroke: "#ffa726"
-							},
-							propsForVerticalLabels :{
-								color:'green'
-							},
-							strokeWidth: 3,
-						}}
-						bezier
-						style={{
-							marginVertical: 8,
-							borderRadius: 16,
-							padding : 2,
-						}}
-					/>
+								propsForVerticalLabels: {
+									color: 'green'
+								},
+								strokeWidth: 3,
+							}}
+							bezier
+							style={{
+								marginVertical: 8,
+								borderRadius: 16,
+								padding: 2,
+							}}
+						/>
+					</ScrollView>
+					
 				</View>
 
 
@@ -353,7 +360,12 @@ const styles = StyleSheet.create({
 		borderRadius : 20,
 		padding : 1,
 		alignItems : 'center',
-		marginVertical:10
+		marginVertical:10,
+		width : '100%',
+		paddingHorizontal : 10
+	},
+	displayChart: {
+		borderRadius : 20,
 	},
 	monthContainer : {
 		borderRadius : 20,

@@ -5,8 +5,6 @@ import { selectContactPhone } from 'react-native-select-contact';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { NavigationRouteContext } from '@react-navigation/native';
 
-
-
 const AddGrpExpMembers = ({ route, navigation}) => {
 
     const [membersList, setMembersList] = React.useState([]);
@@ -31,6 +29,7 @@ const AddGrpExpMembers = ({ route, navigation}) => {
         const selection = await selectContactPhone().
             then(function (selection) {
                 console.log('Successfully Fetched Contact');
+                
                 if (!selection) {
                     return null;
                 }
@@ -107,8 +106,16 @@ const AddGrpExpMembers = ({ route, navigation}) => {
 
 
     React.useEffect(() => {
-        console.log("In Use Effect")
-        addUser();
+        console.log("In Use Effect", route.params);
+
+        if(route.params!=null && route.params.grpMembersList!=null && route.params.grpMembersList.length>0)
+        {
+            setMembersList([...route.params.grpMembersList]);
+        }
+        else{
+            addUser();
+        }
+        
     }, [])
 
     const addUser = async() =>
@@ -183,8 +190,13 @@ const AddGrpExpMembers = ({ route, navigation}) => {
                 navigation.navigate('Redirect To Payment Apps', {grpMembersList : membersList});
                 alert('Saved');
             }
-            else{
+            else if(route.params && route.params.previous_screen=='Scan Bills'){
                 navigation.navigate('Scan Bills', {grpMembersList : membersList});
+                alert('Saved');
+            }
+            else
+            {
+                navigation.navigate('ShowExpenseDetails', {grpMembersList : membersList});
                 alert('Saved');
             }
             

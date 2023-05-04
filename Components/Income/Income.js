@@ -67,6 +67,7 @@ function Income({navigation, route}) {
     const [categoryWiseInc, setCategoryWiseInc] = React.useState([]);
     const [messageList, setMessageList] = React.useState([]);
     const [transactionList, setTransactionList] = React.useState([]);
+    const [accBalance, setAccBalance] = React.useState(0);
     
     function onDateSelected(event, value) {
         const tempDate = new Date();
@@ -108,8 +109,10 @@ function Income({navigation, route}) {
 					fetchLastFetchedMsgTS();
 				}
 			});
+            
 		}
     }, []);
+
 
     React.useEffect(() => {
 		const unsubscribe = navigation.addListener('focus', () => {
@@ -273,7 +276,7 @@ function Income({navigation, route}) {
 
     const fetchLastFetchedMsgTS = async () => {
 		try {
-			const user = await getDoc(doc(db, "User", "LCssg7nKyeWotOlCXOov5iVlQwO2"));
+			const user = await getDoc(doc(db, "User",  auth.currentUser.uid));
 			// console.log(user.data());
 
 			filter.minDate = user.data().lastViewTS;
@@ -359,13 +362,13 @@ function Income({navigation, route}) {
 	}
     const updateLastViewTS = async (lastViewTS) => {
         console.log("updateLastViewTS")
-		const user = await updateDoc(doc(db, "User", "LCssg7nKyeWotOlCXOov5iVlQwO2"), {
+		const user = await updateDoc(doc(db, "User", auth.currentUser.uid), {
 			"lastViewTS": lastViewTS
 		});
 	}
     const showUntrackedTransactions = () => {
 		navigation.navigate("ConfirmUntrackedIncTrans", {
-            messageList : messageList
+            messageList : messageList,
         });
 	}
 
@@ -376,6 +379,7 @@ function Income({navigation, route}) {
         console.log(filterData);
         console.log(filterData.length);
         setIncomeRecords(filterData);
+        updateBalOnRecDelete(item.incAmount);
     }
 
     React.useEffect(() => {
@@ -397,6 +401,24 @@ function Income({navigation, route}) {
     React.useEffect(() => {
        console.log(messageList, "************************************MessageList", messageList.length);
     }, [messageList]);
+
+
+    const updateBalOnRecDelete = async(amount) => {
+        try{
+            const user = await getDoc(doc(db, "User", auth.currentUser.uid));
+
+            console.log(amount , 'amount');
+			  //update account balance
+			  await updateDoc(doc(db,"User",auth.currentUser.uid), {
+                accBalance :parseFloat(user.data().accBalance) - parseFloat(amount) +""
+              });
+		}
+		catch(e)
+		{
+			console.log(e);
+		}
+
+    }
 
     return (
             <KeyboardAvoidingView style={{ width: "100%"}}>

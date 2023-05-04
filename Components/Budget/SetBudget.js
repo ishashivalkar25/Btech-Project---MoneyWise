@@ -53,6 +53,15 @@ const SetBudget = ({ navigation }) => {
         fetchExpCategories();
     }, []);
 
+    // React.useEffect(() => {
+	// 	const unsubscribe = navigation.addListener('focus', () => {
+	// 		clearFields();
+	// 	});
+
+	// 	// Return the function to unsubscribe from the event so it gets removed on unmount
+	// 	return unsubscribe;
+	// }, [navigation]);
+
     const fetchExpCategories = async () => {
 
         try {
@@ -62,7 +71,7 @@ const SetBudget = ({ navigation }) => {
             //     const tempCategory = doc.data();
             //     tempCategories.push({ label: tempCategory.ExpCatName, value: tempCategory.ExpCatName });
             // });
-            const docRef = doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1");
+            const docRef = doc(db, "User", auth.currentUser.uid);
             const user = await getDoc(docRef);
             setCategories(user.data().expCategories);
             // setCategories(tempCategories);
@@ -92,15 +101,17 @@ const SetBudget = ({ navigation }) => {
     const clearFields = () => {
         setDate(new Date());
         setMonthlyInc(null);
-        setCategories([]);
-        updateSelectedCategories([]);
-        setCategoryWiseBudget([]);
         setSelectedBudgetingMethod(null);
     }
 
     return (
         <SafeAreaView>
-         
+            <ImageBackground
+                source={require("../../Assets/Background.jpeg")}
+                style={{
+                height: "100%",
+                }}
+            >
                 <View style={styles.setBudgetContainer}>
                     <View style={styles.time}>
                         <TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
@@ -147,16 +158,17 @@ const SetBudget = ({ navigation }) => {
                     />
                 </View>
                 <View style={styles.categoryWiseBudget}>
-                    <View style={{ marginBottom: 10, justifyContent: 'center' }}>
-                        <Text style={styles.categoryWiseBudgetTitleText}>Budget Planned : </Text>
-                    </View>
-
+                    
                     {(selectedBudgetingMethod === "Envelop Method") && <Envelope monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date} />}
                     {(selectedBudgetingMethod === "Zero Based Budgeting") && <ZeroBased monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date} />}
                     {(selectedBudgetingMethod === "50-30-20") && <FiftyThirtyTwenty monthlyInc={monthlyInc} selectedBudgetingMethod={selectedBudgetingMethod} navigation={navigation} date={date} />}
 
                 </View>
 
+                <TouchableOpacity style={styles.addMembersBtn} onPress={()=>{ navigation.navigate('Help')}}>
+                    <Image source={require('../../Assets/question-mark.png')} style={{ width: 30, height: 30, tintColor: "white" }} />
+                </TouchableOpacity>
+            </ImageBackground>
         </SafeAreaView>
     );
 };
@@ -166,7 +178,7 @@ export default SetBudget;
 const styles = StyleSheet.create({
     setBudgetContainer: {
         padding: 5,
-        backgroundColor: 'rgba(0,0,0,0.02)',
+        backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 10,
         margin: 5,
     },
@@ -236,9 +248,8 @@ const styles = StyleSheet.create({
     },
     categoryWiseBudget: {
         marginBottom: 5,
-        marginHorizontal: 10,
         borderRadius: 10,
-        height: "58%",
+        height: "60%",
     },
     categoryWiseBudgetTitle: {
         backgroundColor: 'rgba(0,0,0,0.05)',
@@ -367,6 +378,18 @@ const styles = StyleSheet.create({
     },
     enabled: {
         opacity: 1
-    }
-
+    },
+    addMembersBtn: {
+        backgroundColor: "#EBB02D",
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        position: 'absolute',
+        right: 15,
+        bottom: 80,
+        zIndex: 1
+    },
 });

@@ -28,7 +28,8 @@ import {
   storage,
   auth,
   doc,
-  updateDoc
+  updateDoc,
+  setDoc
 } from '../../Firebase/config';
 
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -48,9 +49,12 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 let downloadURL = ""
 const { width, height } = Dimensions.get("window");
 
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 function ShowExpenseDetails({ route, navigation }) {
-  const { expenseRecId, expenseRec } = route.params;
+
+  const [expenseRecId, setExpenseRecId] = useState(route.params.expenseRecId);
+  const [expenseRec, setExpenseRec] = useState(route.params.expenseRec);
   const insets = useSafeAreaInsets();
   const [category, setCategory] = useState([]);
   const [imagePath, setImagePath] = useState();
@@ -59,9 +63,10 @@ function ShowExpenseDetails({ route, navigation }) {
   const [isImgModalVisible, setVisibilityOfImgModal] = useState(false);
   const [date, setDate] = useState(expenseRec.expDate.toDate());
   const [previousExpAmt, setPreviousExpAmt] = useState()
-
+  const [accBalance, setAccBalance] = useState(0);
   const [amount, setAmount] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState(expenseRec.expCategory);
+  const [userExpCategories, setUserExpCategories] = useState([]);
 
   const [description, setDescription] = useState("");
 
@@ -75,7 +80,8 @@ function ShowExpenseDetails({ route, navigation }) {
 			if (val) {
 				navigation.navigate("AddGrpExpMembers", {
 					splitAmount: amount,
-					previous_screen: 'Manual'
+					previous_screen: 'ShowExpenseDetails',
+          grpMembersList : expenseRec.groupExp ? expenseRec.grpMembersList : []
 				})
 			}
 		}
@@ -108,7 +114,8 @@ function ShowExpenseDetails({ route, navigation }) {
         // catList.push(user.data().expCategories);
         catList.push({ label: "other", value: "other" });
         setCategory(catList);
-        // setUserExpCategories(user.data().expCategories);
+        setAccBalance(user.data().accBalance);
+        setUserExpCategories(user.data().expCategories);
         // console.log(user.data().expCategories, "userExpCategories");
         // console.log(category);
 
@@ -117,6 +124,7 @@ function ShowExpenseDetails({ route, navigation }) {
       }
     }
 
+    console.log(route.params, 'route.params');
     loadData();
   }
     , []);
@@ -131,18 +139,19 @@ function ShowExpenseDetails({ route, navigation }) {
     setDatePicker(false);
   }
 
+	useEffect(() => {
+
+		if (route.params && route.params.grpMembersList) {
+
+      const tempExp  = expenseRec;
+      tempExp.grpMembersList = route.params.grpMembersList;
+			console.log(route.params.grpMembersList, 'route.params.grpMembersList');
+			setExpenseRec(tempExp);
+		}
+	}, [route.params]);
+
 
   const updateRecord = async () => {
-
-    // console.log(auth.currentUser.uid,"expense id",expenseRecId,"image path",expenseRec.expImage)
-
-    // const docRef = await updateDoc(doc(db,doc,auth.currentUser.uid), "expense",expenseRecId, {
-    //     expAmount: amount,
-    //     expDate: date,
-    //     expCategory: selectedCategory,
-    //     expDescription: description,
-    //     expImage: pickedImagePath,
-    //   });
 
 
     try {
@@ -168,6 +177,19 @@ function ShowExpenseDetails({ route, navigation }) {
           Toast.hide(toast);
         }, 800);
       }
+      else if (isEnabled && (route.params==null || (route.params!=null && (route.params.grpMembersList==null || (route.params.grpMembersList!=null && route.params.grpMembersList.length==0))))){
+				// alert('Please add group members to split an expense.')
+				// Add a Toast on screen.
+				let toast = Toast.show("Please add group members to split an expense.", {
+					duration: Toast.durations.LONG,
+				});
+
+				// You can manually hide the Toast, or it will automatically disappear after a `duration` ms timeout.
+				setTimeout(function hideToast() {
+					Toast.hide(toast);
+				}, 800);
+
+			}
       else {
         if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
           //concerting image to blob image
@@ -253,16 +275,22 @@ function ShowExpenseDetails({ route, navigation }) {
             expDate: date,
             expCategory: selectedCategory,
             expDescription: description,
-            // expImage: imagepath,
+            groupExp : isEnabled
           };
+
           if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri && pickedImagePath != expenseRec.expImage) {
             updatedData.expImage = pickedImagePath;
           }
+
           if (pickedImagePath == expenseRec.expImage) {
             updatedData.expImage = expenseRec.expImage;
           }
 
-          await updateDoc(docRef, updatedData);
+          if (isEnabled) {
+            updatedData.grpMembersList = (route.params!=null && route.params.grpMembersList!=null && route.params.grpMembersList.length>0) ? route.params.grpMembersList : expenseRec.grpMembersList;
+          }
+
+          await setDoc(docRef, updatedData);
         }
         else {
           // Assuming db and auth are initialized properly
@@ -273,141 +301,260 @@ function ShowExpenseDetails({ route, navigation }) {
             expDate: date,
             expCategory: selectedCategory,
             expDescription: description,
+            groupExp : isEnabled
           };
-
-          await updateDoc(docRef, updatedData);
+          if (isEnabled) {
+            updatedData.grpMembersList = (route.params!=null && route.params.grpMembersList!=null && route.params.grpMembersList.length>0) ? route.params.grpMembersList : expenseRec.grpMembersList;
+          }
+          await setDoc(docRef, updatedData);
         }
 
         console.log("Previous income amount------>", previousExpAmt);
 
-
-
-
         //Update budget
-        const recordId = months[date.getMonth()] + "" + date.getFullYear();
-        console.log(recordId);
-        const document = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
+				const recordId = months[date.getMonth()] + "" + date.getFullYear();
+				console.log(recordId);
+				const document = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
+	
+				if(document.data())
+				{
+					const categoryWiseBudget = document.data()
+					var isCategoryBudgetSet = false;
+					var isPreExpAmtAdded = false;
+					var otherExpIdx = -1;
+					var savingsIdx = -1;
+					var done = false;
+					var doneSubtracting = false;
+		
+					if (categoryWiseBudget.method === 'Envelop Method') {
+						console.log('Inside : ', categoryWiseBudget.method)
+	
+            if(expenseRec.expCategory==selectedCategory)
+            {
+              categoryWiseBudget.budget.forEach((item, idx) => {
+                if (item.category == selectedCategory) {
+                  item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                  isCategoryBudgetSet = true;
+                }
+      
+                if (item.category == "Additional Expenses") {
+                  otherExpIdx = idx;
+                }
+              });
+      
+              if (!isCategoryBudgetSet && otherExpIdx > -1) {
+                categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+              }
+            }
+            else
+            {
+              categoryWiseBudget.budget.forEach((item, idx) => {
 
-        const categoryWiseBudget = document.data()
-        var isCategoryBudgetSet = false;
-        var otherExpIdx = -1;
+                if (item.category == expenseRec.expCategory) {
+                  item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) ;
+                  isPreExpAmtAdded = true;
+                }
 
-        console.log(categoryWiseBudget);
-        categoryWiseBudget.budget.forEach((item, idx) => {
-          if (item.category == selectedCategory) {
-            item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-            isCategoryBudgetSet = true;
-          }
+                if (item.category == selectedCategory) {
+                  item.budgetSpent = item.budgetSpent + parseFloat(amount);
+                  isCategoryBudgetSet = true;
+                }
+      
+                if (item.category == "Additional Expenses") {
+                  otherExpIdx = idx;
+                }
+              });
+      
+              if (!isPreExpAmtAdded && otherExpIdx > -1) {
+                categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent - parseFloat(expenseRec.expAmount);
+              }
+              if (!isCategoryBudgetSet && otherExpIdx > -1) {
+                categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
+              }
+            }
+						
+					}
+					else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
+	
+						console.log('Inside : ', categoryWiseBudget.method)
 
-          if (item.category == "Other Expenses") {
-            otherExpIdx = idx;
-          }
+            if(expenseRec.expCategory==selectedCategory)
+            {
+              categoryWiseBudget.budget.forEach((item, idx) => {
+                if (item.category == selectedCategory) {
+                  item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                  isCategoryBudgetSet = true;
+                }
+      
+                if (item.category == "Savings") {
+                  savingsIdx = idx;
+                }
+              });
+      
+              if (!isCategoryBudgetSet && savingsIdx > -1) {
+                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned + parseFloat(expenseRec.expAmount) - parseFloat(amount);
+                console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+              }
+      
+            }
+            else
+            {
+              categoryWiseBudget.budget.forEach((item, idx) => {
+                if (item.category == expenseRec.expCategory) {
+                  item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) ;
+                  isPreExpAmtAdded = true;
+                }
+                if (item.category == selectedCategory) {
+                  item.budgetSpent = item.budgetSpent  + parseFloat(amount);
+                  isCategoryBudgetSet = true;
+                }
+      
+                if (item.category == "Savings") {
+                  savingsIdx = idx;
+                }
+              });
+      
+              if (!isPreExpAmtAdded && savingsIdx > -1) {
+                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent - parseFloat(expenseRec.expAmount) ;
+                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned + parseFloat(expenseRec.expAmount) ;
+                console.log('Added from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+              }
+              if (!isCategoryBudgetSet && savingsIdx > -1) {
+                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent  + parseFloat(amount);
+                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned  - parseFloat(amount);
+                console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+              }
+      
+            }
+
+					}
+					else {
+						console.log('Inside : ', categoryWiseBudget)
+
+            if(expenseRec.expCategory==selectedCategory)
+            {
+              categoryWiseBudget.budget.needs.forEach((item, idx) => {
+                if (item.category == selectedCategory) {
+                  item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                  isCategoryBudgetSet = true;
+                  done = true;
+                }
+              });
+      
+              if (!done) {
+                categoryWiseBudget.budget.wants.forEach((item, idx) => {
+                  if (item.category == selectedCategory) {
+                    item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                    isCategoryBudgetSet = true;
+                    done = true;
+                  }
+                });
+      
+              }
+      
+              if (!done) {
+                categoryWiseBudget.budget.savings.forEach((item, idx) => {
+                  if (item.category == selectedCategory) {
+                    item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                    isCategoryBudgetSet = true;
+                    done = true;
+                  }
+      
+                  if (item.category == "Other Savings") {
+                    otherExpIdx = idx;
+                  }
+                });
+      
+                if (!isCategoryBudgetSet && otherExpIdx > -1) {
+                  categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                  done = true;
+                }
+              }
+            }
+            else
+            {
+
+
+              categoryWiseBudget.budget.needs.forEach((item, idx) => {
+                if (item.category == expenseRec.expCategory) {
+                  item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) ;
+                  isPreExpAmtAdded = true;
+                  doneSubtracting == true;
+                }
+                if (item.category == selectedCategory) {
+                  item.budgetSpent = item.budgetSpent + parseFloat(amount);
+                  isCategoryBudgetSet = true;
+                  done = true;
+                }
+              });
+      
+              if (!done || !doneSubtracting) {
+                categoryWiseBudget.budget.wants.forEach((item, idx) => {
+                  if (item.category == expenseRec.expCategory) {
+                    item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) ;
+                    isPreExpAmtAdded = true;
+                    doneSubtracting == true;
+                  }
+                  if (item.category == selectedCategory) {
+                    item.budgetSpent = item.budgetSpent + parseFloat(amount);
+                    isCategoryBudgetSet = true;
+                    done = true;
+                  }
+                });
+      
+              }
+      
+              if (!done || !doneSubtracting) {
+                categoryWiseBudget.budget.savings.forEach((item, idx) => {
+                  if (item.category == expenseRec.expCategory) {
+                    item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) ;
+                    isPreExpAmtAdded = true;
+                    doneSubtracting == true;
+                  }
+                  if (item.category == selectedCategory) {
+                    item.budgetSpent = item.budgetSpent + parseFloat(amount);
+                    isCategoryBudgetSet = true;
+                    done = true;
+                  }
+      
+                  if (item.category == "Other Savings") {
+                    otherExpIdx = idx;
+                  }
+                });
+      
+                if (!isPreExpAmtAdded && otherExpIdx > -1) {
+                  categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent - parseFloat(expenseRec.expAmount) ;
+                  done = true;
+                }
+                if (!isCategoryBudgetSet && otherExpIdx > -1) {
+                  categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent + parseFloat(amount);
+                  done = true;
+                }
+              }
+            }
+						
+					}
+		
+					await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
+		
+				}
+
+				//add category to user expense categories if not present
+				if(!userExpCategories.includes(selectedCategory))
+				{
+					userExpCategories.push(selectedCategory);
+					await updateDoc(doc(db, "User", auth.currentUser.uid), {
+						expCategories : userExpCategories,
+					});
+				}
+
+
+        
+        //update account balance
+        await updateDoc(doc(db, "User", auth.currentUser.uid), {
+          accBalance: parseFloat(accBalance) + parseFloat(expenseRec.expAmount) - parseFloat(amount) + ""
         });
-
-        if (!isCategoryBudgetSet && otherExpIdx > -1) {
-          categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-        }
-
-
-        if (categoryWiseBudget.method === 'Envelop Method') {
-          categoryWiseBudget.budget.forEach((item, idx) => {
-            if (item.category == selectedCategory) {
-              item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-              isCategoryBudgetSet = true;
-            }
-
-            if (item.category == "Other Expenses") {
-              otherExpIdx = idx;
-            }
-          });
-
-          if (!isCategoryBudgetSet && otherExpIdx > -1) {
-            categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-          }
-        }
-        else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
-          categoryWiseBudget.budget.forEach((item, idx) => {
-            if (item.category == selectedCategory) {
-              item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-              isCategoryBudgetSet = true;
-            }
-
-            if (item.category == "Other Expenses") {
-              otherExpIdx = idx;
-            }
-
-            if (item.category == "Savings") {
-              savingsIdx = idx;
-            }
-          });
-
-          if (!isCategoryBudgetSet && otherExpIdx > -1) {
-            categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-            categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount) + parseFloat(previousExpAmt);
-          }
-          else {
-            categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
-          }
-        }
-        else {
-          categoryWiseBudget.needs.forEach((item, idx) => {
-            if (item.category == selectedCategory) {
-              item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-              isCategoryBudgetSet = true;
-              done = true;
-            }
-
-            if (item.category == "Other Needs") {
-              otherExpIdx = idx;
-            }
-          });
-
-          if (!isCategoryBudgetSet && otherExpIdx > -1) {
-            categoryWiseBudget.needs[otherExpIdx].budgetSpent = categoryWiseBudget.needs[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-            done = true;
-          }
-
-          if (!done) {
-            categoryWiseBudget.wants.forEach((item, idx) => {
-              if (item.category == selectedCategory) {
-                item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-                isCategoryBudgetSet = true;
-                done = true;
-              }
-
-              if (item.category == "Other Wants") {
-                otherExpIdx = idx;
-              }
-            });
-
-            if (!isCategoryBudgetSet && otherExpIdx > -1) {
-              categoryWiseBudget.wants[otherExpIdx].budgetSpent = categoryWiseBudget.wants[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-              done = true;
-            }
-
-          }
-
-          if (!done) {
-            categoryWiseBudget.needs.forEach((item, idx) => {
-              if (item.category == selectedCategory) {
-                item.budgetSpent = item.budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-                isCategoryBudgetSet = true;
-                done = true;
-              }
-
-              if (item.category == "Other Savings") {
-                otherExpIdx = idx;
-              }
-            });
-
-            if (!isCategoryBudgetSet && otherExpIdx > -1) {
-              categoryWiseBudget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.savings[otherExpIdx].budgetSpent + parseFloat(amount) - parseFloat(previousExpAmt);
-              done = true;
-            }
-          }
-        }
-
-        await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
 
         const querySnapshot = await getDocs(collection(db, "expense"));
         querySnapshot.forEach((doc) => {
@@ -415,7 +562,7 @@ function ShowExpenseDetails({ route, navigation }) {
         });
 
         alert("Record Added Successfully");
-        navigation.navigate("HomePage");
+        navigation.navigate("Root");
       }
 
     } catch (e) {
@@ -530,7 +677,7 @@ function ShowExpenseDetails({ route, navigation }) {
       source={require('../../Assets/Background.jpeg')}
       style={{ width: width, height: height, marginTop: insets.top }}
     >
-      <Text style={styles.Title}>Expense Record</Text>
+      <Text style={styles.Title}>Edit Expense</Text>
       <View style={styles.container}>
         <View style={styles.mainContainer}>
           <ScrollView>
@@ -645,7 +792,7 @@ function ShowExpenseDetails({ route, navigation }) {
 								onValueChange={(val) => toggleSwitch(val)}
 								value={isEnabled}
 							/>
-              {isEnabled && <TouchableOpacity style={styles.sendReminder} onPress={() => sendReminder()}>
+              {isEnabled && ((expenseRec.groupExp && expenseRec.grpMembersList) || (route.params && route.params.grpMembersList)) && <TouchableOpacity style={styles.sendReminder} onPress={() => sendReminder()}>
 								<Text style={styles.sendReminderText}>Remind Members</Text>
 							</TouchableOpacity>}
 						</View>

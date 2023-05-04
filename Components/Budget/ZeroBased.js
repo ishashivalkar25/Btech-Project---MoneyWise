@@ -24,11 +24,16 @@ const ZeroBased = (props) => {
 
 
     React.useEffect(() => {
-      setTotalSavings(props.monthlyInc);
-      // setCategoryWiseBudget({ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent : 0})
-      if(props.monthlyInc)
-      setCategoryWiseBudget([{ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent : 0}]);
-  },[]);
+        setTotalSavings(props.monthlyInc==null ? 0 : props.monthlyInc);
+        console.log(props.monthlyInc, 'totalSaving ', totalSavings)
+        // setCategoryWiseBudget({ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent : 0})
+        
+    }, [props.monthlyInc]);
+
+    React.useEffect(() => {
+
+        setCategoryWiseBudget([{ category: 'Savings', budgetPlanned: parseFloat(totalSavings), budgetSpent: 0 }, ...categoryWiseBudget.slice(1)]);
+    }, [totalSavings]);
 
     React.useEffect(() => {
         fetchExpCategories();
@@ -37,7 +42,7 @@ const ZeroBased = (props) => {
     const fetchExpCategories = async () => {
 
         try {
-          const docRef = doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1");
+          const docRef = doc(db, "User", auth.currentUser.uid);
           const user = await getDoc(docRef);
           console.log(user.data().expCategories, " Categories **");
           const tempCategories = [];
@@ -57,7 +62,7 @@ const ZeroBased = (props) => {
 
 
     const addCategory = () => {
-
+ 
         if (!props.monthlyInc) {
             console.log("Please enter Monthly Income!")
             alert("Please enter Monthly Income!")
@@ -73,16 +78,24 @@ const ZeroBased = (props) => {
         }
     }
 
-    const deleteCategory = (index) => {
-        const rm = categoryWiseBudget.splice(index, 1);
-        const rms = selectedCategories.splice(index, 1);
-        console.log(rm, "rm");
-        console.log(rms, "rms");
-        updateIsCategoryWiseBudgetChanged(true);
+    const deleteCategory = (item) => {
+
+        const filterData = categoryWiseBudget.filter(curr => curr !== item);
+        console.log(filterData);
+        console.log(filterData.length);
+        setCategoryWiseBudget(filterData);
+
+        const filterCat = selectedCategories.filter(curr => curr !== item.category);
+        console.log(filterCat);
+        updateSelectedCategories(filterCat);
+        
     }
 
+
+
     const editCategoryWiseBudget = (index) => {
-        setEditCatBudgetModalVisible(!editCatBudgetModalVisible)
+        setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
+        
         console.log (index);
         setEditIdx(index);
     }
@@ -91,7 +104,8 @@ const ZeroBased = (props) => {
 
         setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
         console.log(editIdx, " ", categoryBudgetEdit);
-        
+        // categoryWiseBudget[0].budgetPlanned=totalSavings-parseFloat(categoryBudget);
+        // setTotalSavings(totalSavings-parseFloat(categoryBudget));
         if(categoryBudgetEdit == null)
         {
             alert("Please enter budget amount!")
@@ -103,8 +117,9 @@ const ZeroBased = (props) => {
         else if(editIdx>-1 && categoryWiseBudget.length>editIdx && categoryWiseBudget[editIdx]!=null)
         {
             console.log(categoryWiseBudget[editIdx], "****");
-            console.log(categoryWiseBudget[editIdx].budgetPlanned, "**");
+            console.log(categoryWiseBudget[editIdx].budgetPlanned, "**", categoryWiseBudget[0].budgetPlanned);
             categoryWiseBudget[0].budgetPlanned = categoryWiseBudget[0].budgetPlanned + categoryWiseBudget[editIdx].budgetPlanned - parseFloat(categoryBudgetEdit);
+            setTotalSavings(totalSavings + categoryWiseBudget[editIdx].budgetPlanned - parseFloat(categoryBudgetEdit));
             categoryWiseBudget[editIdx].budgetPlanned = parseFloat(categoryBudgetEdit);
             console.log(categoryWiseBudget[editIdx]);
             setCategoryBudgetEdit(null);
@@ -125,6 +140,9 @@ const ZeroBased = (props) => {
         }
         else if (categoryBudget <= 0) {
             alert("Please enter valid budget amount!");
+        }
+        else if (totalSavings-parseFloat(categoryBudget) < 0) {
+            alert("You are exceeding total budget!");
         }
         else {
             categoryWiseBudget[0].budgetPlanned=totalSavings-parseFloat(categoryBudget)
@@ -181,15 +199,15 @@ const ZeroBased = (props) => {
 
         const totalAmount = calculateTotalIncome();
 
-        if(!selectedCategories.includes("Other Expenses"))
-        {
-            categoryWiseBudget.push({ category: "Other Expenses", budgetPlanned: 0, budgetSpent : 0});
-        }
+        // if(!selectedCategories.includes("Other Expenses"))
+        // {
+        //     categoryWiseBudget.push({ category: "Other Expenses", budgetPlanned: 0, budgetSpent : 0});
+        // }
 
         try{
             
             const recordId = months[props.date.getMonth()] + ""+ props.date.getFullYear();
-            const docRef = await setDoc(doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1", "Budget", recordId), {
+            const docRef = await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), {
                 method : props.selectedBudgetingMethod,
                 budget: categoryWiseBudget,
                 saving : props.monthlyInc - totalAmount,
@@ -238,117 +256,123 @@ const ZeroBased = (props) => {
 
     return (
         <SafeAreaView>
-            <View style={styles.categoryWiseBudget}>
-                <FlatList
-                    data={categoryWiseBudget}
-                    ListHeaderComponent={
-                        <View style={styles.categoryWiseBudgetTitle}>
-                            <Text style={styles.categoryWiseBudgetTitleText}>Zero Based : </Text>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={addCategory} >
-                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    renderItem={({ item, index }) =>
-                    <View style={styles.budgetCategory}>
-                    <TouchableOpacity style={styles.budgetCategoryEdit} onPress={() => editCategoryWiseBudget(index)}>
-                        <View style={styles.budgetCategoryCenter}>
-                            <Text style={styles.budgetCategoryText}>Category Name</Text>
-                            <Text>{item.category}</Text>
-                        </View>
-                        <View style={styles.budgetCategoryCenter}>
-                            <Text style={styles.budgetCategoryText}>Budget Planned</Text>
-                            <Text>{item.budgetPlanned}</Text>
-                        </View>
-                    </TouchableOpacity>
-                    {item.category!=='Savings' && <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(index)}>
-                        <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
-                    </TouchableOpacity>}
+            <View style={styles.categoryWiseBudgetContainer}>
+                <View style={{ margin: 10, justifyContent: 'center' }}>
+                    <Text style={styles.categoryWiseBudgetTitleText}>Budget Planned : </Text>
                 </View>
-                    }
-                    ListEmptyComponent={
-                        <View style={styles.noBudget}>
-                            <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
-                            <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
+                <View style={styles.categoryWiseBudget}>
+                    <FlatList
+                        data={categoryWiseBudget}
+                        ListHeaderComponent={
+                            <View style={styles.categoryWiseBudgetTitle}>
+                                <Text style={styles.categoryWiseBudgetTitleText}>Zero Based : </Text>
+                                <TouchableOpacity style={styles.budgetCategoryCenter} onPress={addCategory} >
+                                    <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                                </TouchableOpacity>
+                            </View>
+                        }
+                        renderItem={({ item, index }) =>
+                            <View style={styles.budgetCategory}>
+                                <TouchableOpacity style={styles.budgetCategoryEdit} disabled={item.category == "Savings" ? true : false} onPress={() => editCategoryWiseBudget(index)}>
+                                    <View style={styles.budgetCategoryCenter}>
+                                        <Text style={styles.budgetCategoryText}>Category Name</Text>
+                                        <Text>{item.category}</Text>
+                                    </View>
+                                    <View style={styles.budgetCategoryCenter}>
+                                        <Text style={styles.budgetCategoryText}>Budget Planned</Text>
+                                        <Text>{item.budgetPlanned}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                {item.category !== 'Savings' && <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteCategory(item)}>
+                                    <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
+                                </TouchableOpacity>}
+                            </View>
+                        }
+                        ListEmptyComponent={
+                            <View style={styles.noBudget}>
+                                <Image source={require('../../Assets/no-data.png')} style={{ width: 100, height: 100 }} />
+                                <Text style={styles.noBudgetText}>Budget is not set for any Category!</Text>
+                            </View>
+                        }
+                        extraData={isCategoryWiseBudgetChanged}
+                        style={{ backgroundColor: "white" }}
+                    />
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={editCatBudgetModalVisible}
+                        onRequestClose={() => {
+                            setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
+                        }}>
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalText}>Enter Budget</Text>
+                                <TextInput
+                                    style={styles.budgetAmountInput}
+                                    onChangeText={text => setCategoryBudgetEdit(text)}
+                                    value={categoryBudgetEdit}
+                                    placeholder='Enter Budget for this category...'
+                                    keyboardType="numeric"
+                                />
+                                <TouchableOpacity
+                                    style={[styles.buttonModal, styles.buttonClose]}
+                                    onPress={() => setEditedCategoryWiseBudget()}>
+                                    <Text style={styles.textStyle}>Set</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    }
-                // extraData={isBudgetChanged}
-                style={{backgroundColor:"white"}}
-                />
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={editCatBudgetModalVisible}
-                    onRequestClose={() => {
-                        setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
-                    }}>
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>Enter Budget</Text>
-                            <TextInput
-                                style={styles.budgetAmountInput}
-                                onChangeText={text => setCategoryBudgetEdit(text)}
-                                value={categoryBudgetEdit}
-                                placeholder='Enter Budget for this category...'
-                                keyboardType="numeric"
-                            />
-                            <TouchableOpacity
-                                style={[styles.buttonModal, styles.buttonClose]}
-                                onPress={() => setEditedCategoryWiseBudget()}>
-                                <Text style={styles.textStyle}>Set</Text>
-                            </TouchableOpacity>
+                    </Modal>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            setModalVisible(!modalVisible);
+                        }}>
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalText}>Add Categorywise Budget</Text>
+                                <Dropdown
+                                    style={styles.dropdown}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    itemTextStyle={{ color: "black" }}
+                                    data={categories}
+                                    search
+                                    maxHeight={300}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder="Select Category"
+                                    searchPlaceholder="Search..."
+                                    value="category"
+                                    onChange={(item) => {
+                                        setSelectedCategory(item.value);
+                                    }}
+                                />
+                                <TextInput
+                                    style={styles.budgetAmountInput}
+                                    onChangeText={text => setCategoryBudget(text)}
+                                    value={categoryBudget}
+                                    placeholder='Enter Budget for selected category...'
+                                    keyboardType="numeric"
+                                />
+                                <TouchableOpacity
+                                    style={[styles.buttonModal, styles.buttonClose]}
+                                    onPress={addCategoryWiseBudget}>
+                                    <Text style={styles.textStyle}>Add</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                </Modal>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => {
-                        setModalVisible(!modalVisible);
-                    }}>
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>Add Categorywise Budget</Text>
-                            <Dropdown
-                                style={styles.dropdown}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                itemTextStyle={{ color: "black" }}
-                                data={categories}
-                                search
-                                maxHeight={300}
-                                labelField="label"
-                                valueField="value"
-                                placeholder="Select Category"
-                                searchPlaceholder="Search..."
-                                value="category"
-                                onChange={(item) => {
-                                    setSelectedCategory(item.value);
-                                }}
-                            />
-                            <TextInput
-                                style={styles.budgetAmountInput}
-                                onChangeText={text => setCategoryBudget(text)}
-                                value={categoryBudget}
-                                placeholder='Enter Budget for selected category...'
-                                keyboardType="numeric"
-                            />
-                            <TouchableOpacity
-                                style={[styles.buttonModal, styles.buttonClose]}
-                                onPress={addCategoryWiseBudget}>
-                                <Text style={styles.textStyle}>Add</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
+                    </Modal>
+                </View>
+                <View style={styles.buttonContainer} >
+                    <TouchableOpacity style={[styles.button, (categoryWiseBudget != null && categoryWiseBudget.length > 0) ? styles.enabled : styles.disabled]} disabled={(categoryWiseBudget != null && categoryWiseBudget.length > 0) ? false : true} onPress={confirmBudget}>
+                        <Text style={styles.buttonText}>Set Budget</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <View style={styles.buttonContainer} >
-                <TouchableOpacity style={[styles.button, (categoryWiseBudget!=null && categoryWiseBudget.length > 0) ? styles.enabled : styles.disabled]} disabled={(categoryWiseBudget!=null && categoryWiseBudget.length > 0) ? false : true} onPress={confirmBudget}>
-                    <Text style={styles.buttonText}>Set Budget</Text>
-                </TouchableOpacity>
-            </View>
+
         </SafeAreaView>
     );
 };
@@ -426,11 +450,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'black',
     },
-    categoryWiseBudget: {
+    categoryWiseBudgetContainer: {
         marginBottom: 5,
-        marginHorizontal: 10,
+        marginHorizontal: 5,
         borderRadius: 10,
-        height: "90%",
+        height: "100%",
+        backgroundColor: 'rgba(255,255,255,0.9)',
+    },
+    categoryWiseBudget: {
+        height: "80%",
     },
     categoryWiseBudgetTitle: {
         backgroundColor: 'rgba(0,0,0,0.05)',

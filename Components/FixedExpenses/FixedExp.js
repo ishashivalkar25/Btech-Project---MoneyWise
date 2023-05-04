@@ -79,7 +79,7 @@ const FixedExp = ({ navigation, route }) => {
 
 	const fetchFixedExp = async () => {
 		try {
-			const querySnapshot = await getDocs(collection(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1", "FixedExpenses"));
+			const querySnapshot = await getDocs(collection(db, "User", auth.currentUser.uid, "FixedExpenses"));
 			const tempFixedExp = []
 			querySnapshot.forEach((doc) => {
 				// doc.data() is never undefined for query doc snapshots
@@ -98,7 +98,7 @@ const FixedExp = ({ navigation, route }) => {
 		
 		// deletefrom database
 		try {
-			await deleteDoc(doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1", "FixedExpenses", item.id));
+			await deleteDoc(doc(db, "User", auth.currentUser.uid, "FixedExpenses", item.id));
 			console.log("Deleted")
 		}
 		catch(e)
@@ -237,7 +237,7 @@ const FixedExp = ({ navigation, route }) => {
 	const updateFixedExpStatus = async(item, status) => {
 
 		try {
-			await updateDoc(doc(db, "User", "o4qWuRGsfDRbSyuA1OO2yljfjDr1", "FixedExpenses", item.id), {
+			await updateDoc(doc(db, "User", auth.currentUser.uid, "FixedExpenses", item.id), {
 				status : status
 			});
 			console.log("Update")

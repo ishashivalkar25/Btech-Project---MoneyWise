@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getTransactionInfo } from "trny";
-import { auth, db, collection, getDocs, doc,updateDoc,  getDoc, deleteDoc} from "../../Firebase/config";
+import { auth, db, collection, getDocs, doc,updateDoc,  getDoc, deleteDoc, setDoc} from "../../Firebase/config";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import SmsAndroid from 'react-native-get-sms-android';
 import Background from '../Background';
@@ -250,13 +250,128 @@ function Expense({navigation}) {
         console.log(categoryWiseAmt, "Category------------------------------**********************************");
     }
 
-    const deleteRecord = async(item) => {
-        const docRef = await deleteDoc(doc(db, 'User', auth.currentUser.uid, 'Expense', item.key));
+    const deleteRecord = async(record) => {
+        const docRef = await deleteDoc(doc(db, 'User', auth.currentUser.uid, 'Expense', record.key));
         console.log("document deleted")
-        const filterData = expenseRecords.filter(curr => curr !== item);
+        const filterData = expenseRecords.filter(curr => curr !== record);
         console.log(filterData);
         console.log(filterData.length);
         setExpenseRecords(filterData);
+        updateBalOnRecDelete(record.expAmount);
+
+         //Update budget
+        const recordId = months[date.getMonth()] + "" + date.getFullYear();
+        console.log(recordId);
+        const document = await getDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId));
+
+        if (document.data()) {
+            const categoryWiseBudget = document.data()
+            var isCategoryBudgetSet = false;
+            var otherExpIdx = -1;
+            var savingsIdx = -1;
+            var done = false;
+
+            if (categoryWiseBudget.method === 'Envelop Method') {
+                console.log('Inside : ', categoryWiseBudget.method)
+
+                categoryWiseBudget.budget.forEach((item, idx) => {
+                    if (item.category == record.expCategory) {
+                        item.budgetSpent = item.budgetSpent - parseFloat(record.expAmount) ;
+                        isCategoryBudgetSet = true;
+                    }
+
+                    if (item.category == "Additional Expenses") {
+                        otherExpIdx = idx;
+                    }
+                });
+
+                if (!isCategoryBudgetSet && otherExpIdx > -1) {
+                    categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent - parseFloat(record.expAmount) ;
+                }
+            }
+            else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
+
+                console.log('Inside : ', categoryWiseBudget.method)
+                categoryWiseBudget.budget.forEach((item, idx) => {
+                    if (item.category == record.expCategory) {
+                        item.budgetSpent = item.budgetSpent - parseFloat(record.expAmount);
+                        isCategoryBudgetSet = true;
+                    }
+
+                    if (item.category == "Savings") {
+                        savingsIdx = idx;
+                    }
+                });
+
+                if (!isCategoryBudgetSet && savingsIdx > -1) {
+                    categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent - parseFloat(record.expAmount);
+                    categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned + parseFloat(record.expAmount) ;
+                    console.log('Added to savings', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+                }
+
+            }
+            else {
+                console.log('Inside : ', categoryWiseBudget)
+                categoryWiseBudget.budget.needs.forEach((item, idx) => {
+                    if (item.category == record.expCategory) {
+                        item.budgetSpent = item.budgetSpent - parseFloat(record.expAmount) ;
+                        isCategoryBudgetSet = true;
+                        done = true;
+                    }
+                });
+
+                if (!done) {
+                    categoryWiseBudget.budget.wants.forEach((item, idx) => {
+                        if (item.category == record.expCategory) {
+                            item.budgetSpent = item.budgetSpent - parseFloat(record.expAmount);
+                            isCategoryBudgetSet = true;
+                            done = true;
+                        }
+                    });
+
+                }
+
+                if (!done) {
+                    categoryWiseBudget.budget.savings.forEach((item, idx) => {
+                        if (item.category == record.expCategory) {
+                            item.budgetSpent = item.budgetSpent - parseFloat(record.expAmount);
+                            isCategoryBudgetSet = true;
+                            done = true;
+                        }
+
+                        if (item.category == "Other Savings") {
+                            otherExpIdx = idx;
+                        }
+                    });
+
+                    if (!isCategoryBudgetSet && otherExpIdx > -1) {
+                        categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent - parseFloat(record.expAmount) ;
+                        done = true;
+                    }
+                }
+            }
+
+            await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), categoryWiseBudget);
+
+        }
+
+    }
+
+    const updateBalOnRecDelete = async(amount) => {
+        try{
+            const user = await getDoc(doc(db, "User", auth.currentUser.uid));
+
+            console.log(amount , 'amount');
+			  //update account balance
+			  await updateDoc(doc(db,"User",auth.currentUser.uid), {
+                accBalance :parseFloat(user.data().accBalance) + parseFloat(amount) +""
+              });
+
+		}
+		catch(e)
+		{
+			console.log(e);
+		}
     }
     return (
         <>
