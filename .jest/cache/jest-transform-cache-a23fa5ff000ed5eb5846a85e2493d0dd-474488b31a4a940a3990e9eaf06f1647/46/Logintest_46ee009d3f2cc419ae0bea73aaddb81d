@@ -1,7 +1,0 @@
-5f2ab17d9778353e98fffdcdb647f376
-describe('Login Screen', function () {
-  it('Should go to home page on login', function () {
-    expect(false).toBeTruthy();
-  });
-});
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJkZXNjcmliZSIsIml0IiwiZXhwZWN0IiwidG9CZVRydXRoeSJdLCJzb3VyY2VzIjpbIkxvZ2luLXRlc3QuanMiXSwic291cmNlc0NvbnRlbnQiOlsiZGVzY3JpYmUoJ0xvZ2luIFNjcmVlbicsICgpID0+IHtcclxuICAgIGl0KCdTaG91bGQgZ28gdG8gaG9tZSBwYWdlIG9uIGxvZ2luJywgKCkgPT4ge1xyXG4gICAgICAgIGV4cGVjdChmYWxzZSkudG9CZVRydXRoeSgpO1xyXG4gICAgfSlcclxufSkiXSwibWFwcGluZ3MiOiJBQUFBQSxRQUFRLENBQUMsY0FBYyxFQUFFLFlBQU07RUFDM0JDLEVBQUUsQ0FBQyxpQ0FBaUMsRUFBRSxZQUFNO0lBQ3hDQyxNQUFNLENBQUMsS0FBSyxDQUFDLENBQUNDLFVBQVUsQ0FBQyxDQUFDO0VBQzlCLENBQUMsQ0FBQztBQUNOLENBQUMsQ0FBQyJ9
