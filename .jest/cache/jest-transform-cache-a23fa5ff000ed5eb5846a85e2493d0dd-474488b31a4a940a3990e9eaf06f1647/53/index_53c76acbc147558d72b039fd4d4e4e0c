@@ -1,0 +1,26 @@
+1a47a23a871e137cddf5c38c776734d7
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "NativeStackView", {
+  enumerable: true,
+  get: function get() {
+    return _NativeStackView.default;
+  }
+});
+Object.defineProperty(exports, "createNativeStackNavigator", {
+  enumerable: true,
+  get: function get() {
+    return _createNativeStackNavigator.default;
+  }
+});
+var _createNativeStackNavigator = _interopRequireDefault(require("./navigators/createNativeStackNavigator"));
+var _NativeStackView = _interopRequireDefault(require("./views/NativeStackView"));
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfY3JlYXRlTmF0aXZlU3RhY2tOYXZpZ2F0b3IiLCJfaW50ZXJvcFJlcXVpcmVEZWZhdWx0IiwicmVxdWlyZSIsIl9OYXRpdmVTdGFja1ZpZXciLCJvYmoiLCJfX2VzTW9kdWxlIiwiZGVmYXVsdCJdLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9pbmRleC50c3giXSwic291cmNlc0NvbnRlbnQiOltudWxsXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBR0EsSUFBQUEsMkJBQUEsR0FBQUMsc0JBQUEsQ0FBQUMsT0FBQTtBQUtBLElBQUFDLGdCQUFBLEdBQUFGLHNCQUFBLENBQUFDLE9BQUE7QUFBcUUsU0FBQUQsdUJBQUFHLEdBQUE7RUFBQSxPQUFBQSxHQUFBLElBQUFBLEdBQUEsQ0FBQUMsVUFBQSxHQUFBRCxHQUFBO0lBQUFFLE9BQUEsRUFBQUY7RUFBQTtBQUFBIn0=

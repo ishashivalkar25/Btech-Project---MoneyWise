@@ -5,10 +5,11 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const Background = ({children}) => {
 
-  const insets = useSafeAreaInsets();
+  // const insets = useSafeAreaInsets();
   return (
     
-    <View style={{marginTop:insets.top}}>
+    // <View style={{marginTop:insets.top}}>
+    <View>
       <ImageBackground
         source={require('../Assets/Background.jpeg')}
         style={{width: '100%', height: '100%'}}

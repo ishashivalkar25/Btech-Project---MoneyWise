@@ -12,7 +12,6 @@ import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context"
 import Background from "../Background";
 import React, { useState } from 'react'
 import { auth, db, collection, getDocs, doc } from "../../Firebase/config";
-import { pink200 } from "react-native-paper/lib/typescript/src/styles/themes/v2/colors";
 import MonthPicker from 'react-native-month-year-picker';
 
 const { height, width } = Dimensions.get("window");

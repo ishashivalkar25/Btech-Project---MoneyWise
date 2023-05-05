@@ -1,0 +1,25 @@
+72c2bed03d25756fe4529c5de407387b
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+var _wrapNativeSuper2 = _interopRequireDefault(require("@babel/runtime/helpers/wrapNativeSuper"));
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2.default)(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2.default)(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2.default)(this, result); }; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+var HeadlessJsTaskError = function (_Error) {
+  (0, _inherits2.default)(HeadlessJsTaskError, _Error);
+  var _super = _createSuper(HeadlessJsTaskError);
+  function HeadlessJsTaskError() {
+    (0, _classCallCheck2.default)(this, HeadlessJsTaskError);
+    return _super.apply(this, arguments);
+  }
+  return (0, _createClass2.default)(HeadlessJsTaskError);
+}((0, _wrapNativeSuper2.default)(Error));
+exports.default = HeadlessJsTaskError;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJIZWFkbGVzc0pzVGFza0Vycm9yIiwiX0Vycm9yIiwiX2luaGVyaXRzMiIsImRlZmF1bHQiLCJfc3VwZXIiLCJfY3JlYXRlU3VwZXIiLCJfY2xhc3NDYWxsQ2hlY2syIiwiYXBwbHkiLCJhcmd1bWVudHMiLCJfY3JlYXRlQ2xhc3MyIiwiX3dyYXBOYXRpdmVTdXBlcjIiLCJFcnJvciIsImV4cG9ydHMiXSwic291cmNlcyI6WyJIZWFkbGVzc0pzVGFza0Vycm9yLmpzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogQ29weXJpZ2h0IChjKSBNZXRhIFBsYXRmb3JtcywgSW5jLiBhbmQgYWZmaWxpYXRlcy5cbiAqXG4gKiBUaGlzIHNvdXJjZSBjb2RlIGlzIGxpY2Vuc2VkIHVuZGVyIHRoZSBNSVQgbGljZW5zZSBmb3VuZCBpbiB0aGVcbiAqIExJQ0VOU0UgZmlsZSBpbiB0aGUgcm9vdCBkaXJlY3Rvcnkgb2YgdGhpcyBzb3VyY2UgdHJlZS5cbiAqXG4gKiBAZmxvdyBzdHJpY3QtbG9jYWxcbiAqIEBmb3JtYXRcbiAqL1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBIZWFkbGVzc0pzVGFza0Vycm9yIGV4dGVuZHMgRXJyb3Ige31cbiJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztJQVVxQkEsbUJBQW1CLGFBQUFDLE1BQUE7RUFBQSxJQUFBQyxVQUFBLENBQUFDLE9BQUEsRUFBQUgsbUJBQUEsRUFBQUMsTUFBQTtFQUFBLElBQUFHLE1BQUEsR0FBQUMsWUFBQSxDQUFBTCxtQkFBQTtFQUFBLFNBQUFBLG9CQUFBO0lBQUEsSUFBQU0sZ0JBQUEsQ0FBQUgsT0FBQSxRQUFBSCxtQkFBQTtJQUFBLE9BQUFJLE1BQUEsQ0FBQUcsS0FBQSxPQUFBQyxTQUFBO0VBQUE7RUFBQSxXQUFBQyxhQUFBLENBQUFOLE9BQUEsRUFBQUgsbUJBQUE7QUFBQSxNQUFBVSxpQkFBQSxDQUFBUCxPQUFBLEVBQVNRLEtBQUs7QUFBQUMsT0FBQSxDQUFBVCxPQUFBLEdBQUFILG1CQUFBIn0=

@@ -1,0 +1,64 @@
+0a2b56b6adc3914b9a2d8fa4bcc7a340
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = useInvalidPreventRemoveError;
+var _native = require("@react-navigation/native");
+var React = _interopRequireWildcard(require("react"));
+function _getRequireWildcardCache(nodeInterop) {
+  if (typeof WeakMap !== "function") return null;
+  var cacheBabelInterop = new WeakMap();
+  var cacheNodeInterop = new WeakMap();
+  return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) {
+    return nodeInterop ? cacheNodeInterop : cacheBabelInterop;
+  })(nodeInterop);
+}
+function _interopRequireWildcard(obj, nodeInterop) {
+  if (!nodeInterop && obj && obj.__esModule) {
+    return obj;
+  }
+  if (obj === null || typeof obj !== "object" && typeof obj !== "function") {
+    return {
+      default: obj
+    };
+  }
+  var cache = _getRequireWildcardCache(nodeInterop);
+  if (cache && cache.has(obj)) {
+    return cache.get(obj);
+  }
+  var newObj = {};
+  var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor;
+  for (var key in obj) {
+    if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) {
+      var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null;
+      if (desc && (desc.get || desc.set)) {
+        Object.defineProperty(newObj, key, desc);
+      } else {
+        newObj[key] = obj[key];
+      }
+    }
+  }
+  newObj.default = obj;
+  if (cache) {
+    cache.set(obj, newObj);
+  }
+  return newObj;
+}
+function useInvalidPreventRemoveError(descriptors) {
+  var _preventedDescriptor$, _preventedDescriptor$2;
+  var _ref = (0, _native.usePreventRemoveContext)(),
+    preventedRoutes = _ref.preventedRoutes;
+  var preventedRouteKey = Object.keys(preventedRoutes)[0];
+  var preventedDescriptor = descriptors[preventedRouteKey];
+  var isHeaderBackButtonMenuEnabledOnPreventedScreen = preventedDescriptor === null || preventedDescriptor === void 0 ? void 0 : (_preventedDescriptor$ = preventedDescriptor.options) === null || _preventedDescriptor$ === void 0 ? void 0 : _preventedDescriptor$.headerBackButtonMenuEnabled;
+  var preventedRouteName = preventedDescriptor === null || preventedDescriptor === void 0 ? void 0 : (_preventedDescriptor$2 = preventedDescriptor.route) === null || _preventedDescriptor$2 === void 0 ? void 0 : _preventedDescriptor$2.name;
+  React.useEffect(function () {
+    if (preventedRouteKey != null && isHeaderBackButtonMenuEnabledOnPreventedScreen) {
+      var message = "The screen " + preventedRouteName + " uses 'usePreventRemove' hook alongside 'headerBackButtonMenuEnabled: true', which is not supported. \n\n" + ("Consider removing 'headerBackButtonMenuEnabled: true' from " + preventedRouteName + " screen to get rid of this error.");
+      console.error(message);
+    }
+  }, [preventedRouteKey, isHeaderBackButtonMenuEnabledOnPreventedScreen, preventedRouteName]);
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfbmF0aXZlIiwicmVxdWlyZSIsIlJlYWN0IiwiX2ludGVyb3BSZXF1aXJlV2lsZGNhcmQiLCJfZ2V0UmVxdWlyZVdpbGRjYXJkQ2FjaGUiLCJub2RlSW50ZXJvcCIsIldlYWtNYXAiLCJjYWNoZUJhYmVsSW50ZXJvcCIsImNhY2hlTm9kZUludGVyb3AiLCJvYmoiLCJfX2VzTW9kdWxlIiwiZGVmYXVsdCIsImNhY2hlIiwiaGFzIiwiZ2V0IiwibmV3T2JqIiwiaGFzUHJvcGVydHlEZXNjcmlwdG9yIiwiT2JqZWN0IiwiZGVmaW5lUHJvcGVydHkiLCJnZXRPd25Qcm9wZXJ0eURlc2NyaXB0b3IiLCJrZXkiLCJwcm90b3R5cGUiLCJoYXNPd25Qcm9wZXJ0eSIsImNhbGwiLCJkZXNjIiwic2V0IiwidXNlSW52YWxpZFByZXZlbnRSZW1vdmVFcnJvciIsImRlc2NyaXB0b3JzIiwiX3ByZXZlbnRlZERlc2NyaXB0b3IkIiwiX3ByZXZlbnRlZERlc2NyaXB0b3IkMiIsIl9yZWYiLCJ1c2VQcmV2ZW50UmVtb3ZlQ29udGV4dCIsInByZXZlbnRlZFJvdXRlcyIsInByZXZlbnRlZFJvdXRlS2V5Iiwia2V5cyIsInByZXZlbnRlZERlc2NyaXB0b3IiLCJpc0hlYWRlckJhY2tCdXR0b25NZW51RW5hYmxlZE9uUHJldmVudGVkU2NyZWVuIiwib3B0aW9ucyIsImhlYWRlckJhY2tCdXR0b25NZW51RW5hYmxlZCIsInByZXZlbnRlZFJvdXRlTmFtZSIsInJvdXRlIiwibmFtZSIsInVzZUVmZmVjdCIsIm1lc3NhZ2UiLCJjb25zb2xlIiwiZXJyb3IiXSwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvdXRpbHMvdXNlSW52YWxpZFByZXZlbnRSZW1vdmVFcnJvci50c3giXSwic291cmNlc0NvbnRlbnQiOltudWxsXSwibWFwcGluZ3MiOiI7Ozs7OztBQUFBLElBQUFBLE9BQUEsR0FBQUMsT0FBQTtBQUNBLElBQUFDLEtBQUEsR0FBQUMsdUJBQUEsQ0FBQUYsT0FBQTtBQUErQixTQUFB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

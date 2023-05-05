@@ -1,0 +1,18 @@
+40ebdb532ab8834dd21260885cc8b092
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = getDrawerStatusFromState;
+function getDrawerStatusFromState(state) {
+  var _ref, _ref2;
+  if (state.history == null) {
+    throw new Error("Couldn't find the drawer status in the state object. Is it a valid state object of drawer navigator?");
+  }
+  var entry = state.history.find(function (it) {
+    return it.type === 'drawer';
+  });
+  return (_ref = (_ref2 = entry === null || entry === void 0 ? void 0 : entry.status) != null ? _ref2 : state.default) != null ? _ref : 'closed';
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJnZXREcmF3ZXJTdGF0dXNGcm9tU3RhdGUiLCJzdGF0ZSIsIl9yZWYiLCJfcmVmMiIsImhpc3RvcnkiLCJFcnJvciIsImVudHJ5IiwiZmluZCIsIml0IiwidHlwZSIsInN0YXR1cyIsImRlZmF1bHQiXSwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvdXRpbHMvZ2V0RHJhd2VyU3RhdHVzRnJvbVN0YXRlLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6W251bGxdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBTWUsU0FBU0Esd0JBQXdCQSxDQUM5Q0MsS0FBMkMsRUFDN0I7RUFBQSxJQUFBQyxJQUFBLEVBQUFDLEtBQUE7RUFDZCxJQUFJRixLQUFLLENBQUNHLE9BQU8sSUFBSSxJQUFJLEVBQUU7SUFDekIsTUFBTSxJQUFJQyxLQUFLLENBQ2Isc0dBQXNHLENBQ3ZHO0VBQ0g7RUFFQSxJQUFNQyxLQUFLLEdBQUdMLEtBQUssQ0FBQ0csT0FBTyxDQUFDRyxJQUFJLENBQUUsVUFBQUMsRUFBRTtJQUFBLE9BQUtBLEVBQUUsQ0FBQ0MsSUFBSSxLQUFLLFFBQVE7RUFBQSxFQUVoRDtFQUViLFFBQUFQLElBQUEsSUFBQUMsS0FBQSxHQUFPRyxLQUFLLGFBQUxBLEtBQUssdUJBQUxBLEtBQUssQ0FBRUksTUFBTSxZQUFBUCxLQUFBLEdBQUlGLEtBQUssQ0FBQ1UsT0FBTyxZQUFBVCxJQUFBLEdBQUksUUFBUTtBQUNuRCJ9

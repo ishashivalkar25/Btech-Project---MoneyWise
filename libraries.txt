@@ -35,6 +35,11 @@ npm i trny
 npm uninstall react-native-vision-camera
 npm uninstall vision-camera-code-scanner
 
+npm install --save-dev jest
+npm i @testing-library/react-native
+npm install --save-dev babel-jest
+npm install @babel/preset-env --save-dev
+
 npm i lottie-react-native
 
 cd android     
@@ -43,3 +48,12 @@ cd ..
 
 
 react-native-circular-progress-indicator
+
+
+,
+    //  "moduleFileExtensions" : ["ts", "tsx", "js", "jsx", "json", "node"],
+    // "transformIgnorePatterns" : [
+    //   "node_modules/(?!(react-native"
+    //     + "|@react-navigation/drawer"
+    //     + ")/)"
+    // ]

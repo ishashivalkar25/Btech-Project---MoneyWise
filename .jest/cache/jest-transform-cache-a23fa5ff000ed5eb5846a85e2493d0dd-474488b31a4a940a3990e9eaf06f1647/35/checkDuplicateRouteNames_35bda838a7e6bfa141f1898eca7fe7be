@@ -1,0 +1,27 @@
+8a9ac2eb1deab0eaaaa12dfa81887bbd
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = checkDuplicateRouteNames;
+function checkDuplicateRouteNames(state) {
+  var duplicates = [];
+  var getRouteNames = function getRouteNames(location, state) {
+    state.routes.forEach(function (route) {
+      var _route$state, _route$state$routeNam;
+      var currentLocation = location ? location + " > " + route.name : route.name;
+      (_route$state = route.state) === null || _route$state === void 0 ? void 0 : (_route$state$routeNam = _route$state.routeNames) === null || _route$state$routeNam === void 0 ? void 0 : _route$state$routeNam.forEach(function (routeName) {
+        if (routeName === route.name) {
+          duplicates.push([currentLocation, currentLocation + " > " + route.name]);
+        }
+      });
+      if (route.state) {
+        getRouteNames(currentLocation, route.state);
+      }
+    });
+  };
+  getRouteNames('', state);
+  return duplicates;
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjaGVja0R1cGxpY2F0ZVJvdXRlTmFtZXMiLCJzdGF0ZSIsImR1cGxpY2F0ZXMiLCJnZXRSb3V0ZU5hbWVzIiwibG9jYXRpb24iLCJyb3V0ZXMiLCJmb3JFYWNoIiwicm91dGUiLCJfcm91dGUkc3RhdGUiLCJfcm91dGUkc3RhdGUkcm91dGVOYW0iLCJjdXJyZW50TG9jYXRpb24iLCJuYW1lIiwicm91dGVOYW1lcyIsInJvdXRlTmFtZSIsInB1c2giXSwic291cmNlcyI6WyIuLi8uLi9zcmMvY2hlY2tEdXBsaWNhdGVSb3V0ZU5hbWVzLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6W251bGxdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBRWUsU0FBU0Esd0JBQXdCQSxDQUFDQyxLQUFzQixFQUFFO0VBQ3ZFLElBQU1DLFVBQXNCLEdBQUcsRUFBRTtFQUVqQyxJQUFNQyxhQUFhLEdBQUcsU0FBaEJBLGFBQWFBLENBQ2pCQyxRQUFnQixFQUNoQkgsS0FBc0QsRUFDbkQ7SUFDSEEsS0FBSyxDQUFDSSxNQUFNLENBQUNDLE9BQU8sQ0FBRSxVQUFBQyxLQUE2QixFQUFLO01BQUEsSUFBQUMsWUFBQSxFQUFBQyxxQkFBQTtNQUN0RCxJQUFNQyxlQUFlLEdBQUdOLFFBQVEsR0FDekJBLFFBQVMsV0FBS0csS0FBSyxDQUFDSSxJQUFLLEdBQzVCSixLQUFLLENBQUNJLElBQUk7TUFFZCxDQUFBSCxZQUFBLEdBQUFELEtBQUssQ0FBQ04sS0FBSyxjQUFBTyxZQUFBLHdCQUFBQyxxQkFBQSxHQUFYRCxZQUFBLENBQWFJLFVBQVUsY0FBQUgscUJBQUEsdUJBQXZCQSxxQkFBQSxDQUF5QkgsT0FBTyxDQUFFLFVBQUFPLFNBQVMsRUFBSztRQUM5QyxJQUFJQSxTQUFTLEtBQUtOLEtBQUssQ0FBQ0ksSUFBSSxFQUFFO1VBQzVCVCxVQUFVLENBQUNZLElBQUksQ0FBQyxDQUNkSixlQUFlLEVBQ1pBLGVBQWdCLFdBQUtILEtBQUssQ0FBQ0ksSUFBSyxDQUNwQyxDQUFDO1FBQ0o7TUFDRixDQUFDLENBQUM7TUFFRixJQUFJSixLQUFLLENBQUNOLEtBQUssRUFBRTtRQUNmRSxhQUFhLENBQUNPLGVBQWUsRUFBRUgsS0FBSyxDQUFDTixLQUFLLENBQUM7TUFDN0M7SUFDRixDQUFDLENBQUM7RUFDSixDQUFDO0VBRURFLGFBQWEsQ0FBQyxFQUFFLEVBQUVGLEtBQUssQ0FBQztFQUV4QixPQUFPQyxVQUFVO0FBQ25CIn0=

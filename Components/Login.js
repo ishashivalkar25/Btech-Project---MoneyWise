@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, TextInput, Dimensions, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import React from 'react';
 import { auth } from '../Firebase/config'
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigation } from '@react-navigation/core';
 import DialogInput from 'react-native-dialog-input';
@@ -16,11 +17,11 @@ export default function Login(props) {
   const [dialogBoxVisibility, setDialogBoxVisibility] = React.useState(false);
   const [userNameValidity, setUserNameValidity] = React.useState(true);
 
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   React.useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if(user && user.emailVerified){
-        navigation.replace("Root");
+        props.navigation.replace("Root");
         console.log(user);
       }
     });
@@ -37,7 +38,7 @@ export default function Login(props) {
         const user = userCredentials.user;
         console.log("user email :", user.email);
         if(user.emailVerified){
-          navigation.replace("Root");
+          props.navigation.replace("Root");
           console.log(JSON.stringify(user));
           alert("Logged In Successfully!!!");
         }
@@ -87,6 +88,7 @@ export default function Login(props) {
   }
 
   return (
+    // <SafeAreaProvider>
     <Background>
       <View style={{ justifyContent:"center", alignItems: "center", width: "100%",  height:height*0.15,}}>
         <Text
@@ -142,17 +144,33 @@ export default function Login(props) {
             <Text
               style={{ color: darkGreen, fontWeight: "bold", fontSize: 16 }}
               onPress={forgotPassword}
-            >
-              Forgot Password ?
-            </Text>
+              testID='Forgot Password'
+            >Forgot Password ?</Text>
           </View>
 
-          <Btn
+          {/* <Btn
             textColor="white"
             bgColor={darkGreen}
             btnLabel="Login"
             Press={logInToAcc}
-          />
+            testID = "LoginBtn"
+          /> */}
+          <TouchableOpacity
+            onPress={logInToAcc}
+            style={{
+              backgroundColor: darkGreen,
+              borderRadius: 200,
+              alignItems: 'center',
+              width: 250,
+              paddingVertical: 5,
+              marginVertical: 10
+            }}
+            testID="LoginBtn"
+          >
+            <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold' }}>
+              Login
+            </Text>
+          </TouchableOpacity>
 
           <DialogInput isDialogVisible={dialogBoxVisibility}
               title={"Password Recovery"}
@@ -186,6 +204,7 @@ export default function Login(props) {
         </View>
       
     </Background>
+   
   );
 }
 

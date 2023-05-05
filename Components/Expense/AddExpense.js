@@ -1,6 +1,5 @@
 import React from 'react'
 import { View, Text, Dimensions} from 'react-native'
-import { darkGreen } from "./Constants";
 import Btn from "../Btn";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import ScanBills from './ScanBills';

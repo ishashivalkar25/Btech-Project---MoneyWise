@@ -29,12 +29,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
 import uploadImg from "../../Assets/uploadReceiptIcon.png";
 import Toast from "react-native-root-toast";
-import { darkGreen } from "../Constants";
+// import { darkGreen } from "../Constants";
 import * as ImagePicker from 'react-native-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Alert } from "react-native";
 
 const { width, height } = Dimensions.get("window");
+const darkGreen ="#006A42";
 
 export default function AddIncome(props) {
 

@@ -1,0 +1,84 @@
+bc92f0dede4b8a25de99b83f48e51a62
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _react = _interopRequireDefault(require("react"));
+var _reactNative = require("react-native");
+var _reactNativePaper = require("react-native-paper");
+var _jsxRuntime = require("react/jsx-runtime");
+var Help = function Help() {
+  return (0, _jsxRuntime.jsx)(_reactNative.View, {
+    style: {
+      width: "100%"
+    },
+    children: (0, _jsxRuntime.jsxs)(_reactNative.ImageBackground, {
+      source: require("../../Assets/Background.jpeg"),
+      style: {
+        height: "100%"
+      },
+      children: [(0, _jsxRuntime.jsx)(_reactNative.Text, {
+        style: styles.heading,
+        children: " Details about budgeting techniques "
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Title, {
+        style: styles.title,
+        children: "1. Envelop Method"
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Caption, {
+        style: styles.caption,
+        children: "       It is a budgeting technique where you divide your income into different categories and assign a specific amount of money for each category."
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Title, {
+        style: styles.title,
+        children: "2. Zero Based Budgeting"
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Caption, {
+        style: styles.caption,
+        children: "    It is a budgeting technique where every expense must be justified for each new period. This means that the budget starts from scratch, or zero, every time a new budgeting period begins, rather than taking the previous period's budget as the starting point.  "
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Title, {
+        style: styles.title,
+        children: "3. 50-30-20"
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Caption, {
+        style: styles.caption,
+        children: "      Under this technique, you divide your income into three categories:  "
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Caption, {
+        style: styles.caption,
+        children: "i) Needs (50%): This category includes expenses that are necessary for your survival, such as rent, utilities, food, transportation, and healthcare."
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Caption, {
+        style: styles.caption,
+        children: "ii) Wants (30%): This category includes discretionary expenses such as entertainment, dining out, travel, and shopping."
+      }), (0, _jsxRuntime.jsx)(_reactNativePaper.Caption, {
+        style: styles.caption,
+        children: "iii) Savings and Debt Repayment (20%): This category includes money that you set aside for savings, investments, and debt repayment."
+      })]
+    })
+  });
+};
+var styles = _reactNative.StyleSheet.create({
+  heading: {
+    fontSize: 20,
+    marginTop: 15,
+    fontWeight: 'bold',
+    color: 'white',
+    paddingLeft: 7,
+    fontStyle: 'italic'
+  },
+  title: {
+    fontSize: 17,
+    marginTop: 15,
+    fontWeight: 'bold',
+    color: 'white',
+    paddingLeft: 25
+  },
+  caption: {
+    fontSize: 15,
+    lineHeight: 14,
+    marginTop: 4,
+    color: 'white',
+    flexWrap: 'wrap',
+    paddingLeft: 45,
+    paddingRight: 25,
+    textAlign: 'justify'
+  }
+});
+var _default = Help;
+exports.default = _default;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfcmVhY3QiLCJfaW50ZXJvcFJlcXVpcmVEZWZhdWx0IiwicmVxdWlyZSIsIl9yZWFjdE5hdGl2ZSIsIl9yZWFjdE5hdGl2ZVBhcGVyIiwiX2pzeFJ1bnRpbWUiLCJIZWxwIiwianN4IiwiVmlldyIsInN0eWxlIiwid2lkdGgiLCJjaGlsZHJlbiIsImpzeHMiLCJJbWFnZUJhY2tncm91bmQiLCJzb3VyY2UiLCJoZWlnaHQiLCJUZXh0Iiwic3R5bGVzIiwiaGVhZGluZyIsIlRpdGxlIiwidGl0bGUiLCJDYXB0aW9uIiwiY2FwdGlvbiIsIlN0eWxlU2hlZXQiLCJjcmVhdGUiLCJmb250U2l6ZSIsIm1hcmdpblRvcCIsImZvbnRXZWlnaHQiLCJjb2xvciIsInBhZGRpbmdMZWZ0IiwiZm9udFN0eWxlIiwibGluZUhlaWdodCIsImZsZXhXcmFwIiwicGFkZGluZ1JpZ2h0IiwidGV4dEFsaWduIiwiX2RlZmF1bHQiLCJleHBvcnRzIiwiZGVmYXVsdCJdLCJzb3VyY2VzIjpbIkhlbHAuanMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFJlYWN0IGZyb20gJ3JlYWN0JztcclxuaW1wb3J0IHsgVGV4dCwgVmlldywgU3R5bGVTaGVldCwgSW1hZ2VCYWNrZ3JvdW5kIH0gZnJvbSAncmVhY3QtbmF0aXZlJztcclxuaW1wb3J0IHsgVGl0bGUsIENhcHRpb24gfSBmcm9tICdyZWFjdC1uYXRpdmUtcGFwZXInO1xyXG5cclxuY29uc3QgSGVscCA9ICgpID0+IHtcclxuICByZXR1cm4gKFxyXG4gICAgPFZpZXcgc3R5bGU9e3sgd2lkdGg6IFwiMTAwJVwiIH19PlxyXG4gICAgICA8SW1hZ2VCYWNrZ3JvdW5kXHJcbiAgICAgICAgc291cmNlPXtyZXF1aXJlKFwiLi4vLi4vQXNzZXRzL0JhY2tncm91bmQuanBlZ1wiKX1cclxuICAgICAgICBzdHlsZT17e1xyXG4gICAgICAgICAgaGVpZ2h0OiBcIjEwMCVcIixcclxuICAgICAgICB9fVxyXG4gICAgICA+XHJcbiAgICAgICAgPFRleHQgc3R5bGU9e3N0eWxlcy5oZWFkaW5nfT4gRGV0YWlscyBhYm91dCBidWRnZXRpbmcgdGVjaG5pcXVlcyA8L1RleHQ+XHJcblxyXG4gICAgICAgIDxUaXRsZSBzdHlsZT17c3R5bGVzLnRpdGxlfT4xLiBFbnZlbG9wIE1ldGhvZDwvVGl0bGU+XHJcbiAgICAgICAgPENhcHRpb24gc3R5bGU9e3N0eWxlcy5jYXB0aW9ufT4gICAgICAgSXQgaXMgYSBidWRnZXRpbmcgdGVjaG5pcXVlIHdoZXJlIHlvdSBkaXZpZGUgeW91ciBpbmNvbWUgaW50b1xyXG4gICAgICAgICAgZGlmZmVyZW50IGNhdGVnb3JpZXMgYW5kIGFzc2lnbiBhIHNwZWNpZmljIGFtb3VudCBvZiBtb25leSBmb3IgZWFjaCBjYXRlZ29yeS48L0NhcHRpb24+XHJcblxyXG4gICAgICAgIDxUaXRsZSBzdHlsZT17c3R5bGVzLnRpdGxlfT4yLiBaZXJvIEJhc2VkIEJ1ZGdldGluZzwvVGl0bGU+XHJcbiAgICAgICAgPENhcHRpb24gc3R5bGU9e3N0eWxlcy5jYXB0aW9ufT4gICAgSXQgaXMgYSBidWRnZXRpbmcgdGVjaG5pcXVlIHdoZXJlIGV2ZXJ5IGV4cGVuc2UgbXVzdCBiZSBqdXN0aWZpZWQgZm9yIGVhY2ggbmV3IHBlcmlvZC4gVGhpcyBtZWFucyB0aGF0IHRoZSBidWRnZXQgc3RhcnRzIGZyb20gc2NyYXRjaCwgb3IgemVybywgZXZlcnkgdGltZSBhIG5ldyBidWRnZXRpbmcgcGVyaW9kIGJlZ2lucyxcclxuICAgICAgICAgIHJhdGhlciB0aGFuIHRha2luZyB0aGUgcHJldmlvdXMgcGVyaW9kJ3MgYnVkZ2V0IGFzIHRoZSBzdGFydGluZyBwb2ludC4gIDwvQ2FwdGlvbj5cclxuXHJcbiAgICAgICAgPFRpdGxlIHN0eWxlPXtzdHlsZXMudGl0bGV9PjMuIDUwLTMwLTIwPC9UaXRsZT5cclxuICAgICAgICA8Q2FwdGlvbiBzdHlsZT17c3R5bGVzLmNhcHRpb259PiAgICAgIFVuZGVyIHRoaXMgdGVjaG5pcXVlLCB5b3UgZGl2aWRlIHlvdXIgaW5jb21lIGludG8gdGhyZWUgY2F0ZWdvcmllczogIDwvQ2FwdGlvbj5cclxuICAgICAgICA8Q2FwdGlvbiBzdHlsZT17c3R5bGVzLmNhcHRpb259PmkpIE5lZWRzICg1MCUpOiBUaGlzIGNhdGVnb3J5IGluY2x1ZGVzIGV4cGVuc2VzIHRoYXQgYXJlIG5lY2Vzc2FyeSBmb3IgeW91ciBzdXJ2aXZhbCwgc3VjaCBhcyByZW50LCB1dGlsaXRpZXMsIGZvb2QsIHRyYW5zcG9ydGF0aW9uLCBhbmQgaGVhbHRoY2FyZS48L0NhcHRpb24+XHJcbiAgICAgICAgPENhcHRpb24gc3R5bGU9e3N0eWxlcy5jYXB0aW9ufT5paSkgV2FudHMgKDMwJSk6IFRoaXMgY2F0ZWdvcnkgaW5jbHVkZXMgZGlzY3JldGlvbmFyeSBleHBlbnNlcyBzdWNoIGFzIGVudGVydGFpbm1lbnQsIGRpbmluZyBvdXQsIHRyYXZlbCwgYW5kIHNob3BwaW5nLjwvQ2FwdGlvbj5cclxuICAgICAgICA8Q2FwdGlvbiBzdHlsZT17c3R5bGVzLmNhcHRpb259PmlpaSkgU2F2aW5ncyBhbmQgRGVidCBSZXBheW1lbnQgKDIwJSk6IFRoaXMgY2F0ZWdvcnkgaW5jbHVkZXMgbW9uZXkgdGhhdCB5b3Ugc2V0IGFzaWRlIGZvciBzYXZpbmdzLCBpbnZlc3RtZW50cywgYW5kIGRlYnQgcmVwYXltZW50LjwvQ2FwdGlvbj5cclxuXHJcbiAgICAgIDwvSW1hZ2VCYWNrZ3JvdW5kPlxyXG4gICAgPC9WaWV3PlxyXG4gICk7XHJcbn07XHJcblxyXG5jb25zdCBzdHlsZXMgPSBTdHlsZVNoZWV0LmNyZWF0ZSh7XHJcbiAgaGVhZGluZzoge1xyXG4gICAgZm9udFNpemU6IDIwLFxyXG4gICAgbWFyZ2luVG9wOiAxNSxcclxuICAgIGZvbnRXZWlnaHQ6ICdib2xkJyxcclxuICAgIGNvbG9yOiAnd2hpdGUnLFxyXG4gICAgcGFkZGluZ0xlZnQ6IDcsXHJcbiAgICBmb250U3R5bGU6ICdpdGFsaWMnLFxyXG4gIH0sXHJcbiAgdGl0bGU6IHtcclxuICAgIGZvbnRTaXplOiAxNyxcclxuICAgIG1hcmdpblRvcDogMTUsXHJcbiAgICBmb250V2VpZ2h0OiAnYm9sZCcsXHJcbiAgICBjb2xvcjogJ3doaXRlJyxcclxuICAgIHBhZGRpbmdMZWZ0OiAyNSxcclxuICB9LFxyXG4gIGNhcHRpb246IHtcclxuICAgIGZvbnRTaXplOiAxNSxcclxuICAgIGxpbmVIZWlnaHQ6IDE0LFxyXG4gICAgbWFyZ2luVG9wOiA0LFxyXG4gICAgY29sb3I6ICd3aGl0ZScsXHJcbiAgICBmbGV4V3JhcDogJ3dyYXAnLFxyXG4gICAgcGFkZGluZ0xlZnQ6IDQ1LFxyXG4gICAgcGFkZGluZ1JpZ2h0IDogMjUsXHJcbiAgICB0ZXh0QWxpZ246ICdqdXN0aWZ5J1xyXG4gIH0sXHJcblxyXG59KTtcclxuXHJcbmV4cG9ydCBkZWZhdWx0IEhlbHA7Il0sIm1hcHBpbmdzIjoiOzs7OztBQUFBLElBQUFBLE1BQUEsR0FBQUMsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFDLFlBQUEsR0FBQUQsT0FBQTtBQUNBLElBQUFFLGlCQUFBLEdBQUFGLE9BQUE7QUFBb0QsSUFBQUcsV0FBQSxHQUFBSCxPQUFBO0FBRXBELElBQU1JLElBQUksR0FBRyxTQUFQQSxJQUFJQSxDQUFBLEVBQVM7RUFDakIsT0FDRSxJQUFBRCxXQUFBLENBQUFFLEdBQUEsRUFBQ0osWUFBQSxDQUFBSyxJQUFJO0lBQUNDLEtBQUssRUFBRTtNQUFFQyxLQUFLLEVBQUU7SUFBTyxDQUFFO0lBQUFDLFFBQUEsRUFDN0IsSUFBQU4sV0FBQSxDQUFBTyxJQUFBLEVBQUNULFlBQUEsQ0FBQVUsZUFBZTtNQUNkQyxNQUFNLEVBQUVaLE9BQU8sQ0FBQyw4QkFBOEIsQ0FBRTtNQUNoRE8sS0FBSyxFQUFFO1FBQ0xNLE1BQU0sRUFBRTtNQUNWLENBQUU7TUFBQUosUUFBQSxHQUVGLElBQUFOLFdBQUEsQ0FBQUUsR0FBQSxFQUFDSixZQUFBLENBQUFhLElBQUk7UUFBQ1AsS0FBSyxFQUFFUSxNQUFNLENBQUNDLE9BQVE7UUFBQVAs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

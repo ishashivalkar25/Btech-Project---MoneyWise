@@ -1,0 +1,18 @@
+d7b9c45e4947bf9bafa22b77b6d30d32
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _codegenNativeComponent = _interopRequireDefault(require("react-native/Libraries/Utilities/codegenNativeComponent"));
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+var _default = (0, _codegenNativeComponent.default)('RNSVGSvgViewAndroid', {
+  excludedPlatforms: ['iOS']
+});
+exports.default = _default;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfY29kZWdlbk5hdGl2ZUNvbXBvbmVudCIsIl9pbnRlcm9wUmVxdWlyZURlZmF1bHQiLCJyZXF1aXJlIiwib2JqIiwiX19lc01vZHVsZSIsImRlZmF1bHQiLCJfZGVmYXVsdCIsImV4Y2x1ZGVkUGxhdGZvcm1zIiwiZXhwb3J0cyJdLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9mYWJyaWMvQW5kcm9pZFN2Z1ZpZXdOYXRpdmVDb21wb25lbnQudHMiXSwic291cmNlc0NvbnRlbnQiOltudWxsXSwibWFwcGluZ3MiOiI7Ozs7OztBQUFBLElBQUFBLHVCQUFBLEdBQUFDLHNCQUFBLENBQUFDLE9BQUE7QUFBNkYsU0FBQUQsdUJBQUFFLEdBQUE7RUFBQSxPQUFBQSxHQUFBLElBQUFBLEdBQUEsQ0FBQUMsVUFBQSxHQUFBRCxHQUFBO0lBQUFFLE9BQUEsRUFBQUY7RUFBQTtBQUFBO0FBQUEsSUFBQUcsUUFBQSxHQTBFOUUsSUFBQU4sdUJBQUEsQ0FBQUssT0FBc0IsRUFBYyxxQkFBcUIsRUFBRTtFQUN4RUUsaUJBQWlCLEVBQUUsQ0FBQyxLQUFLO0FBQzNCLENBQUMsQ0FBQztBQUFBQyxPQUFBLENBQUFILE9BQUEsR0FBQUMsUUFBQSJ9

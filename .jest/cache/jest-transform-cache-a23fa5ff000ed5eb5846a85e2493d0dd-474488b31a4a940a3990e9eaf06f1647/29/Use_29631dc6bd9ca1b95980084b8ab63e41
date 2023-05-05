@@ -1,0 +1,89 @@
+c87249f749802c6532296e1242e96d42
+"use strict";
+
+var _interopRequireDefault2 = require("@babel/runtime/helpers/interopRequireDefault");
+var _classCallCheck2 = _interopRequireDefault2(require("@babel/runtime/helpers/classCallCheck"));
+var _createClass2 = _interopRequireDefault2(require("@babel/runtime/helpers/createClass"));
+var _inherits2 = _interopRequireDefault2(require("@babel/runtime/helpers/inherits"));
+var _possibleConstructorReturn2 = _interopRequireDefault2(require("@babel/runtime/helpers/possibleConstructorReturn"));
+var _getPrototypeOf2 = _interopRequireDefault2(require("@babel/runtime/helpers/getPrototypeOf"));
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2.default)(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2.default)(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2.default)(this, result); }; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _react = _interopRequireDefault(require("react"));
+var _extractProps = require("../lib/extract/extractProps");
+var _util = require("../lib/util");
+var _Shape = _interopRequireDefault(require("./Shape"));
+var _UseNativeComponent = _interopRequireDefault(require("../fabric/UseNativeComponent"));
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+function _extends() {
+  _extends = Object.assign ? Object.assign.bind() : function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  };
+  return _extends.apply(this, arguments);
+}
+var Use = function (_Shape$default) {
+  (0, _inherits2.default)(Use, _Shape$default);
+  var _super = _createSuper(Use);
+  function Use() {
+    (0, _classCallCheck2.default)(this, Use);
+    return _super.apply(this, arguments);
+  }
+  (0, _createClass2.default)(Use, [{
+    key: "render",
+    value: function render() {
+      var _this = this;
+      var props = this.props;
+      var children = props.children,
+        x = props.x,
+        y = props.y,
+        width = props.width,
+        height = props.height,
+        xlinkHref = props.xlinkHref,
+        _props$href = props.href,
+        href = _props$href === void 0 ? xlinkHref : _props$href;
+      var matched = href && href.match(_util.idPattern);
+      var match = matched && matched[1];
+      if (!match) {
+        console.warn('Invalid `href` prop for `Use` element, expected a href like "#id", but got: "' + href + '"');
+      }
+      var useProps = (0, _extractProps.stringifyPropsForFabric)({
+        href: match,
+        x: x,
+        y: y,
+        width: width,
+        height: height
+      });
+      return _react.default.createElement(_UseNativeComponent.default, _extends({
+        ref: function ref(_ref) {
+          return _this.refMethod(_ref);
+        }
+      }, (0, _extractProps.withoutXY)(this, props), useProps), children);
+    }
+  }]);
+  return Use;
+}(_Shape.default);
+Use.displayName = 'Use';
+Use.defaultProps = {
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0
+};
+exports.default = Use;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfcmVhY3QiLCJfaW50ZXJvcFJlcXVpcmVEZWZhdWx0IiwicmVxdWlyZSIsIl9leHRyYWN0UHJvcHMiLCJfdXRpbCIsIl9TaGFwZSIsIl9Vc2VOYXRpdmVDb21wb25lbnQiLCJvYmoiLCJfX2VzTW9kdWxlIiwiZGVmYXVsdCIsIl9leHRlbmRzIiwiT2JqZWN0IiwiYXNzaWduIiwiYmluZCIsInRhcmdldCIsImkiLCJhcmd1bWVudHMiLCJsZW5ndGgiLCJzb3VyY2UiLCJrZXkiLCJwcm90b3R5cGUiLCJoYXNPd25Qcm9wZXJ0eSIsImNhbGwiLCJhcHBseSIsIlVzZSIsIl9TaGFwZSRkZWZhdWx0IiwiX2luaGVyaXRzMiIsIl9zdXBlciIsIl9jcmVhdGVTdXBlciIsIl9jbGFzc0NhbGxDaGVjazIiLCJfY3JlYXRlQ2xhc3MyIiwidmFsdWUiLCJyZW5kZXIiLCJfdGhpcyIsInByb3BzIiwiY2hpbGRyZW4iLCJ4IiwieSIsIndpZHRoIiwiaGVpZ2h0IiwieGxpbmtIcmVmIiwiX3Byb3BzJGhyZWYiLCJocmVmIiwibWF0Y2hlZCIsIm1hdGNoIiwiaWRQYXR0ZXJuIiwiY29uc29sZSIsIndhcm4iLCJ1c2VQcm9wcyIsInN0cmluZ2lmeVByb3BzRm9yRmFicmljIiwiY3JlYXRlRWxlbWVudCIsInJlZiIsInJlZk1ldGhvZCIsIndpdGhvdXRYWSIsImRpc3BsYXlOYW1lIiwiZGVmYXVsdFByb3BzIiwiZXhwb3J0cyJdLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9lbGVtZW50cy9Vc2UudHN4Il0sInNvdXJjZXNDb250ZW50IjpbbnVsbF0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7OztBQUNBLElBQUFBLE1BQUEsR0FBQUMsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFDLGFBQUEsR0FBQUQsT0FBQTtBQUtBLElBQUFFLEtBQUEsR0FBQUYsT0FBQTtBQUNBLElBQUFHLE1BQUEsR0FBQUosc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFJLG1CQUFBLEdBQUFMLHNCQUFB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

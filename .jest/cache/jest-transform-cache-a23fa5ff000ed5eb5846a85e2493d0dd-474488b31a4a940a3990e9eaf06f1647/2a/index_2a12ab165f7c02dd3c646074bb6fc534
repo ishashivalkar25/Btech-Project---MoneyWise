@@ -1,0 +1,166 @@
+b61a8acefb0da6c80742ef0061b89410
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "RNSVGCircle", {
+  enumerable: true,
+  get: function get() {
+    return _CircleNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGClipPath", {
+  enumerable: true,
+  get: function get() {
+    return _ClipPathNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGDefs", {
+  enumerable: true,
+  get: function get() {
+    return _DefsNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGEllipse", {
+  enumerable: true,
+  get: function get() {
+    return _EllipseNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGForeignObject", {
+  enumerable: true,
+  get: function get() {
+    return _ForeignObjectNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGGroup", {
+  enumerable: true,
+  get: function get() {
+    return _GroupNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGImage", {
+  enumerable: true,
+  get: function get() {
+    return _ImageNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGLine", {
+  enumerable: true,
+  get: function get() {
+    return _LineNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGLinearGradient", {
+  enumerable: true,
+  get: function get() {
+    return _LinearGradientNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGMarker", {
+  enumerable: true,
+  get: function get() {
+    return _MarkerNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGMask", {
+  enumerable: true,
+  get: function get() {
+    return _MaskNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGPath", {
+  enumerable: true,
+  get: function get() {
+    return _PathNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGPattern", {
+  enumerable: true,
+  get: function get() {
+    return _PatternNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGRadialGradient", {
+  enumerable: true,
+  get: function get() {
+    return _RadialGradientNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGRect", {
+  enumerable: true,
+  get: function get() {
+    return _RectNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGSvgAndroid", {
+  enumerable: true,
+  get: function get() {
+    return _AndroidSvgViewNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGSvgIOS", {
+  enumerable: true,
+  get: function get() {
+    return _IOSSvgViewNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGSymbol", {
+  enumerable: true,
+  get: function get() {
+    return _SymbolNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGTSpan", {
+  enumerable: true,
+  get: function get() {
+    return _TSpanNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGText", {
+  enumerable: true,
+  get: function get() {
+    return _TextNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGTextPath", {
+  enumerable: true,
+  get: function get() {
+    return _TextPathNativeComponent.default;
+  }
+});
+Object.defineProperty(exports, "RNSVGUse", {
+  enumerable: true,
+  get: function get() {
+    return _UseNativeComponent.default;
+  }
+});
+var _CircleNativeComponent = _interopRequireDefault(require("./CircleNativeComponent"));
+var _ClipPathNativeComponent = _interopRequireDefault(require("./ClipPathNativeComponent"));
+var _DefsNativeComponent = _interopRequireDefault(require("./DefsNativeComponent"));
+var _EllipseNativeComponent = _interopRequireDefault(require("./EllipseNativeComponent"));
+var _ForeignObjectNativeComponent = _interopRequireDefault(require("./ForeignObjectNativeComponent"));
+var _GroupNativeComponent = _interopRequireDefault(require("./GroupNativeComponent"));
+var _ImageNativeComponent = _interopRequireDefault(require("./ImageNativeComponent"));
+var _LinearGradientNativeComponent = _interopRequireDefault(require("./LinearGradientNativeComponent"));
+var _LineNativeComponent = _interopRequireDefault(require("./LineNativeComponent"));
+var _MarkerNativeComponent = _interopRequireDefault(require("./MarkerNativeComponent"));
+var _MaskNativeComponent = _interopRequireDefault(require("./MaskNativeComponent"));
+var _PathNativeComponent = _interopRequireDefault(require("./PathNativeComponent"));
+var _PatternNativeComponent = _interopRequireDefault(require("./PatternNativeComponent"));
+var _RadialGradientNativeComponent = _interopRequireDefault(require("./RadialGradientNativeComponent"));
+var _RectNativeComponent = _interopRequireDefault(require("./RectNativeComponent"));
+var _AndroidSvgViewNativeComponent = _interopRequireDefault(require("./AndroidSvgViewNativeComponent"));
+var _IOSSvgViewNativeComponent = _interopRequireDefault(require("./IOSSvgViewNativeComponent"));
+var _SymbolNativeComponent = _interopRequireDefault(require("./SymbolNativeComponent"));
+var _TextNativeComponent = _interopRequireDefault(require("./TextNativeComponent"));
+var _TextPathNativeComponent = _interopRequireDefault(require("./TextPathNativeComponent"));
+var _TSpanNativeComponent = _interopRequireDefault(require("./TSpanNativeComponent"));
+var _UseNativeComponent = _interopRequireDefault(require("./UseNativeComponent"));
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfQ2lyY2xlTmF0aXZlQ29tcG9uZW50IiwiX2ludGVyb3BSZXF1aXJlRGVmYXVsdCIsInJlcXVpcmUiLCJfQ2xpcFBhdGhOYXRpdmVDb21wb25lbnQiLCJfRGVmc05hdGl2ZUNvbXBvbmVudCIsIl9FbGxpcHNlTmF0aXZlQ29tcG9uZW50IiwiX0ZvcmVpZ25PYmplY3ROYXRpdmVDb21wb25lbnQiLCJfR3JvdXBOYXRpdmVDb21wb25lbnQiLCJfSW1hZ2VOYXRpdmVDb21wb25lbnQiLCJfTGluZWFyR3JhZGllbnROYXRpdmVDb21wb25lbnQiLCJfTGluZU5hdGl2ZUNvbXBvbmVudCIsIl9NYXJrZXJOYXRpdmVDb21wb25lbnQiLCJfTWFza05hdGl2ZUNvbXBvbmVudCIsIl9QYXRoTmF0aXZlQ29tcG9uZW50IiwiX1BhdHRlcm5OYXRpdmVDb21wb25lbnQiLCJfUmFkaWFsR3JhZGllbnROYXRpdmVDb21wb25lbnQiLCJfUmVjdE5hdGl2ZUNvbXBvbmVudCIsIl9BbmRyb2lkU3ZnVmlld05hdGl2ZUNvbXBvbmVudCIsIl9JT1NTdmdWaWV3TmF0aXZlQ29tcG9uZW50IiwiX1N5bWJvbE5hdGl2ZUNvbXBvbmVudCIsIl9UZXh0TmF0aXZlQ29tcG9uZW50IiwiX1RleHRQYXRoTmF0aXZlQ29tcG9uZW50IiwiX1RTcGFuTmF0aXZlQ29tcG9uZW50IiwiX1VzZU5hdGl2ZUNvbXBvbmVudCIsIm9iaiIsIl9fZXNNb2R1bGUiLCJkZWZhdWx0Il0sInNvdXJjZXMiOlsiLi4vLi4vLi4vc3JjL2ZhYnJpYy9pbmRleC50cyJdLCJzb3VyY2VzQ29udGVudCI6W251bGxdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxJQUFBQSxzQkFBQSxHQUFBQyxzQkFBQSxDQUFBQyxPQUFBO0FBQ0EsSUFBQUMsd0JBQUEsR0FBQUYsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFFLG9CQUFBLEdBQUFILHNCQUFBLENBQUFDLE9BQUE7QUFDQSxJQUFBRyx1QkFBQSxHQUFBSixzQkFBQSxDQUFBQyxPQUFBO0FBQ0EsSUFBQUksNkJBQUEsR0FBQUwsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFLLHFCQUFBLEdBQUFOLHNCQUFBLENBQUFDLE9BQUE7QUFDQSxJQUFBTSxxQkFBQSxHQUFBUCxzQkFBQSxDQUFBQyxPQUFBO0FBQ0EsSUFBQU8sOEJBQUEsR0FBQVIsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFRLG9CQUFBLEdBQUFULHNCQUFBLENBQUFDLE9BQUE7QUFDQSxJQUFBUyxzQkFBQSxHQUFBVixzQkFBQSxDQUFBQyxPQUFBO0FBQ0EsSUFBQVUsb0JBQUEsR0FBQVgsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFXLG9CQUFBLEdBQUFaLHNCQUFBLENBQUFDLE9BQUE7QUFDQSxJQUFBWSx1QkFBQSxHQUFBYixzQkFBQSxDQUFBQyxPQUFBO0FBQ0EsSUFBQWEsOEJBQUEsR0FBQWQsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFjLG9CQUFBLEdBQUFmLHNCQUFBLENBQUFDLE9BQUE7QUFDQSxJQUFBZSw4QkFBQSxHQUFBaEIsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFnQiwwQkFBQSxHQUFBakIsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFpQixzQkFBQSxHQUFBbEIsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFrQixvQkFBQSxHQUFBbkIsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFtQix3QkFBQSxHQUFBcEIsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFvQixxQkFBQSxHQUFBckIsc0JBQUEsQ0FBQUMsT0FBQTtBQUNBLElBQUFxQixtQkFBQSxHQUFBdEIsc0JBQUEsQ0FBQUMsT0FBQTtBQUE0QyxTQUFBRCx1QkFBQXVCLEdBQUE7RUFBQSxPQUFBQSxHQUFBLElBQUFBLEdBQUEsQ0FBQUMsVUFBQSxHQUFBRCxHQUFBO0lBQUFFLE9BQUEsRUFBQUY7RUFBQTtBQUFBIn0=

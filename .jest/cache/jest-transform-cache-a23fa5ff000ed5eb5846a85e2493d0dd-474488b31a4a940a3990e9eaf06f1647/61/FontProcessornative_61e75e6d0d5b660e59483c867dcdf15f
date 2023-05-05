@@ -1,0 +1,22 @@
+c32b51d77cc3456eff4f28eb7ff71fa3
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.processFonts = processFonts;
+var _ReactNativeStyleAttributes = _interopRequireDefault(require("react-native/Libraries/Components/View/ReactNativeStyleAttributes"));
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+function processFonts(fontFamilies) {
+  var _ReactNativeStyleAttr;
+  var fontFamilyProcessor = (_ReactNativeStyleAttr = _ReactNativeStyleAttributes.default.fontFamily) === null || _ReactNativeStyleAttr === void 0 ? void 0 : _ReactNativeStyleAttr.process;
+  if (typeof fontFamilyProcessor === 'function') {
+    return fontFamilies.map(fontFamilyProcessor);
+  }
+  return fontFamilies;
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfUmVhY3ROYXRpdmVTdHlsZUF0dHJpYnV0ZXMiLCJfaW50ZXJvcFJlcXVpcmVEZWZhdWx0IiwicmVxdWlyZSIsIm9iaiIsIl9fZXNNb2R1bGUiLCJkZWZhdWx0IiwicHJvY2Vzc0ZvbnRzIiwiZm9udEZhbWlsaWVzIiwiX1JlYWN0TmF0aXZlU3R5bGVBdHRyIiwiZm9udEZhbWlseVByb2Nlc3NvciIsImZvbnRGYW1pbHkiLCJwcm9jZXNzIiwibWFwIl0sInNvdXJjZXMiOlsiLi4vLi4vLi4vc3JjL3ZpZXdzL0ZvbnRQcm9jZXNzb3IubmF0aXZlLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6W251bGxdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQ0EsSUFBQUEsMkJBQUEsR0FBQUMsc0JBQUEsQ0FBQUMsT0FBQTtBQUEyRyxTQUFBRCx1QkFBQUUsR0FBQTtFQUFBLE9BQUFBLEdBQUEsSUFBQUEsR0FBQSxDQUFBQyxVQUFBLEdBQUFELEdBQUE7SUFBQUUsT0FBQSxFQUFBRjtFQUFBO0FBQUE7QUFFcEcsU0FBU0csWUFBWUEsQ0FDMUJDLFlBQW9DLEVBQ1o7RUFBQSxJQUFBQyxxQkFBQTtFQUV4QixJQUFNQyxtQkFBbUIsSUFBQUQscUJBQUEsR0FBR1IsMkJBQUEsQ0FBQUssT0FBMEIsQ0FBQ0ssVUFBVSxjQUFBRixxQkFBQSx1QkFBckNBLHFCQUFBLENBQXVDRyxPQUFPO0VBQzFFLElBQUksT0FBT0YsbUJBQW1CLEtBQUssVUFBVSxFQUFFO0lBQzdDLE9BQU9GLFlBQVksQ0FBQ0ssR0FBRyxDQUFDSCxtQkFBbUIsQ0FBQztFQUM5QztFQUNBLE9BQU9GLFlBQVk7QUFDckIifQ==
