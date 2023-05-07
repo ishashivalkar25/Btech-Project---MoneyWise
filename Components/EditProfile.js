@@ -24,6 +24,7 @@ import {
 } from '../Firebase/config';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { green } from './Constants';
 
 const { width, height } = Dimensions.get('window');
 const EditProfile = ({ navigation, route}) => {
@@ -257,7 +258,7 @@ const EditProfile = ({ navigation, route}) => {
 
             <TouchableOpacity
               style={[{
-                backgroundColor: '#006A42',
+                backgroundColor: green,
                 borderRadius: 200,
                 alignItems: 'center',
                 width: 250,
@@ -331,7 +332,7 @@ const styles = StyleSheet.create({
   },
 
   textInput: {
-    color: '#006A42',
+    color: green,
     fontSize: 15,
     padding: 0,
     margin: 0,

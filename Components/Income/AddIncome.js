@@ -405,7 +405,7 @@ export default function AddIncome(props) {
                                 alignItems: 'center',
                                 width: 250,
                                 paddingVertical: 5,
-                                marginVertical: 10,
+                                marginVertical: 20,
                                 alignSelf: 'center',
                             }}>
                             <Text style={{ color: "white", fontSize: 20, fontWeight: 'bold', margin: 0 }}> Save </Text>
@@ -423,14 +423,15 @@ const styles = StyleSheet.create({
     container: {
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
-        height: height * 0.8,
+        height: height * 0.85,
         width: width,
-        backgroundColor: "#fff",
+        backgroundColor:"#fff",
         marginTop: 5,
+        padding : 10
     },
 
     mainContainer: {
-        padding: 25,
+        padding: 15,
         flex: 1,
         height: "100%",
         justifyContent: "space-between"
@@ -439,7 +440,7 @@ const styles = StyleSheet.create({
     container1: {
         width: "100%",
         alignSelf: "center",
-        borderRadius: 15,
+        borderRadius: 10,
         shadowOpacity: 0.5,
         shadowColor: "black",
         shadowOffset: {
@@ -448,13 +449,13 @@ const styles = StyleSheet.create({
         },
         elevation: 5,
         backgroundColor: "white",
-        marginTop: 20,
+        marginTop: 10,
     },
 
     container2: {
         width: "100%",
         alignSelf: "center",
-        borderRadius: 15,
+        borderRadius: 10,
         shadowOpacity: 0.5,
         shadowColor: "black",
         shadowOffset: {
@@ -464,7 +465,7 @@ const styles = StyleSheet.create({
 
         elevation: 5,
         backgroundColor: "white",
-        marginTop: 30,
+        marginTop: 10,
         paddingTop: 5,
         paddingLeft: 20,
         paddingRight: 20,
@@ -489,10 +490,12 @@ const styles = StyleSheet.create({
 
     Title: {
         color: "white",
-        fontSize: 50,
+        fontSize: 35,
         fontWeight: "bold",
         marginVertical: 20,
         alignSelf: "center",
+        height: 0.15 * height,
+        textAlignVertical:"center"
     },
 
     inputPair: {

@@ -11,10 +11,10 @@ export default function MyPieChart(props) {
         var pieData = [];
         console.log(props.data, "*******************123456***************" );
 
-        const r = 170;
-        const g = 0;
+        const r = 100;
+        const g = 87;
         const b = 0;
-        var i = 1;
+        var i = 11;
         var l = props.data.length;
         props.data.forEach((item)=>{
 

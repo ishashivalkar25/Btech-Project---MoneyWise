@@ -17,6 +17,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Animatable from 'react-native-animatable';
 import { NavigationContainer } from '@react-navigation/native';
+import { green } from './Constants';
 
 const { width, height } = Dimensions.get('window');
 const ProfileScreen = ({ navigation }) => {
@@ -106,7 +107,7 @@ const ProfileScreen = ({ navigation }) => {
 
 			<Animatable.View animation="fadeInUpBig" style={styles.container}>
 				<View style={[styles.menuWrapper, styles.divider]}>
-					<Text style={[{ color: "#006A42", marginLeft: 20, fontWeight: 'bold', fontSize: 17 }]}>Personal Details</Text>
+					<Text style={[{ color: green, marginLeft: 20, fontWeight: 'bold', fontSize: 17 }]}>Personal Details</Text>
 					<View style={styles.menuItem}>
 						<Image source={require("../Assets/profile1.png")} style={styles.menuItemImg} />
 						<Text style={styles.menuItemText}>
@@ -131,7 +132,7 @@ const ProfileScreen = ({ navigation }) => {
 					</View>
 				</View>
 
-				<Text style={{ color: "#006A42", marginLeft: 20, fontWeight: 'bold', fontSize: 17, marginTop: 20 }}>Bank Details</Text>
+				<Text style={{ color: green, marginLeft: 20, fontWeight: 'bold', fontSize: 17, marginTop: 20 }}>Bank Details</Text>
 				<View style={styles.bankDetailsContainer}>
 					<Text style={styles.bankText} >Bank Name :</Text>
 					<Text style={styles.bankData}>{bankName}</Text>

@@ -1,7 +1,6 @@
 import React, {useRef, useEffect, Component} from 'react';
-import { Animated, Platform, StyleSheet, View, Text } from 'react-native';
+import { Animated, Platform, StyleSheet, View, Text, Image } from 'react-native';
 import LottieView from 'lottie-react-native';
-import Fading from './Fading';
 import { auth } from '../../Firebase/config'
 
 const FadeInView = (props) => {
@@ -69,7 +68,9 @@ export default function SplashScreen({navigation}) {
                                     style={styles.animation}
                                 />
                             </View>
-                            neyWise
+                            ney<Image
+                            source={require('../../Assets/W2.png')}
+                            style={{width: 38, height: 38,position: 'relative'}}/>ise
                         </Text>
                     </FadeInView>
                 </View>

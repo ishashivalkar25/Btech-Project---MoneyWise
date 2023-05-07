@@ -6,7 +6,7 @@ import {
 	ContributionGraph,
 	StackedBarChart,
 } from "react-native-chart-kit";
-import { Dimensions, StyleSheet, TouchableOpacity, ScrollView} from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { View, Text, Button } from "react-native";
 import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context";
 import Background from "../Background";
@@ -35,13 +35,13 @@ const Visualisation = () => {
 
 	const showPicker = React.useCallback((value) => setShow(value), []);
 	const onValueChange = React.useCallback(
-        (event, newDate) => {
-            const selectedDate = newDate || date;
-            showPicker(false);
-            setDate(selectedDate);
-        },
-        [date, showPicker],
-    );
+		(event, newDate) => {
+			const selectedDate = newDate || date;
+			showPicker(false);
+			setDate(selectedDate);
+		},
+		[date, showPicker],
+	);
 
 	React.useEffect(() => {
 		fetchIncomeRecords();
@@ -131,7 +131,7 @@ const Visualisation = () => {
 			const expMonth = expDate.getMonth()
 			const expYear = expDate.getFullYear();
 			// const currDate = new Date()
-			
+
 
 			if (!dates.includes(tempDate) && expMonth == currMonth && expYear == currYear) {
 				dates.push(tempDate);
@@ -187,12 +187,12 @@ const Visualisation = () => {
 			const incMonth = incDate.getMonth()
 			const incYear = incDate.getFullYear();
 
-			if (!dates.includes(tempDate) && incMonth == currMonth && incYear==currYear) {
+			if (!dates.includes(tempDate) && incMonth == currMonth && incYear == currYear) {
 				dates.push(tempDate);
 				const data = { "name": tempDate, "amount": Number(incomeRecord.incAmount) };
 				dateWiseAmt.push(data);
 			}
-			else if (incMonth == currMonth && incYear==currYear) {
+			else if (incMonth == currMonth && incYear == currYear) {
 				dateWiseAmt.forEach((item) => {
 					console.log(item.name, tempDate)
 					if (item.name == tempDate) {
@@ -247,17 +247,12 @@ const Visualisation = () => {
 					)}
 				</View>
 
-				{/* <View style={styles.monthContainer}>
-				
-				<Text style={styles.month}>Month : {months[new Date().getMonth()]}</Text>
-				</View> */}
-				 
-					<View style={styles.chartContainer}>
-						<Text
-							style={{
-								color: green, fontSize: 20, fontWeight: "bold", padding: 10,
-							}}>Income Line Chart</Text>
-						<ScrollView horizontal={true} contentContainerStyle={styles.displayChart}>
+				<View style={styles.chartContainer}>
+					<Text
+						style={{
+							color: green, fontSize: 20, fontWeight: "bold", padding: 10,
+						}}>Income Line Chart</Text>
+					<ScrollView horizontal={true} contentContainerStyle={styles.displayChart}>
 						<LineChart
 							data={{
 								labels: (incLabels.length == 0) ? [0] : incLabels,
@@ -267,7 +262,7 @@ const Visualisation = () => {
 									},
 								],
 							}}
-							width={ Math.max(Dimensions.get("window").width * incData.length * 0.1 , Dimensions.get("window").width * 0.93)} // from react-native
+							width={Math.max(Dimensions.get("window").width * incData.length * 0.1, Dimensions.get("window").width * 0.93)} // from react-native
 							height={250}
 							yAxisLabel="Rs "
 							yAxisInterval={1} // optional, defaults to 1
@@ -294,14 +289,14 @@ const Visualisation = () => {
 								borderRadius: 16,
 							}}
 						/>
-						</ScrollView>
-						
-					</View>
-				
+					</ScrollView>
+
+				</View>
+
 				<View style={styles.chartContainer}>
 					<Text
 						style={{
-							color: green, fontSize: 20, fontWeight: "bold", padding : 10, 
+							color: green, fontSize: 20, fontWeight: "bold", padding: 10,
 						}}>Expense Line Chart</Text>
 					<ScrollView horizontal={true} contentContainerStyle={styles.displayChart}>
 						<LineChart
@@ -342,7 +337,7 @@ const Visualisation = () => {
 							}}
 						/>
 					</ScrollView>
-					
+
 				</View>
 
 
@@ -357,46 +352,46 @@ const styles = StyleSheet.create({
 
 	chartContainer: {
 		backgroundColor: 'rgba(255,255,255,0.9)',
-		borderRadius : 20,
-		padding : 1,
-		alignItems : 'center',
-		marginVertical:10,
-		width : '100%',
-		paddingHorizontal : 10
+		borderRadius: 20,
+		padding: 1,
+		alignItems: 'center',
+		marginVertical: 10,
+		width: '100%',
+		paddingHorizontal: 10
 	},
 	displayChart: {
-		borderRadius : 20,
+		borderRadius: 20,
 	},
-	monthContainer : {
-		borderRadius : 20,
-		padding : 5,
-		marginVertical : 5,
+	monthContainer: {
+		borderRadius: 20,
+		padding: 5,
+		marginVertical: 5,
 	},
-	 month : { 
-		color: "white", 
-		fontSize: 25, 
-		fontWeight: "bold", 
-		textAlign: "center" ,
-		textDecorationLine : 'underline',
+	month: {
+		color: "white",
+		fontSize: 25,
+		fontWeight: "bold",
+		textAlign: "center",
+		textDecorationLine: 'underline',
 	},
 	time: {
-        padding: 4,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    monthYear: {
-        width: '50%',
-        borderRadius: 10,
-        paddingHorizontal: 10,
-        height: 43,
-        flexDirection: 'row',
-        justifyContent: "center",
-        alignItems: "center",
+		padding: 4,
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+	},
+	monthYear: {
+		width: '50%',
+		borderRadius: 10,
+		paddingHorizontal: 10,
+		height: 43,
+		flexDirection: 'row',
+		justifyContent: "center",
+		alignItems: "center",
 		backgroundColor: 'rgba(255,255,255,0.9)',
-    },
-    monthYearText: {
-        textAlign: "center",
-		fontWeight:'bold'
-    },
-   
+	},
+	monthYearText: {
+		textAlign: "center",
+		fontWeight: 'bold'
+	},
+
 })

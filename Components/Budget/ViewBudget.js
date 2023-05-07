@@ -32,6 +32,7 @@ import {
 import { useNavigation } from '@react-navigation/core';
 import SetBudget from './SetBudget';
 import MonthPicker from 'react-native-month-year-picker';
+import { green } from '../Constants';
 // import CircularProgress from 'react-native-circular-progress-indicator';
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
@@ -145,17 +146,17 @@ export default function ViewBudget({ route, navigation }) {
     );
 
     return (
-        <SafeAreaView>
+        <SafeAreaView >
             <ImageBackground
                 source={require("../../Assets/Background.jpg")}
                 style={{
                     height: "100%",
                 }}
             >
-                <View style={styles.header}>
                     <View style={styles.time}>
                         <TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
                             <Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
+                            <Image source={require('../../Assets/calendar.png')} style={{ width: 18, height: 18, marginLeft:40, }} />
                         </TouchableOpacity>
                         {show && (
                             <MonthPicker
@@ -168,16 +169,31 @@ export default function ViewBudget({ route, navigation }) {
                         )}
                     </View>
 
-                    <Text style={styles.headerText}>Budgeting Method : {budget.method}</Text>
+                <View style={{
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}>
+                    <View style={styles.monthlyInc}>
+                        <View style={styles.IncMethod}>
+                            <Text style={styles.headerText}>Budgeting Method : </Text>
+                            <Text style={styles.monthlyIncText}>{budget.method}</Text>
+                        </View>
+                        <View style={styles.IncMethod}>
+                            <Text style={styles.headerText}>Monthly Income : </Text>
+                            <Text style={styles.monthlyIncText}>{budget.monthlyInc}</Text>
+                        </View>
+                    </View>
                 </View>
 
-                <View style={styles.monthlyInc}>
-                    <Text style={styles.monthlyIncText}>Monthly Income : {budget.monthlyInc}</Text>
-                </View>
                 <View style={styles.categoryWiseBudget}>
                     {budget.method === '50-30-20' &&
-                        <ScrollView style={{height:"80%"}}>
-                            <FlatList
+                        <FlatList
+                        data={[]}
+                        renderItem={null}
+                        ListHeaderComponent={() => (
+                            <View>
+                              <FlatList
                                 data={budget.budget.needs}
                                 ListHeaderComponent={
                                     <View style={styles.categoryWiseBudgetTitle}>
@@ -311,7 +327,11 @@ export default function ViewBudget({ route, navigation }) {
                                 }
                             // extraData={isBudgetChanged}
                             />
-                        </ScrollView>
+                            </View>
+                        )}
+                        
+                        />
+                        
                     }
 
                     {(budget.method === 'Envelop Method' || budget.method === 'Zero Based Budgeting') &&
@@ -373,20 +393,38 @@ const styles = StyleSheet.create({
     },
     headerText: {
         textAlign: "center",
-        fontSize: 15,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        color: green,
+        margin: 5,
+        fontSize: 16,
+        fontWeight: "bold",
     },
-    monthlyInc: {
-        backgroundColor: 'rgba(255,255,255,0.9)',
+    monthlyInc: {     
+       
         borderRadius: 10,
         marginHorizontal: 10,
         marginBottom: 5,
-        padding: 10,
+        padding: 5,
+        shadowOpacity: 0.5,
+        shadowColor: "white",
+        shadowOffset: {
+            height: 5,
+            width: 5
+        },
+        elevation: 5,
+        backgroundColor: '#D3D3D3',
+        width:'70%',
+        
     },
     monthlyIncText: {
         textAlign: "center",
         fontSize: 15,
-        fontWeight: "bold"
+        fontWeight: "bold",
+    },
+    IncMethod:{
+    //    flexDirection: "row",
+    //    justifyContent: "space-around",
+    //    paddingVertical: 5,
     },
     progressBarView: {
         backgroundColor: 'rgba(255,255,255,0.9)',
@@ -401,7 +439,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         marginHorizontal: 10,
         borderRadius: 10,
-        height: "71%",
+        height: "67%",
         paddingBottom: 10,
     },
     categoryWiseBudgetTitle: {
@@ -470,8 +508,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
     },
     monthYear: {
-        width: '50%',
-        borderRadius: 10,
+        width: '40%',
+        borderRadius: 5,
         paddingHorizontal: 10,
         height: 43,
         flexDirection: 'row',
@@ -484,7 +522,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     deleteBudgetBtn: {
-        backgroundColor: '#B43757',
+        backgroundColor: '#d0a800',
         borderRadius: 10,
         padding: 10,
 

@@ -675,14 +675,12 @@ const styles = StyleSheet.create({
 	container: {
 		borderTopLeftRadius: 40,
 		borderTopRightRadius: 40,
-		height: height * 0.7,
+		height: height * 0.8,
 		width: width,
-		backgroundColor: "#fff",
-		marginTop: 5,
 	},
 
 	mainContainer: {
-		padding: 25,
+		padding: 15,
 		flex: 1,
 		height: "100%",
 		justifyContent: "space-between"
@@ -691,7 +689,7 @@ const styles = StyleSheet.create({
 	container1: {
 		width: "100%",
 		alignSelf: "center",
-		borderRadius: 15,
+		borderRadius: 10,
 		shadowOpacity: 0.5,
 		shadowColor: "black",
 		shadowOffset: {
@@ -706,7 +704,7 @@ const styles = StyleSheet.create({
 	container2: {
 		width: "100%",
 		alignSelf: "center",
-		borderRadius: 15,
+		borderRadius: 10,
 		shadowOpacity: 0.5,
 		shadowColor: "black",
 		shadowOffset: {
@@ -720,6 +718,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 20,
 		paddingRight: 20,
 	},
+
 	container_btn_block: {
 		flexDirection: 'row',
 		paddingBottom: 10,
@@ -740,10 +739,11 @@ const styles = StyleSheet.create({
 
 	Title: {
 		color: "white",
-		fontSize: 50,
+		fontSize: 35,
 		fontWeight: "bold",
-		marginVertical: 20,
 		alignSelf: "center",
+		textAlignVertical:"center",
+		height: height * 0.1,
 	},
 
 	inputPair: {

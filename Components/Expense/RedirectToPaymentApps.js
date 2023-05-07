@@ -953,14 +953,12 @@ const styles = StyleSheet.create({
 	container: {
 		borderTopLeftRadius: 40,
 		borderTopRightRadius: 40,
-		height: height * 0.7,
+		height: height * 0.78,
 		width: width,
-		backgroundColor: "#fff",
-		marginTop: 5,
 	},
 
 	mainContainer: {
-		padding: 25,
+		padding: 15,
 		flex: 1,
 		height: "100%",
 		justifyContent: "space-between"
@@ -969,7 +967,7 @@ const styles = StyleSheet.create({
 	container1: {
 		width: "100%",
 		alignSelf: "center",
-		borderRadius: 15,
+		borderRadius: 10,
 		shadowOpacity: 0.5,
 		shadowColor: "black",
 		shadowOffset: {
@@ -978,27 +976,27 @@ const styles = StyleSheet.create({
 		},
 		elevation: 5,
 		backgroundColor: "white",
-		marginTop: 20,
+		marginVertical: 5,
 	},
 
 	container2: {
 		width: "100%",
 		alignSelf: "center",
-		borderRadius: 15,
+		borderRadius: 10,
 		shadowOpacity: 0.5,
 		shadowColor: "black",
 		shadowOffset: {
-			// height:5,
-			//width:5
+			height: 5,
+			width: 5
 		},
-
 		elevation: 5,
 		backgroundColor: "white",
-		marginTop: 30,
+		marginVertical: 5,
 		paddingTop: 5,
 		paddingLeft: 20,
 		paddingRight: 20,
 	},
+
 	container_btn_block: {
 		flexDirection: 'row',
 		paddingBottom: 10,
@@ -1011,17 +1009,19 @@ const styles = StyleSheet.create({
 		flexShrink: 0,
 		flexBasis: 100,
 		borderRadius: 10,
-		backgroundColor: "#841584",
+		backgroundColor: "#d0a800",
 		color: "white",
 		width: 150,
 		margin: 5,
 	},
+
 	Title: {
 		color: "white",
-		fontSize: 50,
+		fontSize: 35,
 		fontWeight: "bold",
-		marginVertical: 20,
 		alignSelf: "center",
+		textAlignVertical:"center",
+		height: height * 0.1,
 	},
 
 

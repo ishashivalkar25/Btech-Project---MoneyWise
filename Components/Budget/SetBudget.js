@@ -117,6 +117,7 @@ const SetBudget = ({ navigation }) => {
                     <View style={styles.time}>
                         <TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
                             <Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
+                            <Image source={require('../../Assets/calendar.png')} style={{ width: 18, height: 18, marginLeft:40, }} />
                         </TouchableOpacity>
                         {show && (
                             <MonthPicker
@@ -381,7 +382,7 @@ const styles = StyleSheet.create({
         opacity: 1
     },
     addMembersBtn: {
-        backgroundColor: "#EBB02D",
+        backgroundColor: "#d0a800",
         width: 60,
         height: 60,
         borderRadius: 30,

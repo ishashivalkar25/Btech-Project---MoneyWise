@@ -1,9 +1,9 @@
 import { AuthErrorCodes } from 'firebase/auth';
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, TextInput, FlatList, Image, TouchableOpacity, Modal, Alert} from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, TextInput, FlatList, Image, TouchableOpacity, Modal, Alert } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import MonthPicker from 'react-native-month-year-picker';
-import { auth, db, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc} from "../../Firebase/config";
+import { auth, db, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc } from "../../Firebase/config";
 import { green } from "../Constants";
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -20,6 +20,8 @@ const Envelope = (props) => {
     const [editIdx, setEditIdx] = React.useState(-1);
     const [categoryWiseBudget, setCategoryWiseBudget] = React.useState([]);
     const [isCategoryWiseBudgetChanged, updateIsCategoryWiseBudgetChanged] = React.useState(false);
+    const [wantToAddOtherCat, editWantToAddOtherCat] = React.useState(false);
+    const [userExpCategories, setUserExpCategories] = React.useState([]);
 
     React.useEffect(() => {
         fetchExpCategories();
@@ -28,14 +30,16 @@ const Envelope = (props) => {
     const fetchExpCategories = async () => {
 
         try {
-          const docRef = doc(db, "User", auth.currentUser.uid);
-          const user = await getDoc(docRef);
-          console.log(user.data().expCategories, " Categories **");
-          const tempCategories = [];
-          user.data().expCategories.forEach((item)=> {
-              tempCategories.push({ label: item, value: item });
-          })
-          setCategories(tempCategories);
+            const docRef = doc(db, "User", auth.currentUser.uid);
+            const user = await getDoc(docRef);
+            setUserExpCategories(user.data().expCategories);
+            console.log(user.data().expCategories, " Categories **");
+            const tempCategories = [];
+            user.data().expCategories.forEach((item) => {
+                tempCategories.push({ label: item, value: item });
+            })
+            tempCategories.push({ label: 'Other', value: 'Other' })
+            setCategories(tempCategories);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
@@ -74,7 +78,7 @@ const Envelope = (props) => {
 
     const editCategoryWiseBudget = (index) => {
         setEditCatBudgetModalVisible(!editCatBudgetModalVisible)
-        console.log (index);
+        console.log(index);
         setEditIdx(index);
     }
 
@@ -82,17 +86,14 @@ const Envelope = (props) => {
 
         setEditCatBudgetModalVisible(!editCatBudgetModalVisible);
         console.log(editIdx, " ", categoryBudgetEdit);
-        
-        if(categoryBudgetEdit == null)
-        {
+
+        if (categoryBudgetEdit == null) {
             alert("Please enter budget amount!")
         }
-        else if(categoryBudgetEdit<=0)
-        {
+        else if (categoryBudgetEdit <= 0) {
             alert("Please enter valid budget amount!")
         }
-        else if(editIdx>-1 && categoryWiseBudget.length>editIdx && categoryWiseBudget[editIdx]!=null)
-        {
+        else if (editIdx > -1 && categoryWiseBudget.length > editIdx && categoryWiseBudget[editIdx] != null) {
             console.log(categoryWiseBudget[editIdx], "****");
             console.log(categoryWiseBudget[editIdx].budgetPlanned, "**");
             categoryWiseBudget[editIdx].budgetPlanned = parseFloat(categoryBudgetEdit);
@@ -100,13 +101,14 @@ const Envelope = (props) => {
             setCategoryBudgetEdit(null);
             setEditIdx(-1);
         }
-    
+
 
     }
 
     const addCategoryWiseBudget = () => {
 
         setModalVisible(!modalVisible);
+        editWantToAddOtherCat(false);
         if (selectedCategory == null) {
             alert("Please select category!");
         }
@@ -117,15 +119,15 @@ const Envelope = (props) => {
             alert("Please enter valid budget amount!");
         }
         else {
+            categories.splice(categories.length-1, 0, { label: selectedCategory, value: selectedCategory })
             selectedCategories.push(selectedCategory);
-            categoryWiseBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent : 0});
+            categoryWiseBudget.push({ category: selectedCategory, budgetPlanned: parseFloat(categoryBudget), budgetSpent: 0 });
             console.log("categoryWiseBudget", categoryWiseBudget);
             updateIsCategoryWiseBudgetChanged(true);
             console.log(isCategoryWiseBudgetChanged);
             setSelectedCategory(null);
             setCategoryBudget(null);
         }
-
         updateIsCategoryWiseBudgetChanged(false);
     }
 
@@ -144,66 +146,79 @@ const Envelope = (props) => {
 
         const totalAmount = calculateTotalIncome();
 
-        if(totalAmount>props.monthlyInc)
-        {
+        if (totalAmount > props.monthlyInc) {
             alert("Your set budget amount total is exceeding your monthly income.")
             return false;
         }
-        else
-        {
+        else {
             return true;
         }
-        
+
     }
 
-    const saveBudget = async() => {
+    const saveBudget = async () => {
 
         const totalAmount = calculateTotalIncome();
 
-        if(!selectedCategories.includes("Additional Expenses"))
-        {
-            categoryWiseBudget.push({ category: "Additional Expenses", budgetPlanned: 0, budgetSpent : 0});
+        if (!selectedCategories.includes("Additional Expenses")) {
+            categoryWiseBudget.push({ category: "Additional Expenses", budgetPlanned: 0, budgetSpent: 0 });
         }
 
-        try{
-            
-            const recordId = months[props.date.getMonth()] + ""+ props.date.getFullYear();
+        try {
+
+            const recordId = months[props.date.getMonth()] + "" + props.date.getFullYear();
             const docRef = await setDoc(doc(db, "User", auth.currentUser.uid, "Budget", recordId), {
-                method : props.selectedBudgetingMethod,
+                method: props.selectedBudgetingMethod,
                 budget: categoryWiseBudget,
-                saving : props.monthlyInc - totalAmount,
-                monthlyInc : props.monthlyInc,
-                totalBudget : totalAmount
-              });
-              console.log("Saved");
-              props.navigation.navigate("Your Budget", {
-                  budgetChanged : true,
-              });
-              alert(`Budget for ${months[props.date.getMonth()] + " " + props.date.getFullYear()} is saved Successfully!`);
-              clearFields();
+                saving: props.monthlyInc - totalAmount,
+                monthlyInc: props.monthlyInc,
+                totalBudget: totalAmount
+            });
+            console.log("Saved");
+            props.navigation.navigate("Your Budget", {
+                budgetChanged: true,
+            });
+
+            var flag =false;
+            categoryWiseBudget.forEach((item)=> {
+                if(!userExpCategories.includes(item.category) && item.category !="Additional Expenses")
+				{
+					userExpCategories.push(item.category);
+                    flag=true;
+				}
+            })
+
+            if(flag)
+            {
+                await updateDoc(doc(db, "User", auth.currentUser.uid), {
+                    expCategories : userExpCategories,
+                });
+            }
+
+
+            alert(`Budget for ${months[props.date.getMonth()] + " " + props.date.getFullYear()} is saved Successfully!`);
+            clearFields();
         }
-        catch(e)
-        {
+        catch (e) {
             console.log(e)
         }
     }
     const confirmBudget = () => {
 
-        if(validateBudget())
-        {
+        if (validateBudget()) {
             Alert.alert('Alert Title', 'Do you want to confirm a Budget?', [
                 {
                     text: 'Cancel',
                     onPress: () => console.log('Cancel Pressed'),
                     style: 'cancel',
                 },
-                { 
-                    text: 'Yes', 
+                {
+                    text: 'Yes',
                     onPress: () => saveBudget()
                 },
             ]);
         }
-        
+
     }
 
     const clearFields = () => {
@@ -291,6 +306,9 @@ const Envelope = (props) => {
                         visible={modalVisible}
                         onRequestClose={() => {
                             setModalVisible(!modalVisible);
+                            editWantToAddOtherCat(false);
+                            setSelectedCategory(null);
+                            setCategoryBudget(null);
                         }}>
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
@@ -310,9 +328,23 @@ const Envelope = (props) => {
                                     searchPlaceholder="Search..."
                                     value="category"
                                     onChange={(item) => {
-                                        setSelectedCategory(item.value);
+                                        if (item.value != "Other") {
+                                            setSelectedCategory(item.value);
+                                            editWantToAddOtherCat(false);
+                                        }
+                                        else {
+                                            editWantToAddOtherCat(true);
+                                            setSelectedCategory(null);
+                                        }
+
                                     }}
                                 />
+                                {wantToAddOtherCat && <TextInput
+                                    style={styles.budgetAmountInput}
+                                    onChangeText={text => setSelectedCategory(text)}
+                                    value={selectedCategory}
+                                    placeholder='Enter Other custom category...'
+                                />}
                                 <TextInput
                                     style={styles.budgetAmountInput}
                                     onChangeText={text => setCategoryBudget(text)}
@@ -328,6 +360,7 @@ const Envelope = (props) => {
                             </View>
                         </View>
                     </Modal>
+
                 </View>
                 <View style={styles.buttonContainer} >
                     <TouchableOpacity style={[styles.button, (categoryWiseBudget != null && categoryWiseBudget.length > 0) ? styles.enabled : styles.disabled]} disabled={(categoryWiseBudget != null && categoryWiseBudget.length > 0) ? false : true} onPress={confirmBudget}>
@@ -383,7 +416,7 @@ const styles = StyleSheet.create({
         padding: 2
     },
     dropdown: {
-        margin: 10,
+        marginVertical: 5,
         width: '90%',
         backgroundColor: 'rgba(0,0,0,0.2)',
         padding: 5,
@@ -450,9 +483,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
     },
-    budgetCategoryEdit : {
+    budgetCategoryEdit: {
         flexDirection: "row",
-        width : "90%",
+        width: "90%",
         justifyContent: "space-around",
     },
     budgetCategoryText: {
@@ -523,7 +556,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.1)',
         borderRadius: 5,
         padding: 8,
-        marginBottom: 5,
+        marginVertical: 5,
+        width : 275
     },
     buttonModal: {
         borderRadius: 10,

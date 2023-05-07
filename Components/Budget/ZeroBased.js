@@ -21,7 +21,8 @@ const ZeroBased = (props) => {
     const [categoryWiseBudget, setCategoryWiseBudget] = React.useState([]);
     const [isCategoryWiseBudgetChanged, updateIsCategoryWiseBudgetChanged] = React.useState(false);
     const [totalSavings,setTotalSavings] = React.useState(props.monthlyInc)
-
+    const [wantToAddOtherCat, editWantToAddOtherCat] = React.useState(false);
+    const [userExpCategories, setUserExpCategories] = React.useState([]);
 
     React.useEffect(() => {
         setTotalSavings(props.monthlyInc==null ? 0 : props.monthlyInc);
@@ -44,11 +45,13 @@ const ZeroBased = (props) => {
         try {
           const docRef = doc(db, "User", auth.currentUser.uid);
           const user = await getDoc(docRef);
+          setUserExpCategories(user.data().expCategories);
           console.log(user.data().expCategories, " Categories **");
           const tempCategories = [];
           user.data().expCategories.forEach((item)=> {
               tempCategories.push({ label: item, value: item });
           })
+          tempCategories.push({ label: 'Other', value: 'Other' })
           setCategories(tempCategories);
         } catch (e) {
             console.error("Error adding document: ", e);
@@ -132,6 +135,7 @@ const ZeroBased = (props) => {
     const addCategoryWiseBudget = () => {
 
         setModalVisible(!modalVisible);
+        editWantToAddOtherCat(false);
         if (selectedCategory == null) {
             alert("Please select category!");
         }
@@ -145,6 +149,7 @@ const ZeroBased = (props) => {
             alert("You are exceeding total budget!");
         }
         else {
+            categories.splice(categories.length-1, 0, { label: selectedCategory, value: selectedCategory })
             categoryWiseBudget[0].budgetPlanned=totalSavings-parseFloat(categoryBudget)
             setTotalSavings(totalSavings-parseFloat(categoryBudget))
             selectedCategories.push(selectedCategory);
@@ -155,7 +160,6 @@ const ZeroBased = (props) => {
             setSelectedCategory(null);
             setCategoryBudget(null);
         }
-
         updateIsCategoryWiseBudgetChanged(false);
     }
 
@@ -218,6 +222,23 @@ const ZeroBased = (props) => {
               props.navigation.navigate("Your Budget", {
                   budgetChanged : true,
               });
+
+              var flag =false;
+              categoryWiseBudget.forEach((item)=> {
+                  if(!userExpCategories.includes(item.category) && item.category !="Additional Expenses")
+                  {
+                      userExpCategories.push(item.category);
+                      flag=true;
+                  }
+              })
+  
+              if(flag)
+              {
+                  await updateDoc(doc(db, "User", auth.currentUser.uid), {
+                      expCategories : userExpCategories,
+                  });
+              }
+
               alert(`Budget for ${months[props.date.getMonth()] + " " + props.date.getFullYear()} is saved Successfully!`);
               // clearFields();
         }
@@ -322,12 +343,16 @@ const ZeroBased = (props) => {
                             </View>
                         </View>
                     </Modal>
+                    
                     <Modal
                         animationType="slide"
                         transparent={true}
                         visible={modalVisible}
                         onRequestClose={() => {
                             setModalVisible(!modalVisible);
+                            editWantToAddOtherCat(false);
+                            setSelectedCategory(null);
+                            setCategoryBudget(null);
                         }}>
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
@@ -347,9 +372,23 @@ const ZeroBased = (props) => {
                                     searchPlaceholder="Search..."
                                     value="category"
                                     onChange={(item) => {
-                                        setSelectedCategory(item.value);
+                                        if (item.value != "Other") {
+                                            setSelectedCategory(item.value);
+                                            editWantToAddOtherCat(false);
+                                        }
+                                        else {
+                                            editWantToAddOtherCat(true);
+                                            setSelectedCategory(null);
+                                        }
+
                                     }}
                                 />
+                                {wantToAddOtherCat && <TextInput
+                                    style={styles.budgetAmountInput}
+                                    onChangeText={text => setSelectedCategory(text)}
+                                    value={selectedCategory}
+                                    placeholder='Enter Other custom category...'
+                                />}
                                 <TextInput
                                     style={styles.budgetAmountInput}
                                     onChangeText={text => setCategoryBudget(text)}
@@ -365,6 +404,7 @@ const ZeroBased = (props) => {
                             </View>
                         </View>
                     </Modal>
+
                 </View>
                 <View style={styles.buttonContainer} >
                     <TouchableOpacity style={[styles.button, (categoryWiseBudget != null && categoryWiseBudget.length > 0) ? styles.enabled : styles.disabled]} disabled={(categoryWiseBudget != null && categoryWiseBudget.length > 0) ? false : true} onPress={confirmBudget}>
@@ -421,7 +461,7 @@ const styles = StyleSheet.create({
         padding: 2
     },
     dropdown: {
-        margin: 10,
+        marginVertical: 5,
         width: '90%',
         backgroundColor: 'rgba(0,0,0,0.2)',
         padding: 5,
@@ -561,7 +601,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.1)',
         borderRadius: 5,
         padding: 8,
-        marginBottom: 5,
+        marginVertical: 5,
+        width : 275
     },
     buttonModal: {
         borderRadius: 10,

@@ -331,7 +331,7 @@ const FixedExp = ({ navigation, route }) => {
 								width: 70,
 								height: 70,
 								borderRadius: 35,
-								backgroundColor: '#006A42',
+								backgroundColor: green,
 								justifyContent: 'center',
 								alignItems: 'center',
 								alignSelf: 'center',
