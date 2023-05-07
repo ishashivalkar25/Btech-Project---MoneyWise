@@ -18,7 +18,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from '@react-navigation/core';
 import Background from './Background';
 import MyPieChart from "./Visualisation/MyPieChart.js"
-import { darkGreen } from "./Constants"
+import { green } from "./Constants"
 import Income from './Income/Income'
 import Expense from './Expense/Expense'
 
@@ -41,10 +41,10 @@ function MyTabs({ navigation }) {
                 tabBarStyle: {
                     fontSize: 20,
                 },
-                tabBarActiveTintColor: "green",
+                tabBarActiveTintColor: green,
                 tabBarInactiveTintColor: "grey",
                 tabBarAndroidRipple: { borderless: false },
-                tabBarPressColor : "green",
+                tabBarPressColor : green,
             }}
             initialLayout = {{
                 width : width
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         height: "15%",
         padding: 5,
         color:"black",
-        backgroundColor: darkGreen,
+        backgroundColor: green,
         borderRadius:5,
 
     },
@@ -170,12 +170,12 @@ const styles = StyleSheet.create({
 
     },
     amt_circle_text: {
-        color: "green",
+        color: green,
         fontWeight: "bold",
         fontSize: 20
     },
     amt_heading: {
-        color: "green",
+        color: green,
         fontWeight: "bold",
         fontSize: 23,
         width: 100,

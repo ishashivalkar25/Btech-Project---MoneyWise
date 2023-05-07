@@ -29,13 +29,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
 import uploadImg from "../../Assets/uploadReceiptIcon.png";
 import Toast from "react-native-root-toast";
-// import { darkGreen } from "../Constants";
+// import { green } from "../Constants";
 import * as ImagePicker from 'react-native-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Alert } from "react-native";
 
 const { width, height } = Dimensions.get("window");
-const darkGreen ="#006A42";
+const green ="#006A42";
 
 export default function AddIncome(props) {
 
@@ -230,7 +230,7 @@ export default function AddIncome(props) {
 
     return (
         <ImageBackground
-            source={require('../../Assets/Background.jpeg')}
+            source={require('../../Assets/Background.jpg')}
             style={{ width: width, height: height, marginTop: insets.top }}
         >
             <Text style={styles.Title}>Add Income</Text>
@@ -372,7 +372,7 @@ export default function AddIncome(props) {
                                         <TouchableOpacity onPress={() => {
                                             setVisibilityOfImgModal(!isImgModalVisible);
                                         }}>
-                                            <Text style={{ color: darkGreen, fontSize: 15, marginTop: 30 }}> Close </Text>
+                                            <Text style={{ color: green, fontSize: 15, marginTop: 30 }}> Close </Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -400,7 +400,7 @@ export default function AddIncome(props) {
                         <TouchableOpacity
                             onPress={saveIncome}
                             style={{
-                                backgroundColor: darkGreen,
+                                backgroundColor: green,
                                 borderRadius: 200,
                                 alignItems: 'center',
                                 width: 250,
@@ -505,13 +505,13 @@ const styles = StyleSheet.create({
         // marginTop:15,
         fontWeight: "bold",
         fontSize: 16,
-        color: darkGreen,
+        color: green,
     },
 
     inputText: {
         padding: 0,
         borderRadius: 5,
-        color: darkGreen,
+        color: green,
         paddingHorizontal: 5,
         width: '60%',
         height: 35,
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontWeight: "bold",
         alignSelf: "center",
-        color: darkGreen,
+        color: green,
         fontSize: 16
     },
 
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
     },
 
     selImg: {
-        backgroundColor: darkGreen,
+        backgroundColor: green,
         borderRadius: 10,
         alignItems: 'center',
         width: 150,

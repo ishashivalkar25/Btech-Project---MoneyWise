@@ -141,7 +141,7 @@ const EditProfile = ({ navigation, route}) => {
   return (
     <View>
       <ImageBackground
-        source={require('../Assets/Background.jpeg')}
+        source={require('../Assets/Background.jpg')}
         style={{ width: width, height: '100%' }}>
         <View style={styles.container}>
           <ScrollView>

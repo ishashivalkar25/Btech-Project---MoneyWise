@@ -4,6 +4,7 @@ import { auth, db, collection, getDocs, doc,updateDoc,  getDoc, deleteDoc} from 
 import { selectContactPhone } from 'react-native-select-contact';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { NavigationRouteContext } from '@react-navigation/native';
+import { green } from '../Constants';
 
 const AddGrpExpMembers = ({ route, navigation}) => {
 
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
         textDecorationLine: "underline",
     },
     addMembersBtn: {
-        backgroundColor: "green",
+        backgroundColor: green,
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -333,7 +334,7 @@ const styles = StyleSheet.create({
         tintColor: "red"
     },
     submitGrpExpBtn: {
-        backgroundColor: "green",
+        backgroundColor: green,
         padding: 10,
         borderRadius: 10,
         margin: "auto",

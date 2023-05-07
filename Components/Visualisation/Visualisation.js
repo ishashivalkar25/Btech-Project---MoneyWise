@@ -13,6 +13,7 @@ import Background from "../Background";
 import React, { useState } from 'react'
 import { auth, db, collection, getDocs, doc } from "../../Firebase/config";
 import MonthPicker from 'react-native-month-year-picker';
+import { green } from '../Constants';
 
 const { height, width } = Dimensions.get("window");
 
@@ -254,7 +255,7 @@ const Visualisation = () => {
 					<View style={styles.chartContainer}>
 						<Text
 							style={{
-								color: "green", fontSize: 20, fontWeight: "bold", padding: 10,
+								color: green, fontSize: 20, fontWeight: "bold", padding: 10,
 							}}>Income Line Chart</Text>
 						<ScrollView horizontal={true} contentContainerStyle={styles.displayChart}>
 						<LineChart
@@ -283,7 +284,7 @@ const Visualisation = () => {
 									stroke: "#ffa726"
 								},
 								propsForVerticalLabels: {
-									color: 'green'
+									color: green
 								},
 								strokeWidth: 3,
 							}}
@@ -300,7 +301,7 @@ const Visualisation = () => {
 				<View style={styles.chartContainer}>
 					<Text
 						style={{
-							color: "green", fontSize: 20, fontWeight: "bold", padding : 10, 
+							color: green, fontSize: 20, fontWeight: "bold", padding : 10, 
 						}}>Expense Line Chart</Text>
 					<ScrollView horizontal={true} contentContainerStyle={styles.displayChart}>
 						<LineChart
@@ -329,7 +330,7 @@ const Visualisation = () => {
 									stroke: "#ffa726"
 								},
 								propsForVerticalLabels: {
-									color: 'green'
+									color: green
 								},
 								strokeWidth: 3,
 							}}

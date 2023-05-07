@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View, ImageBackground } from 'react-native'
 import Background from "./Background";
 import Btn from "./Btn";
-import { darkGreen, green } from "./Constants";
+import { green} from "./Constants";
 import { useNavigation } from '@react-navigation/core';
 import { auth } from '../Firebase/config' 
 import {useSafeAreaInsets} from 'react-native-safe-area-context'; 
@@ -23,7 +23,7 @@ const Index = (props) => {
     return (
         <View style={{marginTop:insets.top}}>
         <ImageBackground
-          source={require('../Assets/Background.jpeg')}
+          source={require('../Assets/Background.jpg')}
           style={{width: '100%', height: '100%'}}
         >
            <View style={{marginTop:40}}></View>
@@ -95,7 +95,7 @@ const Index = (props) => {
                             />
                             <Btn
                                 bgColor="white"
-                                textColor={darkGreen}
+                                textColor={green}
                                 btnLabel="Signup"
                                 Press={() => props.navigation.navigate("Sign Up")}
                             />

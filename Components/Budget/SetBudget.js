@@ -8,6 +8,7 @@ import FiftyThirtyTwenty from './FiftyThirtyTwenty';
 import Envelope from './Envelope';
 import ZeroBased from './ZeroBased';
 import  Background from '../Background';
+import { green } from "../Constants";
 
 const budgetMethods = [
     { label: 'Envelop Method', value: 'Envelop Method' },
@@ -107,7 +108,7 @@ const SetBudget = ({ navigation }) => {
     return (
         <SafeAreaView>
             <ImageBackground
-                source={require("../../Assets/Background.jpeg")}
+                source={require("../../Assets/Background.jpg")}
                 style={{
                 height: "100%",
                 }}
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
     categoryWiseBudgetTitleText: {
         fontSize: 15,
         fontWeight: "bold",
-        color: "green"
+        color: green
     },
     budgetCategory: {
         height: 70,
@@ -313,7 +314,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     button: {
-        backgroundColor: "green",
+        backgroundColor: green,
         height: 45,
         width: "30%",
         padding: 10,
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     buttonClose: {
-        backgroundColor: 'green',
+        backgroundColor: green,
     },
     textStyle: {
         color: 'white',

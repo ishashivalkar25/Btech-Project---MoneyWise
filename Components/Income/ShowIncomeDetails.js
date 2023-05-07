@@ -40,7 +40,7 @@ import uploadImg from "../../Assets/uploadReceiptIcon.png";
 // import { TouchableOpacity } from 'react-native-web';
 import * as ImagePicker from 'react-native-image-picker';
 import Background from "../Background";
-import { darkGreen } from "../Constants";
+import { green } from "../Constants";
 
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
@@ -282,7 +282,7 @@ function ShowIncomeDetails({ route, navigation }) {
 
   return (
     <ImageBackground
-      source={require('../../Assets/Background.jpeg')}
+      source={require('../../Assets/Background.jpg')}
       style={{ width: width, height: height, marginTop: insets.top }}
     >
       <Text style={styles.Title}>Edit Income</Text>
@@ -307,7 +307,7 @@ function ShowIncomeDetails({ route, navigation }) {
                 <DateTimePicker
                   value={incomeRec.incDate.toDate()}
                   mode={"date"}
-                  textColor='green'
+                  textColor={green}
                   display={Platform.OS === "ios" ? "spinner" : "default"}
                   is24Hour={true}
                   onChange={onDateSelected}
@@ -343,7 +343,7 @@ function ShowIncomeDetails({ route, navigation }) {
                 labelField="label"
                 valueField="value"
                 placeholder="Category"
-                textColor="green"
+                textColor={green}
                 searchPlaceholder="Search..."
                 value={incomeRec.incCategory}
                 onChange={(item) => {
@@ -427,7 +427,7 @@ function ShowIncomeDetails({ route, navigation }) {
                 <TouchableOpacity onPress={() => {
                   setVisibilityOfImgModal(!isImgModalVisible);
                 }}>
-                  <Text style={{ color: darkGreen, fontSize: 15, marginTop: 30 }}> Close </Text>
+                  <Text style={{ color: green, fontSize: 15, marginTop: 30 }}> Close </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -455,7 +455,7 @@ function ShowIncomeDetails({ route, navigation }) {
         <TouchableOpacity
 
           style={{
-            backgroundColor: darkGreen,
+            backgroundColor: green,
             borderRadius: 200,
             alignItems: 'center',
             width: 250,
@@ -562,13 +562,13 @@ const styles = StyleSheet.create({
     // marginTop:15,
     fontWeight: "bold",
     fontSize: 16,
-    color: darkGreen,
+    color: green,
   },
 
   inputText: {
     padding: 0,
     borderRadius: 5,
-    color: darkGreen,
+    color: green,
     paddingHorizontal: 5,
     width: '60%',
     height: 35,
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: "bold",
     alignSelf: "center",
-    color: darkGreen,
+    color: green,
     fontSize: 16
   },
 
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
   },
 
   selImg: {
-    backgroundColor: darkGreen,
+    backgroundColor: green,
     borderRadius: 10,
     alignItems: 'center',
     width: 150,

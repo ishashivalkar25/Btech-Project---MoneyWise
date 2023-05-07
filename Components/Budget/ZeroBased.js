@@ -4,7 +4,7 @@ import { SafeAreaView, StyleSheet, Text, View, TextInput, FlatList, Image, Touch
 import { Dropdown } from 'react-native-element-dropdown';
 import MonthPicker from 'react-native-month-year-picker';
 import { auth, db, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc} from "../../Firebase/config";
-
+import { green } from "../Constants";
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
@@ -267,7 +267,7 @@ const ZeroBased = (props) => {
                             <View style={styles.categoryWiseBudgetTitle}>
                                 <Text style={styles.categoryWiseBudgetTitleText}>Zero Based : </Text>
                                 <TouchableOpacity style={styles.budgetCategoryCenter} onPress={addCategory} >
-                                    <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                                    <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: green }} />
                                 </TouchableOpacity>
                             </View>
                         }
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     categoryWiseBudgetTitleText: {
         fontSize: 15,
         fontWeight: "bold",
-        color: "green"
+        color: green
     },
     budgetCategory: {
         height: 70,
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     button: {
-        backgroundColor: "green",
+        backgroundColor: green,
         height: 45,
         width: "30%",
         padding: 10,
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     buttonClose: {
-        backgroundColor: 'green',
+        backgroundColor: green,
     },
     textStyle: {
         color: 'white',

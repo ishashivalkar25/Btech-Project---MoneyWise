@@ -147,7 +147,7 @@ export default function ViewBudget({ route, navigation }) {
     return (
         <SafeAreaView>
             <ImageBackground
-                source={require("../../Assets/Background.jpeg")}
+                source={require("../../Assets/Background.jpg")}
                 style={{
                     height: "100%",
                 }}
@@ -183,7 +183,7 @@ export default function ViewBudget({ route, navigation }) {
                                     <View style={styles.categoryWiseBudgetTitle}>
                                         <Text style={styles.categoryWiseBudgetTitleText}>Needs : </Text>
                                         {/* <TouchableOpacity style={styles.button}>
-                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: green }} />
                             </TouchableOpacity> */}
                                     </View>
                                 }
@@ -228,7 +228,7 @@ export default function ViewBudget({ route, navigation }) {
                                     <View style={styles.categoryWiseBudgetTitle}>
                                         <Text style={styles.categoryWiseBudgetTitleText}>Wants : </Text>
                                         {/* <TouchableOpacity style={styles.button}>
-                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: green }} />
                             </TouchableOpacity> */}
                                     </View>
                                 }
@@ -273,7 +273,7 @@ export default function ViewBudget({ route, navigation }) {
                                     <View style={styles.categoryWiseBudgetTitle}>
                                         <Text style={styles.categoryWiseBudgetTitleText}>Savings : </Text>
                                         {/* <TouchableOpacity style={styles.button}>
-                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                                <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: green }} />
                             </TouchableOpacity> */}
                                     </View>
                                 }
@@ -321,7 +321,7 @@ export default function ViewBudget({ route, navigation }) {
                                 <View style={styles.categoryWiseBudgetTitle}>
                                     <Text style={styles.categoryWiseBudgetTitleText}>Budget : </Text>
                                     {/* <TouchableOpacity style={styles.button}>
-                                    <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: "green" }} />
+                                    <Image source={require('../../Assets/more.png')} style={{ width: 20, height: 20, tintColor: green }} />
                                 </TouchableOpacity> */}
                                 </View>
                             }

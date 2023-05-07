@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react'
 import { StyleSheet, Pressable, ScrollView, TextInput, Switch, Text, Dimensions, Image, View, Button, Modal, TouchableOpacity } from 'react-native'
 import Background from '../Background';
-import { darkGreen } from "../Constants";
+import { green } from "../Constants";
 import * as ImagePicker from "react-native-image-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
@@ -20,6 +20,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import uploadImg from "../../Assets/uploadReceiptIcon.png";
 import Toast from "react-native-root-toast";
 import SmsAndroid from 'react-native-get-sms-android';
+import notifee from '@notifee/react-native';
 
 const { width, height } = Dimensions.get("window");
 let downloadURL = ""
@@ -49,6 +50,29 @@ export default function ScanBills({ route, navigation }) {
 	const [datePicker, setDatePicker] = useState(false);
 
 	const [isEnabled, setIsEnabled] = useState(false);
+
+	async function onDisplayNotification(category,limit) {
+		// Request permissions (required for iOS)
+		await notifee.requestPermission()
+	
+		// Create a channel (required for Android)
+		const channelId = await notifee.createChannel({
+		  id: 'default',
+		  name: 'Default Channel',
+		});
+	
+		// Display a notification
+		await notifee.displayNotification({
+		  title: 'Budget Exceeded',
+		  body: 'Budget planned exceeded for '+category+' by '+limit,
+		  android: {
+			channelId,
+			pressAction: {
+			  id: 'default',
+			},
+		  },
+		});
+	  }
 
 	const toggleSwitch = (val) => {
 
@@ -369,6 +393,8 @@ export default function ScanBills({ route, navigation }) {
 						categoryWiseBudget.budget.forEach((item, idx) => {
 							if (item.category == selectedCategory) {
 								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								if(item.budgetSpent>item.budgetPlanned)
+									onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
 								isCategoryBudgetSet = true;
 							}
 		
@@ -379,6 +405,8 @@ export default function ScanBills({ route, navigation }) {
 		
 						if (!isCategoryBudgetSet && otherExpIdx > -1) {
 							categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
+							if(categoryWiseBudget.budget[otherExpIdx].budgetSpent>categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+								onDisplayNotification(selectedCategory,categoryWiseBudget.budget[otherExpIdx].budgetSpent-categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
 						}
 					}
 					else if (categoryWiseBudget.method === 'Zero Based Budgeting') {
@@ -387,6 +415,8 @@ export default function ScanBills({ route, navigation }) {
 						categoryWiseBudget.budget.forEach((item, idx) => {
 							if (item.category == selectedCategory) {
 								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								if(item.budgetSpent>item.budgetPlanned)
+									onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
 								isCategoryBudgetSet = true;
 							}
 		
@@ -397,7 +427,10 @@ export default function ScanBills({ route, navigation }) {
 		
 						if (!isCategoryBudgetSet && savingsIdx > -1) {
 							categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent + parseFloat(amount);
-							categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+							// categoryWiseBudget.budget[savingsIdx].budgetPlanned = categoryWiseBudget.budget[savingsIdx].budgetPlanned - parseFloat(amount);
+							if(categoryWiseBudget.budget[savingsIdx].budgetPlanned<0)
+								onDisplayNotification(selectedCategory,categoryWiseBudget.budget[savingsIdx].budgetSpent-categoryWiseBudget.budget[savingsIdx].budgetPlanned)
+						
 							console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
 						}
 		
@@ -407,6 +440,8 @@ export default function ScanBills({ route, navigation }) {
 						categoryWiseBudget.budget.needs.forEach((item, idx) => {
 							if (item.category == selectedCategory) {
 								item.budgetSpent = item.budgetSpent + parseFloat(amount);
+								if(item.budgetSpent>item.budgetPlanned)
+								onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
 								isCategoryBudgetSet = true;
 								done = true;
 							}
@@ -416,6 +451,8 @@ export default function ScanBills({ route, navigation }) {
 							categoryWiseBudget.budget.wants.forEach((item, idx) => {
 								if (item.category == selectedCategory) {
 									item.budgetSpent = item.budgetSpent + parseFloat(amount);
+									if(item.budgetSpent>item.budgetPlanned)
+										onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
 									isCategoryBudgetSet = true;
 									done = true;
 								}
@@ -427,6 +464,8 @@ export default function ScanBills({ route, navigation }) {
 							categoryWiseBudget.budget.savings.forEach((item, idx) => {
 								if (item.category == selectedCategory) {
 									item.budgetSpent = item.budgetSpent + parseFloat(amount);
+									if(item.budgetSpent>item.budgetPlanned)
+										onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
 									isCategoryBudgetSet = true;
 									done = true;
 								}
@@ -439,6 +478,8 @@ export default function ScanBills({ route, navigation }) {
 							if (!isCategoryBudgetSet && otherExpIdx > -1) {
 								categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent + parseFloat(amount);
 								done = true;
+								if(categoryWiseBudget.budget[otherExpIdx].budgetSpent>categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+								onDisplayNotification(selectedCategory,categoryWiseBudget.budget[otherExpIdx].budgetSpent-categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
 							}
 						}
 					}
@@ -535,7 +576,7 @@ export default function ScanBills({ route, navigation }) {
 							<TouchableOpacity onPress={() => {
 								setVisibilityOfImgModal(!isImgModalVisible);
 							}}>
-								<Text style={{ color: darkGreen, fontSize: 15, marginTop: 30 }}> Close </Text>
+								<Text style={{ color: green, fontSize: 15, marginTop: 30 }}> Close </Text>
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -561,7 +602,7 @@ export default function ScanBills({ route, navigation }) {
 				<TouchableOpacity
 					onPress={makeRequest}
 					style={{
-						backgroundColor: darkGreen,
+						backgroundColor: green,
 						borderRadius: 200,
 						alignItems: 'center',
 						width: 250,
@@ -683,7 +724,7 @@ export default function ScanBills({ route, navigation }) {
 								<Text style={styles.grpExpText}>Group Expense : </Text>
 								<Switch
 									trackColor={{ false: '#767577', true: 'lightgreen' }}
-									thumbColor={isEnabled ? 'green' : 'white'}
+									thumbColor={isEnabled ? green : 'white'}
 									onValueChange={(val) => toggleSwitch(val)}
 									value={isEnabled}
 								/>
@@ -704,7 +745,7 @@ export default function ScanBills({ route, navigation }) {
 							<TouchableOpacity
 								onPress={saveExpense}
 								style={{
-									backgroundColor: darkGreen,
+									backgroundColor: green,
 									borderRadius: 200,
 									alignItems: 'center',
 									width: 250,
@@ -811,13 +852,13 @@ const styles = StyleSheet.create({
 		// marginTop:15,
 		fontWeight: "bold",
 		fontSize: 16,
-		color: darkGreen,
+		color: green,
 	},
 
 	inputText: {
 		padding: 0,
 		borderRadius: 5,
-		color: darkGreen,
+		color: green,
 		paddingHorizontal: 5,
 		width: '60%',
 		height: 35,
@@ -842,7 +883,7 @@ const styles = StyleSheet.create({
 		marginTop: 10,
 		fontWeight: "bold",
 		alignSelf: "center",
-		color: darkGreen,
+		color: green,
 		fontSize: 16
 	},
 
@@ -975,7 +1016,7 @@ const styles = StyleSheet.create({
 	},
 
 	selImg: {
-		backgroundColor: darkGreen,
+		backgroundColor: green,
 		borderRadius: 10,
 		alignItems: 'center',
 		width: 150,
@@ -995,7 +1036,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 	},
 	grpExpText: {
-		color: darkGreen,
+		color: green,
 		fontWeight: 'bold'
 	}
 });

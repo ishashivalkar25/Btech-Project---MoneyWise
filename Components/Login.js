@@ -8,7 +8,7 @@ import DialogInput from 'react-native-dialog-input';
 import Background from "./Background";
 import Btn from "./Btn";
 import Field from "./Field";
-import { darkGreen } from "./Constants";
+import { green } from "./Constants";
 const { width, height } = Dimensions.get("window");
 
 export default function Login(props) {
@@ -142,7 +142,7 @@ export default function Login(props) {
             }}
           >
             <Text
-              style={{ color: darkGreen, fontWeight: "bold", fontSize: 16 }}
+              style={{ color: green, fontWeight: "bold", fontSize: 16 }}
               onPress={forgotPassword}
               testID='Forgot Password'
             >Forgot Password ?</Text>
@@ -150,7 +150,7 @@ export default function Login(props) {
 
           {/* <Btn
             textColor="white"
-            bgColor={darkGreen}
+            bgColor={green}
             btnLabel="Login"
             Press={logInToAcc}
             testID = "LoginBtn"
@@ -158,7 +158,7 @@ export default function Login(props) {
           <TouchableOpacity
             onPress={logInToAcc}
             style={{
-              backgroundColor: darkGreen,
+              backgroundColor: green,
               borderRadius: 200,
               alignItems: 'center',
               width: 250,
@@ -194,7 +194,7 @@ export default function Login(props) {
               onPress={redirectToSignUp}
             >
               <Text
-                style={{ color: darkGreen, fontWeight: "bold", fontSize: 16 }}
+                style={{ color: green, fontWeight: "bold", fontSize: 16 }}
               >
                 Signup
               </Text>

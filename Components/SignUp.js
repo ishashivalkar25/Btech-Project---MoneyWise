@@ -7,7 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Background from "./Background";
 import Btn from "./Btn";
 import Field from "./Field";
-import { darkGreen } from "./Constants";
+import { green } from "./Constants";
 import { useNavigation } from '@react-navigation/core';
 const { width, height } = Dimensions.get("window");
 
@@ -220,8 +220,8 @@ export default function SignUp(props) {
             <Field placeholder="Contact Number" keyboardType={'numeric'} onChangeText={(text)=>handlePhoneNumberChange(text)}/>
             {!phoneNumberValidity && <Text style={styles.tip}>Please enter valid Phone number!</Text>}
 
-            <Pressable style={{borderRadius: 25, color: darkGreen, paddingHorizontal: 10, width: '70%', height:40, backgroundColor: 'rgb(220,220, 220)', marginVertical: 10, paddingVertical:10}} onPress={() => setShow(true)}>
-              <Text style={{color: darkGreen}}>{formattedDate}</Text>
+            <Pressable style={{borderRadius: 25, color: green, paddingHorizontal: 10, width: '70%', height:40, backgroundColor: 'rgb(220,220, 220)', marginVertical: 10, paddingVertical:10}} onPress={() => setShow(true)}>
+              <Text style={{color: green}}>{formattedDate}</Text>
             </Pressable>
 
             <Field placeholder="Password" secureTextEntry={true} onChangeText={(text)=>handlePasswordChange(text)}/>
@@ -248,7 +248,7 @@ export default function SignUp(props) {
 
             <Btn
               textColor="white"
-              bgColor={darkGreen}
+              bgColor={green}
               btnLabel="Signup"
               Press={signUpToAcc}
             />
@@ -265,7 +265,7 @@ export default function SignUp(props) {
               <TouchableOpacity
                 onPress={() => props.navigation.navigate('Login')}>
                 <Text
-                  style={{color: darkGreen, fontWeight: 'bold', fontSize: 16}}>
+                  style={{color: green, fontWeight: 'bold', fontSize: 16}}>
                   Login
                 </Text>
               </TouchableOpacity>

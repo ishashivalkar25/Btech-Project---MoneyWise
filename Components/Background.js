@@ -11,7 +11,7 @@ const Background = ({children}) => {
     // <View style={{marginTop:insets.top}}>
     <View>
       <ImageBackground
-        source={require('../Assets/Background.jpeg')}
+        source={require('../Assets/Background.jpg')}
         style={{width: '100%', height: '100%'}}
       >
         <ScrollView contentContainerStyle={{paddingBottom: 50}}>

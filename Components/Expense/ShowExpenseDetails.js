@@ -1,6 +1,7 @@
 import React from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from "react-native-root-toast";
+import notifee from '@notifee/react-native';
 
 import {
   ActivityIndicator,
@@ -42,7 +43,7 @@ import uploadImg from "../../Assets/uploadReceiptIcon.png";
 // import { TouchableOpacity } from 'react-native-web';
 import * as ImagePicker from 'react-native-image-picker';
 import Background from "../Background";
-import { darkGreen } from "../Constants";
+import { green } from "../Constants";
 import SmsAndroid from 'react-native-get-sms-android';
 
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -71,6 +72,29 @@ function ShowExpenseDetails({ route, navigation }) {
   const [description, setDescription] = useState("");
 
   const [isEnabled, setIsEnabled] = useState(expenseRec.groupExp);
+
+  async function onDisplayNotification(category,limit) {
+		// Request permissions (required for iOS)
+		await notifee.requestPermission()
+	
+		// Create a channel (required for Android)
+		const channelId = await notifee.createChannel({
+		  id: 'default',
+		  name: 'Default Channel',
+		});
+	
+		// Display a notification
+		await notifee.displayNotification({
+		  title: 'Budget Exceeded',
+		  body: 'Budget planned exceeded for '+category+' by '+limit,
+		  android: {
+			channelId,
+			pressAction: {
+			  id: 'default',
+			},
+		  },
+		});
+	  }
 
 	const toggleSwitch = (val) => {
 
@@ -334,7 +358,9 @@ function ShowExpenseDetails({ route, navigation }) {
               categoryWiseBudget.budget.forEach((item, idx) => {
                 if (item.category == selectedCategory) {
                   item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
-                  isCategoryBudgetSet = true;
+                  if(item.budgetSpent>item.budgetPlanned)
+									onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
+								isCategoryBudgetSet = true;
                 }
       
                 if (item.category == "Additional Expenses") {
@@ -344,7 +370,9 @@ function ShowExpenseDetails({ route, navigation }) {
       
               if (!isCategoryBudgetSet && otherExpIdx > -1) {
                 categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
-              }
+                if(categoryWiseBudget.budget[otherExpIdx].budgetSpent>categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+								  onDisplayNotification(selectedCategory,categoryWiseBudget.budget[otherExpIdx].budgetSpent-categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+						}
             }
             else
             {
@@ -357,6 +385,8 @@ function ShowExpenseDetails({ route, navigation }) {
 
                 if (item.category == selectedCategory) {
                   item.budgetSpent = item.budgetSpent + parseFloat(amount);
+                  if(item.budgetSpent>item.budgetPlanned)
+									 onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                   isCategoryBudgetSet = true;
                 }
       
@@ -370,6 +400,9 @@ function ShowExpenseDetails({ route, navigation }) {
               }
               if (!isCategoryBudgetSet && otherExpIdx > -1) {
                 categoryWiseBudget.budget[otherExpIdx].budgetSpent = categoryWiseBudget.budget[otherExpIdx].budgetSpent + parseFloat(amount);
+                if(categoryWiseBudget.budget[otherExpIdx].budgetSpent>categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+								  onDisplayNotification(selectedCategory,categoryWiseBudget.budget[otherExpIdx].budgetSpent-categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+						
               }
             }
 						
@@ -383,6 +416,8 @@ function ShowExpenseDetails({ route, navigation }) {
               categoryWiseBudget.budget.forEach((item, idx) => {
                 if (item.category == selectedCategory) {
                   item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                  if(item.budgetSpent>item.budgetPlanned)
+									 onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                   isCategoryBudgetSet = true;
                 }
       
@@ -393,7 +428,10 @@ function ShowExpenseDetails({ route, navigation }) {
       
               if (!isCategoryBudgetSet && savingsIdx > -1) {
                 categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
-                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned + parseFloat(expenseRec.expAmount) - parseFloat(amount);
+                // categoryWiseBudget.budget[savingsIdx].budgetPlanned = categoryWiseBudget.budget[savingsIdx].budgetPlanned + parseFloat(expenseRec.expAmount) - parseFloat(amount);
+                if(categoryWiseBudget.budget[savingsIdx].budgetSpent>categoryWiseBudget.budget[savingsIdx].budgetPlanned)
+								  onDisplayNotification(selectedCategory,categoryWiseBudget.budget[savingsIdx].budgetSpent-categoryWiseBudget.budget[savingsIdx].budgetPlanned)
+						
                 console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
               }
       
@@ -407,6 +445,8 @@ function ShowExpenseDetails({ route, navigation }) {
                 }
                 if (item.category == selectedCategory) {
                   item.budgetSpent = item.budgetSpent  + parseFloat(amount);
+                  if(item.budgetSpent>item.budgetPlanned)
+									 onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                   isCategoryBudgetSet = true;
                 }
       
@@ -417,12 +457,15 @@ function ShowExpenseDetails({ route, navigation }) {
       
               if (!isPreExpAmtAdded && savingsIdx > -1) {
                 categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent - parseFloat(expenseRec.expAmount) ;
-                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned + parseFloat(expenseRec.expAmount) ;
+                // categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned + parseFloat(expenseRec.expAmount) ;
                 console.log('Added from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
               }
               if (!isCategoryBudgetSet && savingsIdx > -1) {
                 categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent  + parseFloat(amount);
-                categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned  - parseFloat(amount);
+                if(categoryWiseBudget.budget[savingsIdx].budgetSpent>categoryWiseBudget.budget[savingsIdx].budgetPlanned)
+								  onDisplayNotification(selectedCategory,categoryWiseBudget.budget[savingsIdx].budgetSpent-categoryWiseBudget.budget[savingsIdx].budgetPlanned)
+						
+                // categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned  - parseFloat(amount);
                 console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
               }
       
@@ -437,6 +480,8 @@ function ShowExpenseDetails({ route, navigation }) {
               categoryWiseBudget.budget.needs.forEach((item, idx) => {
                 if (item.category == selectedCategory) {
                   item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                  if(item.budgetSpent>item.budgetPlanned)
+									  onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                   isCategoryBudgetSet = true;
                   done = true;
                 }
@@ -446,6 +491,8 @@ function ShowExpenseDetails({ route, navigation }) {
                 categoryWiseBudget.budget.wants.forEach((item, idx) => {
                   if (item.category == selectedCategory) {
                     item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                    if(item.budgetSpent>item.budgetPlanned)
+									    onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                     isCategoryBudgetSet = true;
                     done = true;
                   }
@@ -457,6 +504,8 @@ function ShowExpenseDetails({ route, navigation }) {
                 categoryWiseBudget.budget.savings.forEach((item, idx) => {
                   if (item.category == selectedCategory) {
                     item.budgetSpent = item.budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
+                    if(item.budgetSpent>item.budgetPlanned)
+                      onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                     isCategoryBudgetSet = true;
                     done = true;
                   }
@@ -469,6 +518,8 @@ function ShowExpenseDetails({ route, navigation }) {
                 if (!isCategoryBudgetSet && otherExpIdx > -1) {
                   categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent - parseFloat(expenseRec.expAmount) + parseFloat(amount);
                   done = true;
+                  if(categoryWiseBudget.budget[otherExpIdx].budgetSpent>categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+								    onDisplayNotification(selectedCategory,categoryWiseBudget.budget[otherExpIdx].budgetSpent-categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
                 }
               }
             }
@@ -484,6 +535,8 @@ function ShowExpenseDetails({ route, navigation }) {
                 }
                 if (item.category == selectedCategory) {
                   item.budgetSpent = item.budgetSpent + parseFloat(amount);
+                  if(item.budgetSpent>item.budgetPlanned)
+                  onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                   isCategoryBudgetSet = true;
                   done = true;
                 }
@@ -498,6 +551,8 @@ function ShowExpenseDetails({ route, navigation }) {
                   }
                   if (item.category == selectedCategory) {
                     item.budgetSpent = item.budgetSpent + parseFloat(amount);
+                    if(item.budgetSpent>item.budgetPlanned)
+                    onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                     isCategoryBudgetSet = true;
                     done = true;
                   }
@@ -514,6 +569,8 @@ function ShowExpenseDetails({ route, navigation }) {
                   }
                   if (item.category == selectedCategory) {
                     item.budgetSpent = item.budgetSpent + parseFloat(amount);
+                    if(item.budgetSpent>item.budgetPlanned)
+                    onDisplayNotification(item.category,item.budgetSpent-item.budgetPlanned);
                     isCategoryBudgetSet = true;
                     done = true;
                   }
@@ -529,7 +586,9 @@ function ShowExpenseDetails({ route, navigation }) {
                 }
                 if (!isCategoryBudgetSet && otherExpIdx > -1) {
                   categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent = categoryWiseBudget.budget.savings[otherExpIdx].budgetSpent + parseFloat(amount);
-                  done = true;
+                  if(categoryWiseBudget.budget[otherExpIdx].budgetSpent>categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+								    onDisplayNotification(selectedCategory,categoryWiseBudget.budget[otherExpIdx].budgetSpent-categoryWiseBudget.budget[otherExpIdx].budgetPlanned)
+						      done = true;
                 }
               }
             }
@@ -674,7 +733,7 @@ function ShowExpenseDetails({ route, navigation }) {
 
   return (
     <ImageBackground
-      source={require('../../Assets/Background.jpeg')}
+      source={require('../../Assets/Background.jpg')}
       style={{ width: width, height: height, marginTop: insets.top }}
     >
       <Text style={styles.Title}>Edit Expense</Text>
@@ -699,7 +758,7 @@ function ShowExpenseDetails({ route, navigation }) {
                 <DateTimePicker
                   value={expenseRec.expDate.toDate()}
                   mode={"date"}
-                  textColor='green'
+                  textColor={green}
                   display={Platform.OS === "ios" ? "spinner" : "default"}
                   is24Hour={true}
                   onChange={onDateSelected}
@@ -735,7 +794,7 @@ function ShowExpenseDetails({ route, navigation }) {
                 labelField="label"
                 valueField="value"
                 placeholder="Category"
-                textColor="green"
+                textColor={green}
                 searchPlaceholder="Search..."
                 value={selectedCategory}
                 onChange={(item) => {
@@ -788,7 +847,7 @@ function ShowExpenseDetails({ route, navigation }) {
 							<Text style={styles.grpExpText}>Group Expense : </Text>
 							<Switch
 								trackColor={{ false: '#767577', true: 'lightgreen' }}
-								thumbColor={isEnabled ? 'green' : 'white'}
+								thumbColor={isEnabled ? green : 'white'}
 								onValueChange={(val) => toggleSwitch(val)}
 								value={isEnabled}
 							/>
@@ -832,7 +891,7 @@ function ShowExpenseDetails({ route, navigation }) {
                     <TouchableOpacity onPress={() => {
                       setVisibilityOfImgModal(!isImgModalVisible);
                     }}>
-                      <Text style={{ color: darkGreen, fontSize: 15, marginTop: 30 }}> Close </Text>
+                      <Text style={{ color: green, fontSize: 15, marginTop: 30 }}> Close </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -861,7 +920,7 @@ function ShowExpenseDetails({ route, navigation }) {
             <TouchableOpacity
 
               style={{
-                backgroundColor: darkGreen,
+                backgroundColor: green,
                 borderRadius: 200,
                 alignItems: 'center',
                 width: 250,
@@ -969,13 +1028,13 @@ const styles = StyleSheet.create({
     // marginTop:15,
     fontWeight: "bold",
     fontSize: 16,
-    color: darkGreen,
+    color: green,
   },
 
   inputText: {
     padding: 0,
     borderRadius: 5,
-    color: darkGreen,
+    color: green,
     paddingHorizontal: 5,
     width: '60%',
     height: 35,
@@ -999,7 +1058,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: "bold",
     alignSelf: "center",
-    color: darkGreen,
+    color: green,
     fontSize: 16
   },
 
@@ -1119,7 +1178,7 @@ const styles = StyleSheet.create({
   },
 
   selImg: {
-    backgroundColor: darkGreen,
+    backgroundColor: green,
     borderRadius: 10,
     alignItems: 'center',
     width: 150,
@@ -1139,7 +1198,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 	},
 	grpExpText: {
-		color: darkGreen,
+		color: green,
 		fontWeight: 'bold'
 	},
   sendReminder : {

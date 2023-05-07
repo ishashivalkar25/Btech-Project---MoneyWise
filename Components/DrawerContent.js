@@ -17,7 +17,7 @@ import {
     DrawerItem,
     DrawerItemList,
 } from '@react-navigation/drawer';
-
+import { green } from './Constants';
 import Icon from 'react-native-vector-icons';
 
 // import{ AuthContext } from '../components/context';
@@ -57,7 +57,7 @@ export function DrawerContent(props) {
 
     return(
         <View style={{flex:1}}>
-            <DrawerContentScrollView {...props}>
+            <DrawerContentScrollView {...props} >
                 <View style={styles.drawerContent}>
                     <View style={styles.userInfoSection}>
                         {/* <View style={{flexDirection:'row',marginTop: 15}}> */}
@@ -125,11 +125,13 @@ export function DrawerContent(props) {
 const styles = StyleSheet.create({
   drawerContent: {
     flex: 1,
+    padding : 0,
+    margin : 0, 
   },
   userInfoSection: {
     paddingLeft: 5,
-    backgroundColor: '#006A42',
-    height:150,
+    backgroundColor: green,
+    height:150
   },
   welcome: {
     fontSize: 30,

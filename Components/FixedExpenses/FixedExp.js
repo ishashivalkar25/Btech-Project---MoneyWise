@@ -25,7 +25,7 @@ import {
 	deleteDoc 
 } from '../../Firebase/config';
 // import DateTimePicker from '@react-native-community/datetimepicker';
-import { darkGreen } from '../Constants';
+import { green } from '../Constants';
 import { NavigationScreenProp } from '@react-navigation/native';
 
 import {
@@ -252,7 +252,7 @@ const FixedExp = ({ navigation, route }) => {
 
 	return (
 		<ImageBackground
-			source={require('../../Assets/Background.jpeg')}
+			source={require('../../Assets/Background.jpg')}
 			style={{ width: width, height: height }}>
 			<View>
 				<Text style={styles.Title}>Fixed Expense</Text>
@@ -281,7 +281,7 @@ const FixedExp = ({ navigation, route }) => {
 											<Text style={styles.fixedExpContainerText}>Paid </Text>
 											<Switch
 												trackColor={{ false: '#767577', true: 'lightgreen' }}
-												thumbColor={(item.status==='Unpaid') ? 'green' : 'white'}
+												thumbColor={(item.status==='Unpaid') ? green : 'white'}
 												onValueChange={(val) => toggleSwitch(item, val)}
 												value={(item.status==='Unpaid') ?false:true}
 											/>
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
 	fixedExpContainerText: {
 		fontSize: 14,
 		fontWeight: "bold",
-		color: "green"
+		color: green
 	},
 	fixedExpContainerVal: {
 		fontSize: 14,

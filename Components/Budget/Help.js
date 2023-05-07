@@ -6,7 +6,7 @@ const Help = () => {
   return (
     <View style={{ width: "100%" }}>
       <ImageBackground
-        source={require("../../Assets/Background.jpeg")}
+        source={require("../../Assets/Background.jpg")}
         style={{
           height: "100%",
         }}

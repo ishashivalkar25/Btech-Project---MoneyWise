@@ -21,7 +21,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import SmsAndroid from 'react-native-get-sms-android';
 import Background from '../Background';
 import MyPieChart from "../Visualisation/MyPieChart.js"
-import { darkGreen } from "../Constants"
+import { green } from "../Constants"
 
 const { height, width } = Dimensions.get('window');
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -423,7 +423,7 @@ function Income({navigation, route}) {
     return (
             <KeyboardAvoidingView style={{ width: "100%"}}>
                 <ImageBackground
-                    source={require("../../Assets/Background.jpeg")}
+                    source={require("../../Assets/Background.jpg")}
                     style={{
                         height: "100%",
                     }}
@@ -615,7 +615,7 @@ function Income({navigation, route}) {
                                 width: 70,
                                 height: 70,
                                 borderRadius: 35,
-                                backgroundColor: "#006A42",
+                                backgroundColor: green,
                                 justifyContent: "center",
                                 alignItems: "center",
                                 alignSelf: "center",
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
         height: "15%",
         padding: 5,
         color: "black",
-        backgroundColor: darkGreen,
+        backgroundColor: green,
         borderRadius: 5,
     },
     choose_filter: {

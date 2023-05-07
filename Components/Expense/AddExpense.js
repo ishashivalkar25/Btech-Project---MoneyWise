@@ -7,6 +7,7 @@ import RedirectToPaymentApps from './RedirectToPaymentApps';
 import ManualAdditionOfExpense from './ManualAdditionOfExpense';
 const { height, width } = Dimensions.get('window');
 const Tab = createMaterialTopTabNavigator();
+import { green } from '../Constants';
 
 export default function AddExpense(props) {
 
@@ -20,10 +21,10 @@ export default function AddExpense(props) {
             tabBarStyle: {
                 fontSize: 20,
             },
-            tabBarActiveTintColor: "green",
+            tabBarActiveTintColor: green,
             tabBarInactiveTintColor: "grey",
             tabBarAndroidRipple: { borderless: false },
-            tabBarPressColor : "green",
+            tabBarPressColor : green,
         }}
         initialLayout = {{
             width : width

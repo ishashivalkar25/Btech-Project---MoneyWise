@@ -54,7 +54,9 @@ export default Fading = () => {
               style={styles.animation}
             />
           </View>
-          neyWise
+          ney<Image
+                source={require('../../Assets/W2.png')}
+                style={{width: 38, height: 38,position: 'relative'}}/>ise
         </Text>
       </FadeInView>
     </View>

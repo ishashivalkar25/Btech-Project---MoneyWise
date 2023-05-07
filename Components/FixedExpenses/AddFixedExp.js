@@ -29,7 +29,7 @@ import LinearGradient from 'react-native-linear-gradient';
 // import Field from './Field';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useState, useEffect } from 'react';
-import { darkGreen } from '../Constants';
+import { green } from '../Constants';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDoc } from 'firebase/firestore';
 
@@ -179,7 +179,7 @@ return (
     <View style={styles.header}>
       <View style={styles.curve}>
         <ImageBackground
-          source={require('../../Assets/Background.jpeg')}
+          source={require('../../Assets/Background.jpg')}
           style={styles.curvedImg}>
           <Text style={styles.text_header}>Add Fixed Payment</Text>
         </ImageBackground>
@@ -250,7 +250,7 @@ return (
         <TouchableOpacity
           onPress={() => saveFixedExpense()}
           style={{
-            backgroundColor: darkGreen,
+            backgroundColor: green,
             borderRadius: 200,
             alignItems: 'center',
             width: 250,
@@ -281,7 +281,7 @@ export default AddFixedExp;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: darkGreen,
+    // backgroundColor: green,
   },
   header: {
     // flex: 1,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     // fontSize: 18,
     fontWeight: 'bold',
     fontSize: 16,
-    color: darkGreen,
+    color: green,
   },
   action: {
     // flexDirection: 'row',
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
   },
   inputText: {
     borderRadius: 5,
-    color: darkGreen,
+    color: green,
     paddingHorizontal: 5,
     width: '60%',
     height: 35,

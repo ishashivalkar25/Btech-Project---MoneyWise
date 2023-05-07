@@ -46,14 +46,7 @@ cd android
 ./gradlew clean
 cd ..
 
+npx jest --clearCache
 
 react-native-circular-progress-indicator
 
-
-,
-    //  "moduleFileExtensions" : ["ts", "tsx", "js", "jsx", "json", "node"],
-    // "transformIgnorePatterns" : [
-    //   "node_modules/(?!(react-native"
-    //     + "|@react-navigation/drawer"
-    //     + ")/)"
-    // ]

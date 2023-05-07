@@ -30,6 +30,7 @@ import { useNavigation } from '@react-navigation/core';
 import SetBudget from './SetBudget';
 // import CircularProgress from 'react-native-circular-progress-indicator';
 import ViewBudget  from './ViewBudget';
+import { green } from "../Constants";
 
 const Tab = createBottomTabNavigator();
 
@@ -37,7 +38,7 @@ const Budget = ({ navigation }) => {
     return (
         <Tab.Navigator
             screenOptions={{
-                tabBarActiveTintColor: 'green',
+                tabBarActiveTintColor: green,
                 tabBarStyle: {
                     position: 'absolute',
                     bottom: 0,
@@ -51,7 +52,7 @@ const Budget = ({ navigation }) => {
                 tabBarLabelStyle: {
                     fontSize: 12,
                     fontWeight: "bold",
-                    color: 'green',
+                    color: green,
                     paddingBottom: 10,
                 },
                 headerShown: false,
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     categoryWiseBudgetTitleText: {
         fontSize: 15,
         fontWeight: "bold",
-        color: "green"
+        color: green
     },
     budgetCategory: {
         height: 100,
