@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, Dimensions} from 'react-native'
+import { StyleSheet, Text, View, Dimensions, ScrollView} from 'react-native'
 import { PieChart } from 'react-native-chart-kit';
 
 export default function MyPieChart(props) {
@@ -12,7 +12,7 @@ export default function MyPieChart(props) {
         console.log(props.data, "*******************123456***************" );
 
         const r = 100;
-        const g = 87;
+        const g = 82;
         const b = 0;
         var i = 11;
         var l = props.data.length;
@@ -36,7 +36,7 @@ export default function MyPieChart(props) {
     }, [props.data])
 
     return (
-      
+        // <ScrollView style={{height:"100%"}}>
             <PieChart
                 data={data}
                 width={350}
@@ -60,6 +60,7 @@ export default function MyPieChart(props) {
                 paddingLeft="2"
                 absolute //for the absolute number remove if you want percentage
             />
+        // </ScrollView>
     )
 }
 

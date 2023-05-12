@@ -32,15 +32,18 @@ export default function Login(props) {
   }, []);
 
   const logInToAcc = ()=>{
-    console.log("Logged In Successfully!!!", auth);
+    // alert("Logged In Successfully!!!");
+
     signInWithEmailAndPassword(auth, userName, password)
       .then(userCredentials => {
+
+        console.log("user email :", userCredentials);
         const user = userCredentials.user;
         console.log("user email :", user.email);
         if(user.emailVerified){
           props.navigation.replace("Root");
           console.log(JSON.stringify(user));
-          alert("Logged In Successfully!!!");
+          alert("Logged In Successfully123!!!");
         }
         else
         {
@@ -128,10 +131,11 @@ export default function Login(props) {
             placeholder="Email / Username"
             keyboardType={"email-address"}
             onChangeText={(text)=>handleUserNameChange(text)}
+            testID = "userName"
           />
           {!userNameValidity && <Text style={styles.tip}>Invalid Email / Username!</Text>}
         
-          <Field placeholder="Password" secureTextEntry={true} onChangeText={(text)=>setPassword(text)}/>
+          <Field placeholder="Password" secureTextEntry={true} onChangeText={(text)=>setPassword(text)} testID = "password"/>
 
           <View
             style={{
@@ -177,7 +181,9 @@ export default function Login(props) {
               message={"Enter registered email address :"}
               hintInput ={"abc@gmail.com"}
               submitInput={ (inputText) => {passwordResetEmail(inputText)} }
-              closeDialog={ () => {setDialogBoxVisibility(false)}}>
+              closeDialog={ () => {setDialogBoxVisibility(false)}}
+              testID="resetPassword"
+              >
           </DialogInput>
 
           <View
@@ -196,7 +202,7 @@ export default function Login(props) {
               <Text
                 style={{ color: green, fontWeight: "bold", fontSize: 16 }}
               >
-                Signup
+                0000
               </Text>
             </TouchableOpacity>
           </View>

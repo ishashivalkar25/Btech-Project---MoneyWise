@@ -828,17 +828,27 @@ function ShowExpenseDetails({ route, navigation }) {
                   />
 
                   {/** This button is responsible to close the modal */}
-                  <Button
-                    title="Add Category"
-                    onPress={() => {
-                      setVisibilityOfCatModal(!isCatModalVisible);
-                      setCategory([
-                        ...category,
-                        { label: selectedCategory, value: selectedCategory },
-                      ]);
-                      addCategoryToFD(selectedCategory);
-                    }}
-                  />
+                  <TouchableOpacity
+										onPress={() => {
+											setVisibilityOfCatModal(!isCatModalVisible);
+											setCategory([
+												...category,
+												{ label: selectedCategory, value: selectedCategory },
+											]);
+										}}
+										style={{
+											backgroundColor: green,
+											borderRadius: 200,
+											alignItems: 'center',
+											width: "60%",
+											paddingVertical: 5,
+											marginVertical: 10,
+											alignSelf: 'center',
+											//marginTop:30,
+										}}>
+										<Text style={{ color: "white", fontSize: 20, fontWeight: 'bold', margin: 0 }}> Add Category </Text>
+									</TouchableOpacity>
+
                 </View>
               </View>
             </Modal>

@@ -47,6 +47,5 @@ cd android
 cd ..
 
 npx jest --clearCache
-
-react-native-circular-progress-indicator
+npm install --save-dev enzyme enzyme-adapter-react-16 --legacy-peer-deps
 

@@ -231,7 +231,7 @@ export default function AddIncome(props) {
     return (
         <ImageBackground
             source={require('../../Assets/Background.jpg')}
-            style={{ width: width, height: height, marginTop: insets.top }}
+            style={{ width: width, height: "100%", marginTop: insets.top }}
         >
             <Text style={styles.Title}>Add Income</Text>
             <View style={styles.container}>

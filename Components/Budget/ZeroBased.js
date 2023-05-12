@@ -176,14 +176,14 @@ const ZeroBased = (props) => {
 
     const validateBudget = () => {
 
-        // categoryWiseBudget.forEach((item) => {
-        //     console.log(item.category)
-        //     if(item.budgetPlanned<=0)
-        //     {
-        //         alert(`Please enter valid budget amount for category ${item.category}!`);
-        //         return false;
-        //     }
-        // })
+        categoryWiseBudget.forEach((item) => {
+            console.log(item.category)
+            if(item.budgetPlanned<=0)
+            {
+                alert(`Please enter valid budget amount for category ${item.category}!`);
+                return false;
+            }
+        })
 
         const totalAmount = calculateTotalIncome();
 

@@ -13,6 +13,7 @@ import {
     KeyboardAvoidingView, 
     PermissionsAndroid,
 	AppState,
+    
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getTransactionInfo } from "trny";
@@ -463,8 +464,8 @@ function Expense({navigation}) {
                                 <Text style={{fontWeight:"bold", fontSize:18}}>No Transactions Found!</Text>
                             </View>
                         )}
-                        <View style={styles.total_amt}>
-                            <MyPieChart data={categoryWiseExp}/>
+                        <View style={styles.Piechart}>
+                                 <MyPieChart data={categoryWiseExp}/>
                         </View>
                     </View>
 
@@ -514,7 +515,7 @@ function Expense({navigation}) {
                                 }}>
                                     <View >
                                     <Text style = {styles.cat}>{item.expCategory}</Text>
-                                    <Text style = {styles.amt}>+{item.expAmount}</Text>
+                                    <Text style = {styles.amt}>-{item.expAmount}</Text>
                                 </View>
                                 <View>
                                     <Text style = {styles.dt}>{getDateFormat(item.expDate.seconds)}</Text>
@@ -547,7 +548,7 @@ function Expense({navigation}) {
                                 }}>
                                     <View >
                                     <Text style = {styles.cat}>{item.expCategory}</Text>
-                                    <Text style = {styles.amt}>+{item.expAmount}</Text>
+                                    <Text style = {styles.amt}>-{item.expAmount}</Text>
                                 </View>
                                 <View>
                                     <Text style = {styles.dt}>{getDateFormat(item.expDate.seconds)}</Text>
