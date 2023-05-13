@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1683891041924" clover="3.2.0">
-  <project timestamp="1683891041925" name="All files">
+<coverage generated="1683956689878" clover="3.2.0">
+  <project timestamp="1683956689878" name="All files">
     <metrics statements="3263" coveredstatements="187" conditionals="1270" coveredconditionals="21" methods="751" coveredmethods="18" elements="5284" coveredelements="226" complexity="0" loc="3263" ncloc="3263" packages="10" files="41" classes="41"/>
     <package name="MoneyWise">
       <metrics statements="28" coveredstatements="5" conditionals="8" coveredconditionals="0" methods="24" coveredmethods="1"/>

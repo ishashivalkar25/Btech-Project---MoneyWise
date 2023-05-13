@@ -11,7 +11,7 @@ import { green } from "./Constants";
 import { useNavigation } from '@react-navigation/core';
 const { width, height } = Dimensions.get("window");
 
-export default function SignUp(props) {
+export default function SignUp({navigation}) {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [phoneNo, setPhoneNo] = React.useState("");
@@ -28,9 +28,6 @@ export default function SignUp(props) {
   const [phoneNumberValidity, setPhoneNumberValidity] = React.useState(true);
   const [accBalanceValidity, setAccBalanceValidity] = React.useState(true);
   const [formattedDate, setFormattedDate] = React.useState("Date of Birth");
-
-
-  const navigation = useNavigation();
 
   const handleEmailChange = (emailInput) => {
 
@@ -263,7 +260,7 @@ export default function SignUp(props) {
                 Already have an account ?{' '}
               </Text>
               <TouchableOpacity
-                onPress={() => props.navigation.navigate('Login')}>
+                onPress={() => navigation.navigate('Login')}>
                 <Text
                   style={{color: green, fontWeight: 'bold', fontSize: 16}}>
                   Login

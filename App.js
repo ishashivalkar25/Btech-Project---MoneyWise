@@ -28,10 +28,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
-function Root({navigation}) {
+
+export function Root() {
   return (
     <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />} >
-      <Drawer.Screen name="Home"
+      <Drawer.Screen name="Home" 
             component={HomePage}
             options={{
               drawerIcon: ({ focused, size }) => (
