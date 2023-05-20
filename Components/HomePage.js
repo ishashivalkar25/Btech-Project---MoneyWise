@@ -15,7 +15,6 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { auth, db, collection, getDocs, doc } from "../Firebase/config";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useNavigation } from '@react-navigation/core';
 import Background from './Background';
 import MyPieChart from "./Visualisation/MyPieChart.js"
 import { green } from "./Constants"
@@ -28,8 +27,6 @@ const months = ["January", "February", "March", "April", "May", "June", "July", 
 
 
 function MyTabs({ navigation }) {
-
-    const insets = useSafeAreaInsets();
 
     return (
         <Tab.Navigator
@@ -64,12 +61,11 @@ function MyTabs({ navigation }) {
 
 
 export default function HompePage(props) {
-    const navigation = useNavigation();
     React.useEffect(() => {
         props.navigation.setOptions({
             headerRight: () => (
                 <View style={styles.header_right}>
-                    <TouchableOpacity onPress={() => { navigation.navigate("Visualisation"); }}>
+                    <TouchableOpacity testID="Visualization" onPress={() => { props.navigation.navigate("Visualisation"); }}>
                         <Image
                             source={require("../Assets/visualization.png")}
                             style={{ width: 25, height: 25, alignSelf: "center" }}
@@ -98,7 +94,7 @@ export default function HompePage(props) {
     return (
         // <NavigationContainer independent={true}>
         <View style={{ flex: 1, flexDirection: "column" }}>
-            <MyTabs navigation={props.navigation} />
+            <MyTabs navigation={props.navigation} testID="tabs"/>
             {/* <Background></Background> */}
         </View>
         // </NavigationContainer>

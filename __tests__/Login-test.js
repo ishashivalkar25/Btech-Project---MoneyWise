@@ -1,20 +1,20 @@
 import React from 'react';
 import { render, fireEvent, waitFor} from '@testing-library/react-native';
 import Login from '../Components/Login';
-import AddIncome from '../Components/Income/AddIncome';
 import { auth } from '../Firebase/config';
 // import { auth } from '../Firebase/config'
 import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import DialogInput from 'react-native-dialog-input';
+import { mount, shallow } from 'enzyme';
 
 jest.mock('firebase/auth', () => ({
     signInWithEmailAndPassword: jest.fn(),
-    sendPasswordResetEmail: jest.fn(),
+    sendPasswordResetEmail: jest.fn().mockResolvedValueOnce(),
   }));
 
 jest.mock('../Firebase/config', () => ({
     auth: {
-      onAuthStateChanged: jest.fn(),
+      onAuthStateChanged: jest.fn(callback => callback({ emailVerified: true })),
       signOut: jest.fn(),
       currentUser: jest.fn(),
     },
@@ -30,6 +30,7 @@ jest.mock('../Firebase/config', () => ({
 
 
 describe('Login', () => {
+
     it('should handle login with valid credentials', async () => {
         const navigationMock = {
             replace: jest.fn(),
@@ -128,29 +129,58 @@ describe('Login', () => {
  
     });
 
-    // it('should call passwordResetEmail when submitting a valid email address', async() => {
-    //     const navigationMock = {
-    //         replace: jest.fn(),
-    //         navigate: jest.fn(),
-    //     };
+    it('should send password reset email when submitting a valid email address', async() => {
+        const wrapper = shallow(<Login />);
+        const validEmail = 'user@example.com';
+        const dialogInput = wrapper.find('[testID="resetPassword"]');
+        dialogInput.props().submitInput(validEmail);
 
-    //     const { queryByPlaceholderText,getByText } = render(
-    //         <AddIncome navigation={navigationMock} />
-    //     );
+        global.alert = jest.fn();
+        expect(sendPasswordResetEmail).toHaveBeenCalledWith(auth, validEmail);
+        await waitFor(() => expect(global.alert).toHaveBeenCalledWith('Password reset link is sent successfully!'));
 
-    //     // signInWithEmailAndPassword.mockResolvedValue({
-    //     //     // email: 'test@example.com'
-    //     //   });
+    });
 
-    //     const emailInput = queryByPlaceholderText('Enter Category');
-    //     const submitButton = getByText('Enter Category');
-    
-    //     // fireEvent(emailInput, 'onChangeText', 'validemail@test.com');
-    //     // fireEvent.press(submitButton);
+    it('On clicking on Register Button redirect to Sign Up Page', async() => {
+        const navigationMock = {
+            navigate: jest.fn(),
+        };
+        const wrapper = shallow(<Login navigation={navigationMock}/>);
+        const registerBtn = wrapper.find('[testID="redirectToSignUpBtn"]');
+        registerBtn.props().onPress();
 
-    //     // await waitFor(() => expect(passwordResetEmail).toHaveBeenCalledWith('validemail@test.com'));
-    //     // await waitFor(() => expect(sendPasswordResetEmail).toHaveBeenCalledWith(auth, 'validemail@test.com'));
- 
-    //   });
+        await waitFor(() => expect(navigationMock.navigate).toHaveBeenCalledWith('Sign Up'));
+    });
+
+    it('On clicking on Forgot Password Button show Dialog Box', async() => {
+        const wrapper = shallow(<Login/>);
+        const forgotPassBtn = wrapper.find('[testID="Forgot Password"]');
+        forgotPassBtn.props().onPress();
+        const dialogInput = wrapper.find('[testID="resetPassword"]');
+        expect(dialogInput.props().isDialogVisible).toBeTruthy();
+    });
+
+    it('After clicking on close button , hide Dialog Box', async() => {
+        const wrapper = shallow(<Login/>);
+        const dialogInput = wrapper.find('[testID="resetPassword"]');
+        dialogInput.props().closeDialog();
+        expect(dialogInput.props().isDialogVisible).toBeFalsy();
+    });
+
+
+    // it('should not send password reset email and give error when submitting a invalid email address', async() => {
+    //     const wrapper = shallow(<Login />);
+    //     const invalidEmail = 'user@example.com';
+    //     const dialogInput = wrapper.find('[testID="resetPassword"]');
+    //     dialogInput.props().submitInput(invalidEmail);
+
+    //     global.alert = jest.fn();
+    //     sendPasswordResetEmail.mockRejectedValue(new Error('Invalid email or password'));
+
+    //     // expect(sendPasswordResetEmail).toHaveBeenCalledTimes(1);
+    //     // expect(sendPasswordResetEmail).toHaveBeenCalledWith(auth, 'user1@example.com');
+    //     await waitFor(() => expect(global.alert).toHaveBeenCalledWith("Please enter valid email address!"));
+
+    // });
 
 });

@@ -117,6 +117,8 @@ const EditProfile = ({ navigation, route}) => {
   };
 
   const updateUserDetails = async () => {
+
+    console.log("Update Valid User Details")
     if (validateInputOnSubmit()) {
       console.log('Updated');
       try {
@@ -203,8 +205,8 @@ const EditProfile = ({ navigation, route}) => {
                 source={require('../Assets/calendar.png')}
                 style={styles.img}
               />
-
               <Pressable
+                testID = "showDOB"
                 onPress={() => setShow(true)}>
                 <Text style={styles.textInput} >{formattedDate}</Text>
               </Pressable>
@@ -268,6 +270,7 @@ const EditProfile = ({ navigation, route}) => {
               }, isChanged ? styles.enabled : styles.disabled ]}
               onPress={() => updateUserDetails()}
               disabled={!isChanged}
+              testID = "submitBtn"
               >
               <Text style={{ color: "white", fontSize: 20, fontWeight: 'bold', margin: 0 }}> Submit </Text>
             </TouchableOpacity>

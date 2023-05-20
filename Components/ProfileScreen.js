@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, SafeAreaView, StyleSheet, TouchableOpacity, Dimensions, Image, Text, ImageBackground, Pressable} from 'react-native';
 import {
 	Title,
@@ -34,63 +34,57 @@ const ProfileScreen = ({ navigation }) => {
 	const [formattedDate, setFormattedDate] = React.useState("");
 	const [isChanged, setChanged] = React.useState(false);
 
-	React.useEffect(() => {
-	
-		navigation.setOptions({
-			headerRight: () => (
-				<View style={{marginRight: 10}}>
-				  <Pressable onPress={() => {navigation.navigate('EditProfile', { 
-					name : name,
-					phoneNo : phoneNo,
-					DOB : DOB.getTime(),
-					bankName : bankName,
-					accBalance : accBalance
-				}) ;console.log(name, phoneNo, '///////////////////////////////')}}>
-				  <Image
-				  source={require("../Assets/Profile_edit.png")}
-				  style={ { height: 25, width: 25}} 
-				/>
-				</Pressable>
-				</View>
-			  ),
-		});
-		
-	}, [name, phoneNo, bankName, accBalance, DOB]);
-
 	const fetchUserDetails = async () => {
 		try {
-			const docRef = doc(db, "User", auth.currentUser.uid);
-			const data = await getDoc(docRef);
-			const userData = data.data();
-			setName(userData.name);
-			const tempDate = new Date(userData.DOB.seconds * 1000 + userData.DOB.nanoseconds / 1000000);
-
-			console.log(tempDate, "userData.DOB");
-			setDOB(tempDate);
-			setEmail(userData.email);
-			setBankName(userData.bankName);
-			setAccBalance(userData.accBalance);
-			setPhoneNo(userData.phoneNo);
-			setFormattedDate(tempDate.getDate() + ' / ' + (tempDate.getMonth() + 1) + ' / ' + tempDate.getFullYear())
-			console.log(userData);
+		  const docRef = doc(db, 'User', auth.currentUser.uid);
+		  const data = await getDoc(docRef);
+		  const userData = data.data();
+		  setName(userData.name);
+		  const tempDate = new Date(userData.DOB.seconds * 1000 + userData.DOB.nanoseconds / 1000000);
+		  setDOB(tempDate);
+		  setEmail(userData.email);
+		  setBankName(userData.bankName);
+		  setAccBalance(userData.accBalance);
+		  setPhoneNo(userData.phoneNo);
+		  setFormattedDate(tempDate.getDate() + ' / ' + (tempDate.getMonth() + 1) + ' / ' + tempDate.getFullYear());
+		} catch (e) {
+		  console.log(e);
 		}
-		catch (e) {
-			console.log(e);
-		}
-	}
+	  };
+	
+	  useEffect(() => {
 
-	React.useEffect(() => {
-		
 		const unsubscribe = navigation.addListener('focus', () => {
-			fetchUserDetails();
-			
+		  fetchUserDetails();
 		});
-
-		// Return the function to unsubscribe from the event so it gets removed on unmount
+	
 		return unsubscribe;
-	}, [navigation]);
-
-
+	  }, [navigation]);
+	
+	  useEffect(() => {
+		navigation.setOptions({
+		  headerRight: () => (
+			<View style={{ marginRight: 10 }}>
+			  <Pressable testID="editProfile" onPress={() => {
+				navigation.navigate('EditProfile', {
+				  name: name,
+				  phoneNo: phoneNo,
+				  DOB: DOB.getTime(),
+				  bankName: bankName,
+				  accBalance: accBalance
+				});
+				console.log(name, phoneNo, '///////////////////////////////')
+			  }}>
+				<Image
+				  source={require('../Assets/Profile_edit.png')}
+				  style={{ height: 25, width: 25 }}
+				/>
+			  </Pressable>
+			</View>
+		  ),
+		});
+	  }, [name, phoneNo, bankName, accBalance, DOB, navigation]);
+	
 	// const ProfileScreen = () => {
 	return (
 		<View style={styles.container1}>
@@ -134,7 +128,7 @@ const ProfileScreen = ({ navigation }) => {
 
 				<Text style={{ color: green, marginLeft: 20, fontWeight: 'bold', fontSize: 17, marginTop: 20 }}>Bank Details</Text>
 				<View style={styles.bankDetailsContainer}>
-					<Text style={styles.bankText} >Bank Name :</Text>
+					<Text testID="editProfile" style={styles.bankText} >Bank Name :</Text>
 					<Text style={styles.bankData}>{bankName}</Text>
 				</View>
 

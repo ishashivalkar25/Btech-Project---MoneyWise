@@ -31,6 +31,7 @@ export default function SignUp({navigation}) {
 
   const handleEmailChange = (emailInput) => {
 
+    console.log("handleEmailChange")
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (reg.test(emailInput) === true){
       setEmailValidity(true);
@@ -56,6 +57,7 @@ export default function SignUp({navigation}) {
 
   const handlePasswordChange = (passwordInput) => {
    
+   
     const reg = new RegExp("^(?=(.*[a-z]){1,})(?=(.*[A-Z]){1,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\-__+.]){1,}).{8,}$");
 
     if (reg.test(passwordInput) === true){
@@ -69,6 +71,7 @@ export default function SignUp({navigation}) {
 
   const handleConfirmPasswordChange = (confirmPasswordInput) => {
 
+    console.log("handlePasswordChange")
       if(confirmPasswordInput === password)
       {
         setConfirmPasswordValidity(true);

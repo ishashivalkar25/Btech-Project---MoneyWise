@@ -68,7 +68,6 @@ export default function Login(props) {
     }
   }
   
-
   const redirectToSignUp = () => {
     props.navigation.navigate("Sign Up");
   }
@@ -77,15 +76,17 @@ export default function Login(props) {
     setDialogBoxVisibility(true);
   }
 
-  const passwordResetEmail = (emailInput) => {
+  const passwordResetEmail = async(emailInput) => {
+
     console.log("Email : ", emailInput);
     setDialogBoxVisibility(false);
     
-    sendPasswordResetEmail(auth, emailInput)
-      .then(function() {
+    await sendPasswordResetEmail(auth, emailInput)
+      .then(() => {
         alert("Password reset link is sent successfully!");
       })
-      .catch(function(error) {
+      .catch((error) => {
+        console.log(error)
         alert("Please enter valid email address!");
       });
   }
@@ -181,7 +182,7 @@ export default function Login(props) {
               message={"Enter registered email address :"}
               hintInput ={"abc@gmail.com"}
               submitInput={ (inputText) => {passwordResetEmail(inputText)} }
-              closeDialog={ () => {setDialogBoxVisibility(false)}}
+              closeDialog={ () => {setDialogBoxVisibility(false); console.log("close");}}
               testID="resetPassword"
               >
           </DialogInput>
@@ -198,11 +199,12 @@ export default function Login(props) {
             </Text>
             <TouchableOpacity
               onPress={redirectToSignUp}
+              testID="redirectToSignUpBtn"
             >
               <Text
                 style={{ color: green, fontWeight: "bold", fontSize: 16 }}
               >
-                0000
+                Register
               </Text>
             </TouchableOpacity>
           </View>

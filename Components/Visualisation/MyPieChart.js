@@ -28,8 +28,6 @@ export default function MyPieChart(props) {
             pieData.push(tempData);
             i = i+1;
         })
-
-
         // setColors(colors);
         setData(pieData);
         // console.log(pieData, "Data");     

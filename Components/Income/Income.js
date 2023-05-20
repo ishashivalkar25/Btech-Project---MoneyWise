@@ -27,26 +27,9 @@ const { height, width } = Dimensions.get('window');
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 var filter = {
 	box: 'inbox', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued', and '' for all
-
-	/**
-	 *  the next 3 filters can work together, they are AND-ed
-	 *  
-	 *  minDate, maxDate filters work like this:
-	 *    - If and only if you set a maxDate, it's like executing this SQL query:
-	 *    "SELECT * from messages WHERE (other filters) AND date <= maxDate"
-	 *    - Same for minDate but with "date >= minDate"
-	 */
 	minDate: 0, // timestamp (in milliseconds since UNIX epoch)
 	maxDate: 0, // timestamp (in milliseconds since UNIX epoch)1679211532291000
 	bodyRegex: "(.*)(?=.*[Aa]ccount.*|.*[Aa]/[Cc].*|.*[Aa][Cc][Cc][Tt].*|.*[Cc][Aa][Rr][Dd].*)(?=.*[Cc]redit.*)(?=.*[Ii][Nn][Rr].*|.*[Rr][Ss].*)(.*)", // content regex to match
-	//(?=.*[Aa]ccount.*|.*[Aa]/[Cc].*|.*[Aa][Cc][Cc][Tt].*|.*[Cc][Aa][Rr][Dd].*)(?=.*[Cc]redit.*|.*[Dd]ebit.*)(?=.*[Ii][Nn][Rr].*|.*[Rr][Ss].*)
-	/** the next 5 filters should NOT be used together, they are OR-ed so pick one **/
-	// read: 0, // 0 for unread SMS, 1 for SMS already read
-	// _id: 1234, // specify the msg id
-	// thread_id: 12 // specify the conversation thread_id
-	// address: '+1888------', // sender's phone number
-	// body: 'How are you', // content to match
-	/** the next 2 filters can be used for pagination **/
 	indexFrom: 0, // start from index 0
 	maxCount: 10, // count of SMS to return each time
 };
@@ -135,6 +118,7 @@ function Income({navigation, route}) {
         // console.log(tempDate, "Templ Date");
         return tempDate.getDate() + ' / ' + (tempDate.getMonth() + 1) + ' / ' + tempDate.getFullYear();
     }
+    
     const fetchRecords = async () => {
         try {
             const tempRecords = [];
@@ -177,6 +161,7 @@ function Income({navigation, route}) {
         setIncomeRecordsDateWise(tempRecords);
         // console.log(incomeRecordsDateWise, "Filtered Records")
     }
+
     const filterRecordsMonthWise = () => {
         const tempRecords = [];
         incomeRecords.forEach((incomeRecord) => {
@@ -189,6 +174,7 @@ function Income({navigation, route}) {
         setIncomeRecordsMonthWise(tempRecords);
         // console.log(incomeRecordsMonthWise, "Filtered Records")
     }
+
     const filterRecordsYearWise = () => {
         const tempRecords = [];
 
@@ -333,7 +319,6 @@ function Income({navigation, route}) {
 		}
 	}
 
-    
 	const checkPermisson = async () => {
 
         try{
@@ -360,12 +345,14 @@ function Income({navigation, route}) {
             console.warn(err);
         }
 	}
+
     const updateLastViewTS = async (lastViewTS) => {
         console.log("updateLastViewTS")
 		const user = await updateDoc(doc(db, "User", auth.currentUser.uid), {
 			"lastViewTS": lastViewTS
 		});
 	}
+
     const showUntrackedTransactions = () => {
 		navigation.navigate("ConfirmUntrackedIncTrans", {
             messageList : messageList,

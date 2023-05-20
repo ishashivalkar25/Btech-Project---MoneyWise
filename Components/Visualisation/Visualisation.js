@@ -34,6 +34,7 @@ const Visualisation = () => {
 	const insets = useSafeAreaInsets();
 
 	const showPicker = React.useCallback((value) => setShow(value), []);
+	
 	const onValueChange = React.useCallback(
 		(event, newDate) => {
 			const selectedDate = newDate || date;
@@ -61,7 +62,6 @@ const Visualisation = () => {
 
 	const getDateFormat = (timestamp) => {
 		const tempDate = new Date(timestamp * 1000);
-		// console.log(tempDate, "Templ Date");
 		if (tempDate.getDate() < 10)
 			return '0' + tempDate.getDate() + ' / ' + (tempDate.getMonth() + 1) + ' / ' + tempDate.getFullYear();
 		else
@@ -233,18 +233,19 @@ const Visualisation = () => {
 				justifyContent: "center",
 			}}>
 				<View style={styles.time}>
-					<TouchableOpacity onPress={() => showPicker(true)} style={styles.monthYear}>
-						<Text style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
+					<TouchableOpacity testID='month-year-button' onPress={() => showPicker(true)} style={styles.monthYear}>
+						<Text testID='month-year-text' style={styles.monthYearText}>{months[date.getMonth()] + " " + date.getFullYear()}</Text>
 					</TouchableOpacity>
-					{show && (
+					{/* {show && ( */}
 						<MonthPicker
+							testID="MonthPicker"
 							onChange={onValueChange}
 							value={date}
 							minimumDate={new Date(2020, 5)}
 							maximumDate={new Date(2025, 5)}
 							mode="short"
 						/>
-					)}
+					{/* )} */}
 				</View>
 
 				<View style={styles.chartContainer}>

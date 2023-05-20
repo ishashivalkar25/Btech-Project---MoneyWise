@@ -15,7 +15,6 @@ const FadeInView = (props) => {
             auth.onAuthStateChanged(user => {
                 if(user && user.emailVerified){
                   props.navigation.replace("Root");
-                  console.log(user);
                 }
                 else
                 {

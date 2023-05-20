@@ -9,7 +9,6 @@ import FixedExp from "./Components/FixedExpenses/FixedExp";
 import AddFixedExp from "./Components/FixedExpenses/AddFixedExp";
 import Budget from "./Components/Budget/Budget";
 import Help from "./Components/Budget/Help";
-import Index from "./Components/Index";
 import Login from "./Components/Login";
 import SignUp from "./Components/SignUp";
 import AddIncome from "./Components/Income/AddIncome";
