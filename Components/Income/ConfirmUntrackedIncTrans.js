@@ -35,6 +35,7 @@ const ConfirmUntrackedIncTrans = ({ route, navigation }) => {
         setMessageList(route.params.messageList);
         setExtraData(true);
         setExtraData(false);
+		console.log("Backpress handle")
 		BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
 		return () => {
 		  BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
@@ -67,17 +68,17 @@ const ConfirmUntrackedIncTrans = ({ route, navigation }) => {
                 accBalance :parseFloat(user.data().accBalance) + parseFloat(item.amount) +""
               });
 
-			  console.log("Saved To DB");
+			  console.log("Saved To DB", user);
 		}
 		catch(e)
 		{
-			console.log("Error To DB");
+			console.log("Error To DB", e);
 		}
 		
 	}
 
 	function handleBackButtonClick() {
-
+		console.log("Backpress handle1")
 		if(messageList.length>0)
 		{
 			Alert.alert('Accept Transactions Alert', 'Do you want accept all transactions?', [
@@ -150,7 +151,7 @@ const ConfirmUntrackedIncTrans = ({ route, navigation }) => {
                                     {/* <TouchableOpacity style={[styles.transactionContainerButn, styles.btnAccept]} onPress={() => onAccept(item)}>
                                         <Image source={require('../../Assets/check.png')} style={styles.btn} />
                                     </TouchableOpacity> */}
-                                    <TouchableOpacity style={[styles.transactionContainerButn, styles.btnDelete]} onPress={() => onDelete(item)}>
+                                    <TouchableOpacity style={[styles.transactionContainerButn, styles.btnDelete]} testID="deleteIncRec" onPress={() => onDelete(item)}>
                                         <Image source={require('../../Assets/reject.png')} style={styles.btn} />
                                     </TouchableOpacity>
                                 </View>
@@ -162,7 +163,7 @@ const ConfirmUntrackedIncTrans = ({ route, navigation }) => {
                 />}
             </View>
 			
-            <TouchableOpacity  style={[styles.btnAcceptAll, messageList.length>0 ? styles.enabled : styles.disabled]} disabled={ messageList.length>0 ? false : true} onPress={() => onAcceptAll()} >
+            <TouchableOpacity  style={[styles.btnAcceptAll, messageList.length>0 ? styles.enabled : styles.disabled]} disabled={ messageList.length>0 ? false : true} testID="acceptAll" onPress={() => onAcceptAll()} >
                 <Text style={styles.btnAcceptAllText}>Accept All Transactions</Text>
             </TouchableOpacity>
         </SafeAreaView>

@@ -141,7 +141,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 				});
 				// console.log(user.data() , "user");
 				// catList.push(user.data().expCategories);
-				catList.push({ label: "other", value: "other" });
+				catList.push({ label: "Other", value: "Other" });
 				setCategory(catList);
 				setUserExpCategories(user.data().expCategories);
 				setAccBalance(user.data().accBalance);
@@ -392,7 +392,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 							if(categoryWiseBudget.budget[savingsIdx].budgetPlanned<0)
 								onDisplayNotification(selectedCategory,categoryWiseBudget.budget[savingsIdx].budgetSpent-categoryWiseBudget.budget[savingsIdx].budgetPlanned)
 						
-							console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+							console.log('deducted from Other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
 						}
 		
 					}
@@ -610,6 +610,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 							<View style={styles.inputPair}>
 								<Text style={styles.head}>Amount:</Text>
 								<TextInput
+									testID="setAmtId"
 									keyboardType="numeric"
 									style={styles.inputText}
 									onChangeText={setAmount}
@@ -618,9 +619,10 @@ export default function RedirectToPaymentApps({route, navigation}) {
 
 							{datePicker && (
 								<DateTimePicker
+									testID="dateTimePicker"
 									value={date}
 									mode={"date"}
-									display={Platform.OS === "ios" ? "spinner" : "default"}
+									display={"default"}
 									is24Hour={true}
 									onChange={onDateSelected}
 									style={styles.datePicker}
@@ -631,7 +633,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 								<Text style={styles.head}>Date: </Text>
 								{!datePicker && (
 									<View style={styles.inputText}>
-										<Pressable style={styles.dateButton} onPress={showDatePicker}>
+										<Pressable testID="showDatePicker" style={styles.dateButton} onPress={showDatePicker}>
 											<Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>
 										</Pressable>
 									</View>
@@ -642,7 +644,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 						<View style={styles.container1}>
 							<Text style={styles.headCenter}>Select Category</Text>
 							<Dropdown
-
+								testID="setSelectedCatId"
 								style={styles.dropdown}
 								placeholderStyle={styles.placeholderStyle}
 								selectedTextStyle={styles.selectedTextStyle}
@@ -657,7 +659,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 								searchPlaceholder="Search..."
 								value={selectedCategory}
 								onChange={(item) => {
-									if (item.value != "other") setSelectedCategory(item.value);
+									if (item.value != "Other") setSelectedCategory(item.value);
 									else {
 										setVisibilityOfCatModal(true);
 									}
@@ -686,6 +688,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 
 									{/** This button is responsible to close the modal */}
 									<TouchableOpacity
+										testID="addCategory"
 										onPress={() => {
 											setVisibilityOfCatModal(!isCatModalVisible);
 											setCategory([
@@ -892,6 +895,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 							<Text style={styles.headCenter}>Add Image</Text>
 
 							<Modal
+								testID="imgModal"
 								animationType="slide"
 								transparent
 								visible={isImgModalVisible}
@@ -902,15 +906,15 @@ export default function RedirectToPaymentApps({route, navigation}) {
 							>
 								<View style={styles.viewWrapper}>
 									<View style={styles.modalView}>
-										<TouchableOpacity onPress={showImagePicker} style={styles.selImg}>
+										<TouchableOpacity testID="showImagePicker" onPress={showImagePicker} style={styles.selImg}>
 											<Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Upload image </Text>
 										</TouchableOpacity>
 
-										<TouchableOpacity onPress={openCamera} style={styles.selImg}>
+										<TouchableOpacity testID="openCamera" onPress={openCamera} style={styles.selImg}>
 											<Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Take Photo </Text>
 										</TouchableOpacity>
 
-										<TouchableOpacity onPress={() => {
+										<TouchableOpacity testID="closeImagePicker" onPress={() => {
 											setVisibilityOfImgModal(!isImgModalVisible);
 										}}>
 											<Text style={{ color: green, fontSize: 15, marginTop: 30 }}> Close </Text>
@@ -919,6 +923,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 								</View>
 							</Modal>
 							<TouchableOpacity
+								testID="setVisibilityOfImgModal"
 								onPress={() => {
 									console.log("image clicked");
 									setVisibilityOfImgModal(true);
@@ -926,6 +931,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 							>
 								{pickedImagePath !== "" && (
 									<Image
+										testID="selectOtherImg"
 										source={{ uri: pickedImagePath }}
 										style={{ width: 50, height: 50, margin: 15, alignSelf: 'center' }}
 										onPress={() => {
@@ -939,6 +945,7 @@ export default function RedirectToPaymentApps({route, navigation}) {
 
 
 						<TouchableOpacity
+							testID="saveExpenseBtn"
 							onPress={saveExpense}
 							style={{
 								backgroundColor: green,

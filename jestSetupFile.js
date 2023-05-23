@@ -23,3 +23,19 @@ jest.mock('react-native-permissions', () => require('react-native-permissions/mo
 import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 
 jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
+
+jest.mock('react-native/Libraries/Utilities/Platform', () => {
+  const Platform = require('react-native/Libraries/Utilities/Platform.android');
+  Platform.OS = 'android';
+  return Platform;
+});
+
+
+console.error = jest.fn();
+
+import mockBackHandler from 'react-native/Libraries/Utilities/__mocks__/BackHandler.js';
+
+jest.mock(
+  'react-native/Libraries/Utilities/BackHandler',
+  () => mockBackHandler,
+);

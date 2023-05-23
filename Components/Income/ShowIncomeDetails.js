@@ -56,7 +56,7 @@ function ShowIncomeDetails({ route, navigation }) {
   const [datePicker, setDatePicker] = useState(false);
   const [isCatModalVisible, setVisibilityOfCatModal] = useState(false);
   const [isImgModalVisible, setVisibilityOfImgModal] = useState(false);
-  const [date, setDate] = useState(incomeRec.incDate.toDate());
+  const [date, setDate] = useState(new Date(incomeRec.incDate.seconds * 1000));
 
   const [amount, setAmount] = useState(0);
   const [accBalance, setAccBalance] = useState(0);
@@ -65,7 +65,7 @@ function ShowIncomeDetails({ route, navigation }) {
   const [description, setDescription] = useState("");
 
   useEffect(() => {
-    setDate(incomeRec.incDate.toDate());
+    setDate(new Date(incomeRec.incDate.seconds * 1000));
     setAmount(incomeRec.incAmount);
     setSelectedCategory(incomeRec.incCategory);
     let imageSrc = ""
@@ -73,7 +73,7 @@ function ShowIncomeDetails({ route, navigation }) {
       imageSrc = incomeRec.incImage;
     else
       imageSrc = pickedImagePath;
-    setPickedImagePath(imageSrc);
+      setPickedImagePath(imageSrc);
     const loadData = async () => {
       const catList = [];
       try {
@@ -86,7 +86,7 @@ function ShowIncomeDetails({ route, navigation }) {
         });
         // console.log(user.data() , "user");
         // catList.push(user.data().expCategories);
-        catList.push({ label: "other", value: "other" });
+        catList.push({ label: "Other", value: "Other" });
         setCategory(catList);
         // setUserIncCategories(user.data().incCategories);
         setAccBalance(user.data().accBalance);
@@ -107,7 +107,7 @@ function ShowIncomeDetails({ route, navigation }) {
 
 
 
-  function onDateSelected(event, value) {
+  function onDateSelected(value) {
     setDate(value);
     setDatePicker(false);
   }
@@ -116,13 +116,15 @@ function ShowIncomeDetails({ route, navigation }) {
   const [selectedCategory, setSelectedCategory] = useState(incomeRec.incCategory);
 
   const updateRecord = async () => {
+    console.log("Amount changed : ", amount)
     if (amount == 0) {
+      console.log("Amount changed1 : ", amount)
       let toast = Toast.show("Please enter amount.", {
         duration: Toast.durations.LONG,
       });
       setTimeout(function hideToast() {
         Toast.hide(toast);
-      }, 800);
+      }, 8000);
       return;
     }
 
@@ -132,7 +134,7 @@ function ShowIncomeDetails({ route, navigation }) {
       });
       setTimeout(function hideToast() {
         Toast.hide(toast);
-      }, 800);
+      }, 8000);
       return;
     }
 
@@ -214,12 +216,6 @@ function ShowIncomeDetails({ route, navigation }) {
 
       await updateDoc(docRef, updatedData);
 
-
-      const querySnapshot = await getDocs(collection(db, "income"));
-      querySnapshot.forEach((doc) => {
-        // console.log(doc.id, JSON.stringify(doc.data()));
-      });
-
       //update account balance
       await updateDoc(doc(db,"User",auth.currentUser.uid), {
         accBalance : parseFloat(accBalance) - parseFloat(incomeRec.incAmount) + parseFloat(amount) +""
@@ -229,25 +225,10 @@ function ShowIncomeDetails({ route, navigation }) {
       console.log("Previous income amount------>", previousExpAmt);
 
       alert("Record Added Successfully");
-      navigation.navigate("HomePage");
+      navigation.navigate("Root");
     } catch (error_1) {
       console.error("Error adding document: ", error_1);
       throw error_1;
-    }
-  };
-
-
-  const addCategoryToFD = async (value) => {
-    try {
-      const docRef = await addDoc(collection(db, "IncCategory"), {
-        IncCatName: value,
-      });
-
-      const querySnapshot = await getDocs(collection(db, "Income"));
-      querySnapshot.forEach((doc) => {
-      });
-    } catch (e) {
-      console.error("Error adding document: ", e);
     }
   };
 
@@ -293,22 +274,25 @@ function ShowIncomeDetails({ route, navigation }) {
               <View style={styles.inputPair}>
                 <Text style={styles.head}>Amount: </Text>
                 <TextInput
+                  testID="setAmtId"
                   keyboardType="numeric"
                   style={styles.inputText}
                   defaultValue={incomeRec.incAmount}
                   onChangeText={(val) => {
                     setPreviousExpAmt(amount);
                     setAmount(val);
+                    console.log("Amount :", val)
                   }}
                 />
               </View>
 
               {datePicker && (
                 <DateTimePicker
-                  value={incomeRec.incDate.toDate()}
+                  testID="dateTimePicker"
+                  value={new Date(incomeRec.incDate.seconds * 1000)}
                   mode={"date"}
                   textColor={green}
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  display={"default"}
                   is24Hour={true}
                   onChange={onDateSelected}
                   style={styles.datePicker}
@@ -319,7 +303,7 @@ function ShowIncomeDetails({ route, navigation }) {
                 <Text style={styles.head}>Date: </Text>
                 {!datePicker && (
                   <View style={styles.inputText}>
-                    <Pressable style={styles.dateButton} onPress={showDatePicker}>
+                    <Pressable testID="showDatePicker" style={styles.dateButton} onPress={showDatePicker}>
                       <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>
                     </Pressable>
                   </View>
@@ -331,7 +315,7 @@ function ShowIncomeDetails({ route, navigation }) {
               <Text style={styles.headCenter}>Select Category</Text>
 
               <Dropdown
-
+                testID="setSelectedCatId"
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
@@ -347,7 +331,7 @@ function ShowIncomeDetails({ route, navigation }) {
                 searchPlaceholder="Search..."
                 value={incomeRec.incCategory}
                 onChange={(item) => {
-                  if (item.value != "other") setSelectedCategory(item.value);
+                  if (item.value != "Other") setSelectedCategory(item.value);
                   else {
                     setVisibilityOfCatModal(true);
                   }
@@ -378,6 +362,7 @@ function ShowIncomeDetails({ route, navigation }) {
 
                   {/** This button is responsible to close the modal */}
                   <TouchableOpacity
+                    testID="addCategory"
 										onPress={() => {
 											setVisibilityOfCatModal(!isCatModalVisible);
 											setCategory([
@@ -416,6 +401,7 @@ function ShowIncomeDetails({ route, navigation }) {
           <Text style={styles.headCenter}>Add Image</Text>
 
           <Modal
+            testID="imgModal"
             animationType="slide"
             transparent
             visible={isImgModalVisible}
@@ -426,15 +412,15 @@ function ShowIncomeDetails({ route, navigation }) {
           >
             <View style={styles.viewWrapper}>
               <View style={styles.modalView}>
-                <TouchableOpacity onPress={showImagePicker} style={styles.selImg}>
+                <TouchableOpacity testID="showImagePicker" onPress={showImagePicker} style={styles.selImg}>
                   <Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Upload image </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={openCamera} style={styles.selImg}>
+                <TouchableOpacity testID="openCamera" onPress={openCamera} style={styles.selImg}>
                   <Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Take Photo </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => {
+                <TouchableOpacity testID="closeImagePicker" onPress={() => {
                   setVisibilityOfImgModal(!isImgModalVisible);
                 }}>
                   <Text style={{ color: green, fontSize: 15, marginTop: 30 }}> Close </Text>
@@ -443,6 +429,7 @@ function ShowIncomeDetails({ route, navigation }) {
             </View>
           </Modal>
           <TouchableOpacity
+            testID="setVisibilityOfImgModal"
             onPress={() => {
               console.log("image clicked");
               setVisibilityOfImgModal(true);
@@ -450,10 +437,10 @@ function ShowIncomeDetails({ route, navigation }) {
           >
             {pickedImagePath !== "" && (
               <Image
+                testID="selectOtherImg"
                 source={{ uri: pickedImagePath }}
                 style={{ width: 50, height: 50, margin: 15, alignSelf: 'center' }}
                 onPress={() => {
-                  console.log("image clicked");
                   setVisibilityOfImgModal(true);
                 }}
               />
@@ -463,7 +450,7 @@ function ShowIncomeDetails({ route, navigation }) {
 
 
         <TouchableOpacity
-
+          testID="updateIncomeBtn"
           style={{
             backgroundColor: green,
             borderRadius: 200,

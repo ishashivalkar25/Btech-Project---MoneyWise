@@ -136,7 +136,7 @@ function ShowExpenseDetails({ route, navigation }) {
         });
         // console.log(user.data() , "user");
         // catList.push(user.data().expCategories);
-        catList.push({ label: "other", value: "other" });
+        catList.push({ label: "Other", value: "Other" });
         setCategory(catList);
         setAccBalance(user.data().accBalance);
         setUserExpCategories(user.data().expCategories);
@@ -432,7 +432,7 @@ function ShowExpenseDetails({ route, navigation }) {
                 if(categoryWiseBudget.budget[savingsIdx].budgetSpent>categoryWiseBudget.budget[savingsIdx].budgetPlanned)
 								  onDisplayNotification(selectedCategory,categoryWiseBudget.budget[savingsIdx].budgetSpent-categoryWiseBudget.budget[savingsIdx].budgetPlanned)
 						
-                console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+                console.log('deducted from Other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
               }
       
             }
@@ -458,7 +458,7 @@ function ShowExpenseDetails({ route, navigation }) {
               if (!isPreExpAmtAdded && savingsIdx > -1) {
                 categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent - parseFloat(expenseRec.expAmount) ;
                 // categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned + parseFloat(expenseRec.expAmount) ;
-                console.log('Added from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+                console.log('Added from Other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
               }
               if (!isCategoryBudgetSet && savingsIdx > -1) {
                 categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetSpent  + parseFloat(amount);
@@ -466,7 +466,7 @@ function ShowExpenseDetails({ route, navigation }) {
 								  onDisplayNotification(selectedCategory,categoryWiseBudget.budget[savingsIdx].budgetSpent-categoryWiseBudget.budget[savingsIdx].budgetPlanned)
 						
                 // categoryWiseBudget.budget[savingsIdx].budgetSpent = categoryWiseBudget.budget[savingsIdx].budgetPlanned  - parseFloat(amount);
-                console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+                console.log('deducted from Other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
               }
       
             }
@@ -636,7 +636,7 @@ function ShowExpenseDetails({ route, navigation }) {
   //   { label: 'Rent', value: 'Rent' },
   //   { label: 'Bonus', value: 'Bonus' },
   //   { label: 'Allowance', value: 'Allowance' },
-  //   { label: 'other', value: 'other' }
+  //   { label: 'Other', value: 'Other' }
 
   const get_category_list = async () => {
     const catList = [];
@@ -744,6 +744,7 @@ function ShowExpenseDetails({ route, navigation }) {
               <View style={styles.inputPair}>
                 <Text style={styles.head}>Amount: </Text>
                 <TextInput
+                  testID="setAmtId"
                   keyboardType="numeric"
                   style={styles.inputText}
                   defaultValue={expenseRec.expAmount}
@@ -756,10 +757,11 @@ function ShowExpenseDetails({ route, navigation }) {
 
               {datePicker && (
                 <DateTimePicker
+                  testID="dateTimePicker"
                   value={expenseRec.expDate.toDate()}
                   mode={"date"}
                   textColor={green}
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  display={"default"}
                   is24Hour={true}
                   onChange={onDateSelected}
                   style={styles.datePicker}
@@ -770,7 +772,7 @@ function ShowExpenseDetails({ route, navigation }) {
                 <Text style={styles.head}>Date: </Text>
                 {!datePicker && (
                   <View style={styles.inputText}>
-                    <Pressable style={styles.dateButton} onPress={showDatePicker}>
+                    <Pressable testID="showDatePicker" style={styles.dateButton} onPress={showDatePicker}>
                       <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>
                     </Pressable>
                   </View>
@@ -782,7 +784,7 @@ function ShowExpenseDetails({ route, navigation }) {
               <Text style={styles.headCenter}>Select Category</Text>
 
               <Dropdown
-
+                testID="setSelectedCatId"
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
@@ -798,7 +800,7 @@ function ShowExpenseDetails({ route, navigation }) {
                 searchPlaceholder="Search..."
                 value={selectedCategory}
                 onChange={(item) => {
-                  if (item.value != "other") setSelectedCategory(item.value);
+                  if (item.value != "Other") setSelectedCategory(item.value);
                   else {
                     setVisibilityOfCatModal(true);
                   }
@@ -829,6 +831,7 @@ function ShowExpenseDetails({ route, navigation }) {
 
                   {/** This button is responsible to close the modal */}
                   <TouchableOpacity
+                    testID="addCategory"
 										onPress={() => {
 											setVisibilityOfCatModal(!isCatModalVisible);
 											setCategory([
@@ -880,6 +883,7 @@ function ShowExpenseDetails({ route, navigation }) {
               <Text style={styles.headCenter}>Add Image</Text>
 
               <Modal
+                testID="imgModal"
                 animationType="slide"
                 transparent
                 visible={isImgModalVisible}
@@ -890,15 +894,15 @@ function ShowExpenseDetails({ route, navigation }) {
               >
                 <View style={styles.viewWrapper}>
                   <View style={styles.modalView}>
-                    <TouchableOpacity onPress={showImagePicker} style={styles.selImg}>
+                    <TouchableOpacity testID="showImagePicker" onPress={showImagePicker} style={styles.selImg}>
                       <Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Upload image </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={openCamera} style={styles.selImg}>
+                    <TouchableOpacity testID="openCamera" onPress={openCamera} style={styles.selImg}>
                       <Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Take Photo </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => {
+                    <TouchableOpacity testID="closeImagePicker" onPress={() => {
                       setVisibilityOfImgModal(!isImgModalVisible);
                     }}>
                       <Text style={{ color: green, fontSize: 15, marginTop: 30 }}> Close </Text>
@@ -907,6 +911,7 @@ function ShowExpenseDetails({ route, navigation }) {
                 </View>
               </Modal>
               <TouchableOpacity
+                testID="setVisibilityOfImgModal"
                 onPress={() => {
                   console.log("image clicked");
                   setVisibilityOfImgModal(true);
@@ -914,6 +919,7 @@ function ShowExpenseDetails({ route, navigation }) {
               >
                 {pickedImagePath !== "" && (
                   <Image
+                    testID="selectOtherImg"
                     source={{ uri: pickedImagePath }}
                     style={{ width: 50, height: 50, margin: 15, alignSelf: 'center' }}
                     onPress={() => {
@@ -928,7 +934,7 @@ function ShowExpenseDetails({ route, navigation }) {
 
 
             <TouchableOpacity
-
+              testID="saveExpenseBtn"
               style={{
                 backgroundColor: green,
                 borderRadius: 200,

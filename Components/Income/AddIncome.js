@@ -35,7 +35,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Alert } from "react-native";
 
 const { width, height } = Dimensions.get("window");
-const green ="#006A42";
+const green = "#006A42";
 
 export default function AddIncome(props) {
 
@@ -70,16 +70,14 @@ export default function AddIncome(props) {
                 });
                 // console.log(user.data() , "user");
                 // catList.push(user.data().expCategories);
-                catList.push({ label: "other", value: "other" });
+                catList.push({ label: "Other", value: "Other" });
                 setCategory(catList);
                 setUserIncCategories(user.data().incCategories);
                 setAccBalance(parseFloat(user.data().accBalance));
-                // /console.log(user.data().incCategories, "incCategories");
-                // console.log(category);
+                console.log("catList", catList)
             } catch (e) {
                 console.error("Error adding document: ", e);
             }
-
             setMounted(true);
         }
 
@@ -91,29 +89,41 @@ export default function AddIncome(props) {
         setDatePicker(true);
     }
 
-    function onDateSelected(event, value) {
+    function onDateSelected(value) {
         setDate(value);
         setDatePicker(false);
+        console.log(value)
     }
 
+   
     // This function is triggered when the "Select an image" button pressed
-    const showImagePicker = async () => {
-
-        const result = await ImagePicker.launchImageLibrary();
-        // console.log(result.assets[0].uri, "file");
-        setPickedImagePath(result.assets[0].uri);
-
-    };
+    const showImagePicker = () => {
+        ImagePicker.launchImageLibrary()
+            .then((result) => {
+                if (result) {
+                    setPickedImagePath(result.assets[0].uri);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
 
     // This function is triggered when the "Open camera" button pressed
-    const openCamera = async () => {
-        const result = await ImagePicker.launchCamera();
-        // console.log(result.assets[0].uri, "file");
-        setPickedImagePath(result.assets[0].uri);
-
+    const openCamera = () => {
+        ImagePicker.launchCamera()
+            .then((result) => {
+                // console.log(result.assets[0].uri, "file");
+                setPickedImagePath(result.assets[0].uri);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     };
 
     const saveIncome = async () => {
+
+        console.log("selected category : ", selectedCategory)
         if (amount == 0) {
             let toast = Toast.show("Please enter amount.", {
                 duration: Toast.durations.LONG,
@@ -134,8 +144,12 @@ export default function AddIncome(props) {
             return;
         }
 
+
         let promise = Promise.resolve();
+        console.log(pickedImagePath, Image.resolveAssetSource(uploadImg).uri)
         if (pickedImagePath != Image.resolveAssetSource(uploadImg).uri) {
+
+            console.log("Different Image path")
             promise = new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.onload = function () {
@@ -143,6 +157,7 @@ export default function AddIncome(props) {
                     const metadata = {
                         contentType: "image/jpeg",
                     };
+                    console.log("Inside onload")
                     const storageRef = ref(storage, "IncImages/" + Date.now());
                     const uploadTask = uploadBytesResumable(storageRef, blobImage, metadata);
                     uploadTask.on(
@@ -150,7 +165,7 @@ export default function AddIncome(props) {
                         (snapshot) => {
                             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
-                            // console.log("Upload is " + progress + "% done");
+                            console.log("Upload is " + progress + "% done");
                             switch (snapshot.state) {
                                 case "paused":
                                     console.log("Upload is paused");
@@ -177,6 +192,7 @@ export default function AddIncome(props) {
                             }
                         },
                         async () => {
+                            console.log("Downloading ::");
                             downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                             console.log("File available at", downloadURL);
                             setPickedImagePath(downloadURL);
@@ -190,11 +206,15 @@ export default function AddIncome(props) {
                 xhr.responseType = "blob";
                 xhr.open("GET", pickedImagePath, true);
                 xhr.send(null);
+                console.log(xhr.responseText, "responseText", pickedImagePath)
             });
         }
 
         try {
+
+            console.log("Promise resolving ...")
             await promise;
+            console.log("Promise resolved ...")
             setPickedImagePath(downloadURL);
             let data_1 = {
                 incAmount: amount,
@@ -209,15 +229,15 @@ export default function AddIncome(props) {
             const docRef = await addDoc(
                 collection(doc(db, "User", auth.currentUser.uid), "Income"), data_1);
 
-            const querySnapshot = await getDocs(collection(db, "income"));
-            querySnapshot.forEach((doc) => {
-                // console.log(doc.id, JSON.stringify(doc.data()));
-            });
+            // const querySnapshot = await getDocs(collection(db, "income"));
+            // querySnapshot.forEach((doc) => {
+            //     // console.log(doc.id, JSON.stringify(doc.data()));
+            // });
 
             //update account balance
-            await updateDoc(doc(db,"User",auth.currentUser.uid), {
-                accBalance : accBalance + parseFloat(amount) +""
-              });
+            await updateDoc(doc(db, "User", auth.currentUser.uid), {
+                accBalance: accBalance + parseFloat(amount) + ""
+            });
 
             alert("Record Added Successfully");
             props.navigation.navigate("Root");
@@ -242,6 +262,7 @@ export default function AddIncome(props) {
                             <View style={styles.inputPair}>
                                 <Text style={styles.head}>Amount:</Text>
                                 <TextInput
+                                    testID="setAmtId"
                                     keyboardType="numeric"
                                     style={styles.inputText}
                                     onChangeText={setAmount}
@@ -250,9 +271,10 @@ export default function AddIncome(props) {
 
                             {datePicker && (
                                 <DateTimePicker
+                                    testID="dateTimePicker"
                                     value={date}
                                     mode={"date"}
-                                    display={Platform.OS === "ios" ? "spinner" : "default"}
+                                    display="default"
                                     is24Hour={true}
                                     onChange={onDateSelected}
                                     style={styles.datePicker}
@@ -263,7 +285,7 @@ export default function AddIncome(props) {
                                 <Text style={styles.head}>Date: </Text>
                                 {!datePicker && (
                                     <View style={styles.inputText}>
-                                        <Pressable style={styles.dateButton} onPress={showDatePicker}>
+                                        <Pressable style={styles.dateButton} testID="showDatePicker" onPress={showDatePicker}>
                                             <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>
                                         </Pressable>
                                     </View>
@@ -274,7 +296,7 @@ export default function AddIncome(props) {
                         <View style={styles.container1}>
                             <Text style={styles.headCenter}>Select Category</Text>
                             <Dropdown
-
+                                testID="setSelectedCatId"
                                 style={styles.dropdown}
                                 placeholderStyle={styles.placeholderStyle}
                                 selectedTextStyle={styles.selectedTextStyle}
@@ -289,19 +311,12 @@ export default function AddIncome(props) {
                                 searchPlaceholder="Search..."
                                 value={selectedCategory}
                                 onChange={(item) => {
-                                    if (item.value != "other") setSelectedCategory(item.value);
+                                    console.log("selectedCategory", item)
+                                    if (item.value != "Other") setSelectedCategory(item.value);
                                     else {
                                         setVisibilityOfCatModal(true);
                                     }
                                 }}
-                            // renderLeftIcon={() => (
-                            //   <AntDesign
-                            //     style={styles.icon}
-                            //     color="black"
-                            //     name="Safety"
-                            //     size={20}
-                            //   />
-                            // )}
                             />
                         </View>
                         <Modal
@@ -324,17 +339,29 @@ export default function AddIncome(props) {
                                     />
 
                                     {/** This button is responsible to close the modal */}
-                                    <Button
-                                        title="Add Category"
+                                    <TouchableOpacity
+                                        testID="addCategory"
                                         onPress={() => {
+                                            console.log(selectedCategory, "selectedCategory")
                                             setVisibilityOfCatModal(!isCatModalVisible);
                                             setCategory([
                                                 ...category,
                                                 { label: selectedCategory, value: selectedCategory },
                                             ]);
-
                                         }}
-                                    />
+                                        style={{
+                                            backgroundColor: green,
+                                            borderRadius: 200,
+                                            alignItems: 'center',
+                                            width: "60%",
+                                            paddingVertical: 5,
+                                            marginVertical: 10,
+                                            alignSelf: 'center',
+                                            //marginTop:30,
+                                        }}>
+                                        <Text style={{ color: "white", fontSize: 20, fontWeight: 'bold', margin: 0 }}> Add Category </Text>
+                                    </TouchableOpacity>
+
                                 </View>
                             </View>
                         </Modal>
@@ -348,9 +375,11 @@ export default function AddIncome(props) {
                                     setDescription(value);
                                 }}
                             />
-                            <Text style={styles.headCenter}>Add Image</Text>
 
+
+                            <Text style={styles.headCenter}>Add Image</Text>
                             <Modal
+                                testID="imgModal"
                                 animationType="slide"
                                 transparent
                                 visible={isImgModalVisible}
@@ -361,15 +390,15 @@ export default function AddIncome(props) {
                             >
                                 <View style={styles.viewWrapper}>
                                     <View style={styles.modalView}>
-                                        <TouchableOpacity onPress={showImagePicker} style={styles.selImg}>
+                                        <TouchableOpacity testID="showImagePicker" onPress={showImagePicker} style={styles.selImg}>
                                             <Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Upload image </Text>
                                         </TouchableOpacity>
 
-                                        <TouchableOpacity onPress={openCamera} style={styles.selImg}>
+                                        <TouchableOpacity testID="openCamera" onPress={openCamera} style={styles.selImg}>
                                             <Text style={{ color: "white", fontSize: 15, fontWeight: 'bold' }}> Take Photo </Text>
                                         </TouchableOpacity>
 
-                                        <TouchableOpacity onPress={() => {
+                                        <TouchableOpacity testID="closeImagePicker" onPress={() => {
                                             setVisibilityOfImgModal(!isImgModalVisible);
                                         }}>
                                             <Text style={{ color: green, fontSize: 15, marginTop: 30 }}> Close </Text>
@@ -377,18 +406,19 @@ export default function AddIncome(props) {
                                     </View>
                                 </View>
                             </Modal>
+
                             <TouchableOpacity
+                                testID="setVisibilityOfImgModal"
                                 onPress={() => {
-                                    // console.log("image clicked");
                                     setVisibilityOfImgModal(true);
                                 }}
                             >
                                 {pickedImagePath !== "" && (
                                     <Image
+                                        testID="selectOtherImg"
                                         source={{ uri: pickedImagePath }}
                                         style={{ width: 50, height: 50, margin: 15, alignSelf: 'center' }}
                                         onPress={() => {
-                                            console.log("image clicked");
                                             setVisibilityOfImgModal(true);
                                         }}
                                     />
@@ -399,6 +429,7 @@ export default function AddIncome(props) {
 
                         <TouchableOpacity
                             onPress={saveIncome}
+                            testID="saveIncomeBtn"
                             style={{
                                 backgroundColor: green,
                                 borderRadius: 200,
@@ -425,9 +456,9 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 40,
         height: height * 0.85,
         width: width,
-        backgroundColor:"#fff",
+        backgroundColor: "#fff",
         marginTop: 5,
-        padding : 10
+        padding: 10
     },
 
     mainContainer: {
@@ -495,7 +526,7 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         alignSelf: "center",
         height: 0.15 * height,
-        textAlignVertical:"center"
+        textAlignVertical: "center"
     },
 
     inputPair: {

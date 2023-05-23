@@ -13,6 +13,7 @@ import {
     KeyboardAvoidingView, 
     PermissionsAndroid,
 	AppState,
+    Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getTransactionInfo } from "trny";
@@ -52,7 +53,8 @@ function Income({navigation, route}) {
     const [transactionList, setTransactionList] = React.useState([]);
     const [accBalance, setAccBalance] = React.useState(0);
     
-    function onDateSelected(event, value) {
+    function onDateSelected(value) {
+        console.log(value, "value")
         const tempDate = new Date();
         if (value.getTime() > tempDate.getTime()) {
             alert("Please select valid date!!")
@@ -80,29 +82,29 @@ function Income({navigation, route}) {
     }, [recordsFilter, date, month, year, incomeRecords]);
 
     React.useEffect(() => {
-        // fetchRecords();
+        
         console.log("In usestate");
 		console.log("MS : ", new Date().getTime())
 
-		if (checkPermisson()) {
-			console.log("Permission Granted");
-			AppState.addEventListener('change', state => {
-				if (state === 'active') {
-					console.log("THIS IS ACTIVE");
-					fetchLastFetchedMsgTS();
-				}
-			});
-            
-		}
+        checkPermisson().
+            then(() => {
+                AppState.addEventListener('change', state => {
+                    console.log("STATE" , state)
+                    if (state === 'active') {
+                        console.log("THIS IS ACTIVE");
+                        fetchLastFetchedMsgTS();
+                    }
+                });
+            })
+		
     }, []);
 
 
     React.useEffect(() => {
+
+        console.log("navigation useEffect")
 		const unsubscribe = navigation.addListener('focus', () => {
 			fetchRecords();
-            // if (checkPermisson()) {
-            //     fetchLastFetchedMsgTS();
-            // }
 		});
 
 		// Return the function to unsubscribe from the event so it gets removed on unmount
@@ -110,7 +112,7 @@ function Income({navigation, route}) {
 	}, [navigation]);
 
     React.useEffect(() => {
-        filterRecordsCategotyWise();
+        filterRecordsCategoryWise();
     }, [incomeRecordsDateWise, incomeRecordsMonthWise, incomeRecordsYearWise]);
 
     const getDateFormat = (timestamp) => {
@@ -118,11 +120,11 @@ function Income({navigation, route}) {
         // console.log(tempDate, "Templ Date");
         return tempDate.getDate() + ' / ' + (tempDate.getMonth() + 1) + ' / ' + tempDate.getFullYear();
     }
-    
+
     const fetchRecords = async () => {
         try {
             const tempRecords = [];
-            // console.log(auth.currentUser.uid, "auth.currentUser.uid***********************")
+            console.log("navigation useEffect fetch records")
             const querySnapshot = await getDocs(collection(doc(db, "User", auth.currentUser.uid), "Income"));
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
@@ -189,7 +191,7 @@ function Income({navigation, route}) {
         // console.log(incomeRecordsYearWise, "Filtered Records")
     }
 
-    const filterRecordsCategotyWise = () => {
+    const filterRecordsCategoryWise = () => {
         const categoryWiseAmt = [];
         const category = [];
         if (recordsFilter == "Day") {
@@ -278,7 +280,7 @@ function Income({navigation, route}) {
 					console.log('Failed with this error: ' + fail);
 				},
 				(count, smsList) => {
-					// console.log('Count: ', count);
+					console.log('Count: ', count);
 					// console.log('List: ', smsList);
 					var arr = JSON.parse(smsList);
                     const tempList = [];
@@ -286,7 +288,7 @@ function Income({navigation, route}) {
 						// console.log('-->' + object.date);
 						// console.log('-->' + object.address);
 						const transactionDetails = getTransactionInfo(object.body);
-						// console.log("Message :" + JSON.stringify(transactionDetails));
+						console.log("Message :" + JSON.stringify(transactionDetails));
 
 						if (!(transactionDetails.account.no == "" || transactionDetails.money == "" || transactionDetails.typeOfTransaction == "")) {
 							const tempTransaction = {
@@ -321,29 +323,37 @@ function Income({navigation, route}) {
 
 	const checkPermisson = async () => {
 
-        try{
-            const permissions = [
-                PermissionsAndroid.PERMISSIONS.READ_SMS, 
-                PermissionsAndroid.PERMISSIONS.SEND_SMS,
-                PermissionsAndroid.PERMISSIONS.RECEIVE_SMS
-              ];
-    
-            var granted = await PermissionsAndroid.requestMultiple(permissions);
-            if (
-                granted[PermissionsAndroid.PERMISSIONS.READ_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
-                granted[PermissionsAndroid.PERMISSIONS.SEND_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
-                granted[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] === PermissionsAndroid.RESULTS.GRANTED
-              ) 
-              {
-                console.log('All permissions granted');
-                return true;
-              } else {
-                console.log('Some permissions not granted');
-                return false;
-              }
-        } catch (err) {
-            console.warn(err);
+        console.log("Platform.OS", Platform.OS)
+        if(Platform.OS == 'android')
+        {
+            console.log("Permission Granted 2")
+            try{
+                const permissions = [
+                    PermissionsAndroid.PERMISSIONS.READ_SMS, 
+                    PermissionsAndroid.PERMISSIONS.SEND_SMS,
+                    PermissionsAndroid.PERMISSIONS.RECEIVE_SMS
+                  ];
+        
+                var granted = await PermissionsAndroid.requestMultiple(permissions);
+                if (
+                    granted[PermissionsAndroid.PERMISSIONS.READ_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
+                    granted[PermissionsAndroid.PERMISSIONS.SEND_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
+                    granted[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] === PermissionsAndroid.RESULTS.GRANTED
+                  ) 
+                  {
+                    console.log('All permissions granted');
+                    return true;
+                  } else {
+                    console.log('Some permissions not granted');
+                    return false;
+                  }
+            } catch (err) {
+                console.warn(err);
+            }
         }
+
+        return false;
+       
 	}
 
     const updateLastViewTS = async (lastViewTS) => {
@@ -351,6 +361,7 @@ function Income({navigation, route}) {
 		const user = await updateDoc(doc(db, "User", auth.currentUser.uid), {
 			"lastViewTS": lastViewTS
 		});
+
 	}
 
     const showUntrackedTransactions = () => {
@@ -417,48 +428,45 @@ function Income({navigation, route}) {
                 >
                     <View style={styles.container}>
                         <View style={styles.records_filter}>
-                            <TouchableOpacity onPress={() => { setRecordsFilter("Day") }}>
+                            <TouchableOpacity testID="dayFilter" onPress={() => { setRecordsFilter("Day") }}>
                                 <Text style={styles.choose_filter_text}>Day</Text>
                             </TouchableOpacity >
-                            <TouchableOpacity onPress={() => { setRecordsFilter("Month") }}>
+                            <TouchableOpacity testID="monthFilter" onPress={() => { setRecordsFilter("Month") }}>
                                 <Text style={styles.choose_filter_text}>Month</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setRecordsFilter("Year") }}>
+                            <TouchableOpacity testID="yearFilter" onPress={() => { setRecordsFilter("Year") }}>
                                 <Text style={styles.choose_filter_text}>Year</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={{ backgroundColor: "rgb(211, 211, 211)", borderRadius: 5 }}>
                             {(recordsFilter == "Day") && (<View style={styles.choose_filter_date}>
-                                <TouchableOpacity onPress={() => setDatePicker(true)}>
+                                <TouchableOpacity testID="showDatePicker" onPress={() => setDatePicker(true)}>
                                     <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>
                                 </TouchableOpacity>
                             </View>)}
                             {(recordsFilter == "Month") && (<View style={styles.choose_filter}>
-                                <TouchableOpacity disabled={month == 0 ? true : false} onPress={() => { setMonth(month - 1) }}>
+                                <TouchableOpacity disabled={month == 0 ? true : false} testID="decrementMonth" onPress={() => { setMonth(month - 1) }}>
                                     <Image
                                         source={require("../../Assets/previous.png")}
                                         style={{ width: 15, height: 15 }}
-                                        onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
                                 <Text>{months[month]}</Text>
-                                <TouchableOpacity disabled={month == 11 ? true : false} onPress={() => { setMonth(month + 1) }}>
+                                <TouchableOpacity disabled={month == 11 ? true : false} testID="incrementMonth" onPress={() => { setMonth(month + 1) }}>
                                     <Image
                                         source={require("../../Assets/next.png")}
                                         style={{ width: 15, height: 15 }}
-                                        onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
                             </View>)}
                             {(recordsFilter == "Year") && (<View style={styles.choose_filter}>
-                                <TouchableOpacity disabled={year == 1 ? true : false} onPress={() => { setYear(year - 1) }}>
+                                <TouchableOpacity disabled={year == 1 ? true : false} testID="decrementYear" onPress={() => { setYear(year - 1) }}>
                                     <Image
                                         source={require("../../Assets/previous.png")}
                                         style={{ width: 15, height: 15 }}
-                                        onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
-                                <TextInput style={styles.choose_filter_textInput} keyboardType="numeric" onChangeText={(text) => {
+                                <TextInput style={styles.choose_filter_textInput} testID="yearInput" keyboardType="numeric" onChangeText={(text) => {
                                     const tempYear = new Date().getFullYear();
                                     if (Number(text) && Number(text) <= tempYear) {
                                         setYear(Number(text))
@@ -470,17 +478,17 @@ function Income({navigation, route}) {
                                     }
                                 }}>{year}</TextInput>
 
-                                <TouchableOpacity disabled={year == (new Date().getFullYear()) ? true : false} onPress={() => { setYear(year + 1) }}>
+                                <TouchableOpacity disabled={year == (new Date().getFullYear()) ? true : false} testID="incrementYear" onPress={() => { setYear(year + 1) }}>
                                     <Image
                                         source={require("../../Assets/next.png")}
                                         style={{ width: 15, height: 15 }}
-                                        onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
                             </View>)}
 
                             {datePicker && (
                                 <DateTimePicker
+                                    testID = "dateTimePicker"
                                     value={date}
                                     mode={"date"}
                                     is24Hour={true}
@@ -499,7 +507,7 @@ function Income({navigation, route}) {
 
                     </View>
                     
-                    {messageList.length> 0 && (<View><TouchableOpacity style={styles.smsNotification} onPress={() => showUntrackedTransactions()}>
+                    {messageList.length> 0 && (<View><TouchableOpacity style={styles.smsNotification} testID="showUntrackedTransactions" onPress={() => showUntrackedTransactions()}>
                         <Text style={styles.smsNotificationText}>You have some untracked Income Transactions... Click Here</Text>
                     </TouchableOpacity></View>)
                     } 
@@ -510,8 +518,7 @@ function Income({navigation, route}) {
                             data={incomeRecordsDateWise}
                             renderItem={({ item }) =>
                                <View style={styles.alignRecord}>
-                                 <TouchableOpacity style={styles.record} onPress={()=>{
-                                    console.log("show income details",item.incPath,item);
+                                 <TouchableOpacity style={styles.record} testID="ShowIncomeDetailsByDate" onPress={()=>{
                                     navigation.navigate("ShowIncomeDetails",{incomeRecId:item.key,incomeRec:item});
                                 }}>
                                     <View >
@@ -536,7 +543,7 @@ function Income({navigation, route}) {
                             data={incomeRecordsMonthWise}
                             renderItem={({ item }) =>
                            <View style={styles.alignRecord}>
-                             <TouchableOpacity style={styles.record} onPress={()=>{
+                             <TouchableOpacity style={styles.record} testID="ShowIncomeDetailsByMonth" onPress={()=>{
                                 console.log("show income details",item.incPath,item);
                                 navigation.navigate("ShowIncomeDetails",{incomeRecId:item.key,incomeRec:item});
                             }}>
@@ -553,7 +560,7 @@ function Income({navigation, route}) {
                                     </TouchableOpacity>
                                 </View> */}
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                            <TouchableOpacity style={styles.budgetCategoryCenter}  onPress={() => deleteRecord(item)}>
                                  <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
                                </TouchableOpacity>
                            </View>
@@ -567,10 +574,9 @@ function Income({navigation, route}) {
                             data={incomeRecordsYearWise}
                             renderItem={({ item }) =>
                             <View style={styles.alignRecord}>
-                                <TouchableOpacity style={styles.record} onPress={()=>{
-                                    console.log("show income details",item.incPath,item);
+                                <TouchableOpacity style={styles.record} testID="ShowIncomeDetails" onPress={()=>{
                                     navigation.navigate("ShowIncomeDetails",{incomeRecId:item.key,incomeRec:item});
-                            }}>
+                                }}>
                                     <View >
                                         <Text style={styles.cat}>{item.incCategory}</Text>
                                         <Text style={styles.amt}>+{item.incAmount}</Text>
@@ -579,7 +585,7 @@ function Income({navigation, route}) {
                                         <Text style={styles.dt}>{getDateFormat(item.incDate.seconds)}</Text>
                                     </View>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                            <TouchableOpacity style={styles.budgetCategoryCenter} testID="deleteRec" onPress={() => deleteRecord(item)}>
                                  <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
                                </TouchableOpacity>
                             </View>
@@ -597,7 +603,7 @@ function Income({navigation, route}) {
                             bottom: 20
                         }}
                     >
-                        <View
+                        <TouchableOpacity
                             style={{
                                 width: 70,
                                 height: 70,
@@ -609,20 +615,21 @@ function Income({navigation, route}) {
                                 marginTop: 5,
                                 marginBottom: 5,
                             }}
-                            onStartShouldSetResponder={() => {
+
+                            testID = "addIncome"
+                            onPress={() => {
+                                console.log("Add Income")
                                 navigation.navigate("AddIncome");
                             }}
                         >
                             <Image
                                 source={require("../../Assets/add.png")}
                                 style={{ width: 30, height: 30 }}
-                                onPress={() => console.log("image pressed")}
                             />
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 </ImageBackground>
             </KeyboardAvoidingView>
-      
     );
 }
 

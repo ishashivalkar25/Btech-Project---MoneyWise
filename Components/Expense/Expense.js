@@ -43,7 +43,7 @@ function Expense({navigation}) {
     const [categoryWiseExp, setCategoryWiseExp] = React.useState([]);
 
 
-    function onDateSelected(event, value) {
+    function onDateSelected(value) {
         const tempDate = new Date();
         if (value.getTime() > tempDate.getTime()) {
             alert("Please select valid date!!")
@@ -385,13 +385,13 @@ function Expense({navigation}) {
                 >
                     <View style={styles.container}>
                         <View style={styles.records_filter}>
-                            <TouchableOpacity onPress={() => { setRecordsFilter("Day") }}>
+                            <TouchableOpacity testID="dayFilter" onPress={() => { setRecordsFilter("Day") }}>
                                 <Text style={{fontSize :17, fontWeight:'bold', color:'white'}}>Day</Text>
                             </TouchableOpacity >
-                            <TouchableOpacity onPress={() => { setRecordsFilter("Month") }}>
+                            <TouchableOpacity testID="monthFilter" onPress={() => { setRecordsFilter("Month") }}>
                                 <Text style={{fontSize :17, fontWeight:'bold', color:'white'}}>Month</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setRecordsFilter("Year") }}>
+                            <TouchableOpacity testID="yearFilter" onPress={() => { setRecordsFilter("Year") }}>
                                 <Text style={{fontSize :17, fontWeight:'bold', color:'white'}}>Year</Text>
                             </TouchableOpacity>
                             {/* <TouchableOpacity>
@@ -400,36 +400,33 @@ function Expense({navigation}) {
                         </View>
                         <View style={{ backgroundColor: "rgb(211, 211, 211)", borderRadius:5}}>
                             {(recordsFilter == "Day") && (<View style={styles.choose_filter_date}>
-                                <TouchableOpacity onPress={() => setDatePicker(true)}>
+                                <TouchableOpacity testID="showDatePicker" onPress={() => setDatePicker(true)}>
                                     <Text>{date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()}</Text>
                                 </TouchableOpacity>
                             </View>)}
                             {(recordsFilter == "Month") && (<View style={styles.choose_filter}>
-                                <TouchableOpacity disabled={month == 0 ? true : false} onPress={() => { setMonth(month - 1) }}>
+                                <TouchableOpacity testID="decrementMonth" disabled={month == 0 ? true : false} onPress={() => { setMonth(month - 1) }}>
                                     <Image
                                         source={require("../../Assets/previous.png")}
                                         style={{ width: 15, height: 15 }}
-                                        onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
                                 <Text>{months[month]}</Text>
-                                <TouchableOpacity disabled={month == 11 ? true : false} onPress={() => { setMonth(month + 1) }}>
+                                <TouchableOpacity testID="incrementMonth" disabled={month == 11 ? true : false} onPress={() => { setMonth(month + 1) }}>
                                     <Image
                                         source={require("../../Assets/next.png")}
                                         style={{ width: 15, height: 15 }}
-                                        onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
                             </View>)}
                             {(recordsFilter == "Year") && (<View style={styles.choose_filter}>
-                                <TouchableOpacity disabled={year == 1 ? true : false} onPress={() => { setYear(year - 1) }}>
+                                <TouchableOpacity testID="decrementYear" disabled={year == 1 ? true : false} onPress={() => { setYear(year - 1) }}>
                                     <Image
                                         source={require("../../Assets/previous.png")}
                                         style={{ width: 15, height: 15 }}
-                                        onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
-                                <TextInput style={styles.choose_filter_textInput} keyboardType="numeric" onChangeText={(text) => {
+                                <TextInput testID="yearInput" style={styles.choose_filter_textInput} keyboardType="numeric" onChangeText={(text) => {
                                     const tempYear = new Date().getFullYear();
                                     if (Number(text) && Number(text) <= tempYear) {
                                         setYear(Number(text))
@@ -441,17 +438,17 @@ function Expense({navigation}) {
                                     }
                                 }}>{year}</TextInput>
 
-                                <TouchableOpacity disabled={year == (new Date().getFullYear()) ? true : false} onPress={() => { setYear(year + 1) }}>
+                                <TouchableOpacity testID="incrementYear" disabled={year == (new Date().getFullYear()) ? true : false} onPress={() => { setYear(year + 1) }}>
                                     <Image
                                         source={require("../../Assets/next.png")}
                                         style={{ width: 15, height: 15 }}
-                                        onPress={() => console.log("image pressed")}
                                     />
                                 </TouchableOpacity>
                             </View>)}
 
                             {datePicker && (
                                 <DateTimePicker
+                                    testID = "dateTimePicker"
                                     value={date}
                                     mode={"date"}
                                     is24Hour={true}
@@ -475,7 +472,7 @@ function Expense({navigation}) {
                             data={expenseRecordsDateWise}
                             renderItem={({ item }) =>
                                 <View style={styles.alignRecord}>
-                                <TouchableOpacity style={styles.record} onPress={()=>{
+                                <TouchableOpacity testID="ShowExpenseDetailsByDate" style={styles.record} onPress={()=>{
                                     console.log("show income details",item.incPath,item);
                                     navigation.navigate("ShowExpenseDetails",{expenseRecId:item.key,expenseRec:item});
                                 }}>
@@ -488,7 +485,7 @@ function Expense({navigation}) {
                                 </View>
                                 
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                <TouchableOpacity style={styles.budgetCategoryCenter} testID="deleteRecByDate" onPress={() => deleteRecord(item)}>
                                  <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
                                </TouchableOpacity>
                                
@@ -509,7 +506,7 @@ function Expense({navigation}) {
                             data={expenseRecordsMonthWise}
                             renderItem={({ item }) =>
                                 <View style={styles.alignRecord}>
-                                    <TouchableOpacity style={styles.record} onPress={()=>{
+                                    <TouchableOpacity style={styles.record} testID="ShowExpenseDetailsByMonth" onPress={()=>{
                                     console.log("show income details",item.incPath,item);
                                     navigation.navigate("ShowExpenseDetails",{expenseRecId:item.key,expenseRec:item});
                                 }}>
@@ -522,7 +519,7 @@ function Expense({navigation}) {
                                 </View>
                                 
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                <TouchableOpacity style={styles.budgetCategoryCenter} testID="deleteRecByMonth" onPress={() => deleteRecord(item)}>
                                  <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
                                </TouchableOpacity>
                                     
@@ -542,7 +539,7 @@ function Expense({navigation}) {
                             data={expenseRecordsYearWise}
                             renderItem={({ item }) =>
                                 <View style={styles.alignRecord}>
-                                    <TouchableOpacity style={styles.record} onPress={()=>{
+                                    <TouchableOpacity style={styles.record} testID="ShowExpenseDetails" onPress={()=>{
                                     console.log("show income details",item.incPath,item);
                                     navigation.navigate("ShowExpenseDetails",{expenseRecId:item.key,expenseRec:item});
                                 }}>
@@ -555,15 +552,10 @@ function Expense({navigation}) {
                                 </View>
                                 
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.budgetCategoryCenter} onPress={() => deleteRecord(item)}>
+                                <TouchableOpacity style={styles.budgetCategoryCenter} testID="deleteRec"  onPress={() => deleteRecord(item)}>
                                  <Image source={require('../../Assets/remove.png')} style={styles.buttonImg} />
                                </TouchableOpacity>
                                     
-                                {/* <View>
-                                    <TouchableOpacity  style={styles.details}>                               
-                                     <Text style={{color: "white", fontSize: 15, fontWeight: 'bold'}}> Details </Text>
-                                    </TouchableOpacity>
-                                </View> */}
                                 </View>
                             }
                             enableEmptySections={true}
@@ -578,7 +570,7 @@ function Expense({navigation}) {
                             bottom: 20
                         }}
                     >
-                        <View
+                        <TouchableOpacity
                             style={{
                                 width: 70,
                                 height: 70,
@@ -590,16 +582,16 @@ function Expense({navigation}) {
                                 marginTop: 5,
                                 marginBottom: 5,
                             }}
-                            onStartShouldSetResponder={() => {
+                            testID = "addExpense"
+                            onPress={() => {
                                 navigation.navigate("AddExpense");
                             }}
                         >
                             <Image
                                 source={require("../../Assets/add.png")}
                                 style={{ width: 30, height: 30 }}
-                                onPress={() => console.log("image pressed")}
                             />
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 </ImageBackground>
             </View>

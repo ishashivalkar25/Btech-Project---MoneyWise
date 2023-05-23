@@ -135,7 +135,7 @@ export default function ScanBills({ route, navigation }) {
 				});
 				// console.log(user.data() , "user");
 				// catList.push(user.data().expCategories);
-				catList.push({ label: "other", value: "other" });
+				catList.push({ label: "Other", value: "Other" });
 				setCategory(catList);
 				setUserExpCategories(user.data().expCategories);
 				setAccBalance(user.data().accBalance);
@@ -203,8 +203,7 @@ export default function ScanBills({ route, navigation }) {
 	const makeRequest = async () => {
 
 		const fileUri = pickedImagePath;
-		// const fileName = Platform.OS === 'android' ? file.split('/').pop() : 'Receipt.jpg';
-		// const fileData = await RNFetchBlob.fs.readFile(fileUri, 'base64');
+	
 		const mimeType = 'image/jpeg';
 
 		// if(fileUri)
@@ -431,7 +430,7 @@ export default function ScanBills({ route, navigation }) {
 							if(categoryWiseBudget.budget[savingsIdx].budgetPlanned<0)
 								onDisplayNotification(selectedCategory,categoryWiseBudget.budget[savingsIdx].budgetSpent-categoryWiseBudget.budget[savingsIdx].budgetPlanned)
 						
-							console.log('deducted from other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
+							console.log('deducted from Other exp', categoryWiseBudget.budget[savingsIdx].budgetSpent)
 						}
 		
 					}
@@ -626,6 +625,7 @@ export default function ScanBills({ route, navigation }) {
 								<View style={styles.inputPair}>
 									<Text style={styles.head}>Amount:</Text>
 									<TextInput
+										testID="setAmtId"
 										keyboardType="numeric"
 										style={styles.inputText}
 										defaultValue={(ocrAmount).toString()}
@@ -636,9 +636,10 @@ export default function ScanBills({ route, navigation }) {
 								{console.log(new Date(ocrDate), '**********************123*****************************************')}
 								{datePicker && (
 									<DateTimePicker
+										testID="dateTimePicker"
 										value={new Date(ocrDate)}
 										mode={"date"}
-										display={Platform.OS === "ios" ? "spinner" : "default"}
+										display={"default"}
 										is24Hour={true}
 										onChange={onDateSelected}
 										style={styles.datePicker}
@@ -649,7 +650,7 @@ export default function ScanBills({ route, navigation }) {
 									<Text style={styles.head}>Date: </Text>
 									{!datePicker && (
 										<View style={styles.inputText}>
-											<Pressable style={styles.dateButton} onPress={showDatePicker}>
+											<Pressable testID="showDatePicker" style={styles.dateButton} onPress={showDatePicker}>
 												<Text>{date != null ? (date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear()) : ocrDate}</Text>
 											</Pressable>
 										</View>
@@ -661,7 +662,7 @@ export default function ScanBills({ route, navigation }) {
 								<Text style={styles.headCenter}>Select Category</Text>
 
 								<Dropdown
-
+									testID="setSelectedCatId"
 									style={styles.dropdown}
 									placeholderStyle={styles.placeholderStyle}
 									selectedTextStyle={styles.selectedTextStyle}
@@ -676,7 +677,7 @@ export default function ScanBills({ route, navigation }) {
 									searchPlaceholder="Search..."
 									value={ocrCategory}
 									onChange={(item) => {
-										if (item.value != "other") setSelectedCategory(item.value);
+										if (item.value != "Other") setSelectedCategory(item.value);
 										else {
 											setVisibilityOfCatModal(true);
 										}
@@ -706,6 +707,7 @@ export default function ScanBills({ route, navigation }) {
 
 										{/** This button is responsible to close the modal */}
 										<TouchableOpacity
+										testID="addCategory"
 										onPress={() => {
 											setVisibilityOfCatModal(!isCatModalVisible);
 											setCategory([
@@ -753,6 +755,7 @@ export default function ScanBills({ route, navigation }) {
 
 
 							<TouchableOpacity
+								testID="saveExpenseBtn"
 								onPress={saveExpense}
 								style={{
 									backgroundColor: green,

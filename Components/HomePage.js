@@ -26,7 +26,7 @@ const { height, width } = Dimensions.get('window');
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 
-function MyTabs({ navigation }) {
+export function MyTabs() {
 
     return (
         <Tab.Navigator
@@ -62,6 +62,7 @@ function MyTabs({ navigation }) {
 
 export default function HompePage(props) {
     React.useEffect(() => {
+        
         props.navigation.setOptions({
             headerRight: () => (
                 <View style={styles.header_right}>
@@ -94,7 +95,7 @@ export default function HompePage(props) {
     return (
         // <NavigationContainer independent={true}>
         <View style={{ flex: 1, flexDirection: "column" }}>
-            <MyTabs navigation={props.navigation} testID="tabs"/>
+            <MyTabs testID="tabs"/>
             {/* <Background></Background> */}
         </View>
         // </NavigationContainer>
